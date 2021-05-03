@@ -14,9 +14,8 @@ In this blog I keep track of what I've tried, what's worked, and what hasn't.
 <ul>
   {% for post in site.posts %}
     <li>
-      <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
+      <h3><a href="https://michaelmbradley.github.io/Detailing{{ post.url }}">{{ post.title }}</a></h3>
       {{ post.excerpt }}
-      {{ post.url }}
     </li>
   {% endfor %}
 </ul>
