@@ -9,11 +9,14 @@ For my first-year internship at Carleton University I'm working on a piece of co
 
 In this blog I keep track of what I've tried, what's worked, and what hasn't.
 
+## Posts
+
 <ul>
   {% for post in site.posts %}
     <li>
-      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+      <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
       {{ post.excerpt }}
+      {{ post.url }}
     </li>
   {% endfor %}
 </ul>
