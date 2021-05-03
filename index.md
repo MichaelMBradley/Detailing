@@ -1,4 +1,9 @@
-# What is this?
+---
+layout: default
+title: Detailing Blog
+---
+
+## What is this?
 
 For my first-year internship at Carleton University I'm working on a piece of code that will add complexity to a given polygon.
 
