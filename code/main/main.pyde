@@ -1,54 +1,49 @@
-# This code is temporary
-# It's only meant to exist, just to have something runnable
+# Beginning of a basic attempt at circle-packing
+# TODO: Swap (x, y) to PVector?
+from packing import *
+from shaping import *
 
-import random
-
+w = h = 300
+create = []
 
 def setup():
-    size(400, 400)
-    global ngon
-    ngon = polygon([(0, 0), (40, 0), (40, 30), (60, 30), (40, 50), (10, 40)])
+    size(w, h)
+    noFill()  # Useful to see shapes and circle packing
+    global ngon, circles, vertices
+    # Square:
+    # vertices = [(0, 0), (100, 0), (100, 100), (0, 100)]
+    # Tilted:
+    # m = 20
+    # vertices = [(0, m), (100-m, 0), (100, 100-m), (m, 100)]
+    # Mouse input:
+    # vertices = [(0, 0), (67, 70), (8, 105), (10, 56), (30, 33)]
+    # More complex vertices:
+    vertices = [(0, 0), (4, 0), (4, 3), (6, 3), (4, 5), (1, 4)]
+    vertices = scalevert(30, vertices)
+    ngon = polygon(vertices)
+    circles = randompack(vertices)
 
-xdir = random.random() * 5
-ydir = random.random() * 5
-x = 0
-y = 0
+
 def draw():
-    global x, y, xdir, ydir
+    global ngon, circles
     background(255)
-    shape(ngon, x, y)
-    x+=xdir
-    y+=ydir
-    if (not (0 <= x <= 340)) or (not (0 <= y <= 350)):
-        xdir *= (random.random() * -2)
-        x = min(max(0, x) , 340)
-        ydir *= (random.random() * -2)
-        y = min(max(0, y) , 350)
+    minx, miny = minvert(vertices)
+    maxx, maxy = maxvert(vertices)
+    xoff = (w - (maxx - minx)) / 2  # Centers horizontally. As each term in the subtraction was to 
+    yoff = (h - (maxy - miny)) / 2  # be divided by two, the entire difference was divided by two.
+    shape(ngon, xoff, yoff)
+    for ((x, y), r) in circles:
+        circle(x + xoff, y + yoff, r * 2)  # p5's circle() accepts diameter, not radius
+
 
 def keyPressed():
-    sys.exit()
+    global circles, vertices
+    circles = randompack(vertices)  # Randomizes the edge packing
 
-def polygon(vertices):
-    """Turns a set of vertices into a shape.
-    
-    Vertices should already represent a valid polygon.
-    
-    Parameters
-    ----------
-    vertices : array
-        An array of tuples, each representing a vertex (x, y)
-    
-    Returns
-    -------
-    shape
-        A shape object with the specified vertices
-    
-    """
-    vertices.append(vertices[0])  # Appends initial vertex to the end of the list so that the last line is drawn
-    ngon = createShape();
-    ngon.beginShape();
-    for (x, y) in vertices:
-        ngon.vertex(x, y)
-    ngon.endShape()
-    return ngon
-    
+def mouseClicked():
+    create.append((mouseX, mouseY))  # Adds new coordinate
+    minx, miny = minvert(create)
+    stable = create[:]  # Shallow copy
+    for i in range(len(stable)):
+        stable[i] = (stable[i][0] - minx, stable[i][1] - miny)  # ALters 'stable' array to be touching x=0 and y=0 at some vertex
+    print("Raw: {}\nStable: {}\n".format(create, stable))
