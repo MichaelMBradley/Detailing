@@ -63,29 +63,57 @@ def randompack(vertices):
     maxx += (offset * 2)  # Generate circles all around shape
     maxy += (offset * 2)
     available = randomfill(maxx, maxy)
+    cutoff = ((maxx + maxy) / 2) / 30  # How far from the line segment is acceptable for a circle to be included
+    fit = []
     for i in range(len(available)):
         available[i] = ((available[i][0][0] - offset, available[i][0][1] - offset), available[i][1])
-    fit = []
-    cutoff = ((maxx + maxy) / 2) / 30  # How far from the line segment is acceptable for a circle to be included
-    within = lambda p0, p1, p2, r: min(p1, p2) - cutoff - r <= p0 <= max(p1, p2) + cutoff + r  # Used to determine if circle is in box around line segment
+        if circlenearline(cutoff, available[i], vertices):
+            fit.append(available[i])
+    increase(fit)
+    return fit
+
+
+def within(p0, p1, p2, r, cutoff):
+    '''Helper function for circlenearline()'''
+    return min(p1, p2) - cutoff - r <= p0 <= max(p1, p2) + cutoff + r  # Used to determine if circle is in box around line segment
+
+
+def circlenearline(cutoff, c, vertices):
+    (x0, y0) = c[0]
     for i in range(-1, len(vertices) - 1):
-        curr = []
         (x1, y1) = vertices[i]
         (x2, y2) = vertices[i+1]
-        for c in available:
-            (x0, y0) = c[0]
-            distance = abs((x2-x1)*(y1-y0)-(x1-x0)*(y2-y1))/dist(x1, y1, x2, y2)  # Distance to infinite line described by adjacent vertices
-            if distance - c[1] <= cutoff and within(x0, x1, x2, c[1]) and within(y0, y1, y2, c[1]):  # If circle is close to edge
-                # This isn't a great solution as it checks if the circle is near the infinite line, and then checks if it's near the specific segment
-                # TODO: There is probably a more direct way to calculate the distance from a point to a line segment
-                curr.append(c)
-        for c in curr:
-            # Removes already-used circles from 'available' array
-            # Prevents doubly counting circles near corners, and slightly improves efficiency
-            available.pop(available.index(c))
-        fit += curr
-    return fit
-    
+        distance = abs((x2-x1)*(y1-y0)-(x1-x0)*(y2-y1))/dist(x1, y1, x2, y2)  # Distance to infinite line described by adjacent vertices
+        if distance - c[1] <= cutoff and within(x0, x1, x2, c[1], cutoff) and within(y0, y1, y2, c[1], cutoff):  # If circle is close to edge
+            # This isn't a great solution as it checks if the circle is near the infinite line, and then checks if it's near the specific segment
+            # TODO: There is probably a more direct way to calculate the distance from a point to a line segment
+            return True
+    return False
+
+
+def randomfillaware(vertices):
+    # FIXME: Issues with graph generation system can be tested with:
+    # return [((20, 20), 20), ((60, 20), 20), ((140, 20), 20), ((180, 20), 20), ((140, 100), 20), ((180, 60), 20), ((180, 100), 20), ((20, 60), 20), ((100, 20), 20), ((100, 60), 20), ((100, 100), 20), ((20, 100), 20), ((60, 100), 20), ((40, 80), 8), ((80, 40), 8), ((80, 80), 8), ((40, 40), 8), ((170, 170), 20), ((210, 170), 20)]
+    maxx, maxy = maxvert(vertices)
+    minradius = max(maxx, maxy) / 60
+    maxradius = minradius * 4
+    offset = maxradius * 2
+    cutoff = ((maxx + maxy + offset * 4) / 2) / 30  # How far from the line segment is acceptable for a circle to be included
+    circles = []
+    consecutivefailed = 0
+    while consecutivefailed < 3000:
+        r = rng.uniform(minradius, maxradius) # Generate random size ond location
+        x = rng.uniform(r - offset, maxx + offset - r)
+        y = rng.uniform(r - offset, maxx + offset - r)
+        if True not in [dist(x, y, p[0][0], p[0][1]) < p[1] + r for p in circles]:  # Checks if new circle occludes previous circles
+            if circlenearline(cutoff, ((x, y), r), vertices):
+                circles.append(((x, y), r))
+                consecutivefailed = 0
+        else:
+            consecutivefailed += 1
+    increase(circles)
+    return circles
+
 
 def randomfill(w, h):
     """Fills the given space with many non-overlapping circles.
@@ -102,7 +130,6 @@ def randomfill(w, h):
     array
         An array of nested tuples in the form ((x, y), r)
     """
-    
     minradius = 3
     maxradius = 10
     consecutivefailed = 0
@@ -116,9 +143,14 @@ def randomfill(w, h):
             consecutivefailed = 0
         else:
             consecutivefailed += 1
+    increase(circles)
+    return circles
+
+
+def increase(circles):
     for i, c in enumerate(circles[:-1]):
         lowest = ((0,0),0)
-        lowestdist = 2*w
+        lowestdist = 1e6  # Arbitrary
         for o in circles[:i] + circles[i+1:]:  # Find closest circle (not including self)
             testdist = dist(c[0][0], c[0][1], o[0][0], o[0][1]) - (c[1] + o[1])
             if testdist < lowestdist:
