@@ -1,8 +1,8 @@
 class node:
-    def __init__(self, info):
-        self.x = info[0][0]
-        self.y = info[0][1]
-        self.r = info[1]
+    def __init__(self, c):
+        self.x = c.x
+        self.y = c.y
+        self.r = c.r
         self.touching = []
         self.graph = set()
     
