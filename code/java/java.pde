@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 ArrayList<PVector> vertices, traverse;
-//ArrayList<circ> circles;
-//ArrayList<node> graph;
+ArrayList<Node> circles, graph;
 PShape shape;
 int w, h;
+float[][] ends;
 
 void setup() {
   size(800, 800);
@@ -20,6 +21,7 @@ void setup() {
   float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
   vertices = toPVector(initvertices);
   scaleVertices((float) w / 40, vertices);
+  ends = extremes(vertices);
   shape = toShape(vertices);
   calc();
 }
@@ -27,8 +29,8 @@ void setup() {
 void draw() {
   background(255);
   float xoff, yoff;
-  xoff = 0;
-  yoff = 0;
+  xoff = (w - (ends[1][0] - ends[0][0])) / 2;
+  yoff = (h - (ends[1][1] - ends[0][1])) / 2;
   shape(shape, xoff, yoff);
 }
 
@@ -37,5 +39,5 @@ void keyPressed() {
 }
 
 void calc() {
-  System.out.println(vertices);
+  // Will be filled
 }
