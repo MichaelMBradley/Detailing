@@ -1,5 +1,8 @@
 # Functions to help with the shapes
 
+def convert(vertices):
+    return [PVector(x, y) for (x, y) in vertices]
+
 
 def scalevert(s, vertices):
     """Scales up an array of vertices by a set amount.
@@ -62,7 +65,7 @@ def polygon(vertices):
     Parameters
     ----------
     vertices : array
-        An array of tuples, each representing a vertex (x, y)
+        An array of PVectors, representing the vertices of the desired shape
     
     Returns
     -------
@@ -70,11 +73,9 @@ def polygon(vertices):
         A shape object with the specified vertices
     """
     
-    local = vertices[:]
-    local.append(local[0])  # Appends initial vertex to the end of the list so that the last line is drawn
     ngon = createShape();
     ngon.beginShape();
-    for (x, y) in local:
+    for [x, y, _] in [v.get() for v in vertices] + [vertices[0].get()]:
         ngon.vertex(x, y)
     ngon.endShape()
     return ngon
