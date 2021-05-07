@@ -1,5 +1,6 @@
 # Algorithms to traverse circles
 from circ import *
+from shaping import *
 
 def closestcircle(vertices, circles):
     tests = 25
@@ -18,22 +19,24 @@ def closestcircle(vertices, circles):
             lines.append(((x, y), closestcircle.loc()))
     return lines
 
-def circletocircle(vertices, circles, a=1, b=1):
-    dists = [c.cendist(vertices[0].x, vertices[0].y) for c in circles]
+def circletocircle(vertices, circles, a=1):
+    dists = [c.cendist(vertices[-1].x, vertices[-1].y) for c in circles]
     points = [circles[dists.index(min(dists))].pv]
-    for i, v in enumerate(vertices[1:]):
-        closest = min([PVector.dist(c.pv, v) for c in circles])
-        while PVector.dist(v, points[-1]) != closest:
-            weights = [a * PVector.dist(points[-1], c.pv) * b * PVector.angleBetween(v - points[-1], c.pv - points[-1]) for c in circles]
-            weightss = ["{}, {}, {}".format(a * PVector.dist(points[-1], c.pv), b * 60 * PVector.angleBetween(v - points[-1], c.pv - points[-1]), c.pv) for c in circles]
+    maxx, maxy = maxvert(vertices)
+    diag = sqrt(maxx ** 2 + maxy ** 2)
+    avail = circles[:]
+    for i, v in enumerate(vertices):
+        closest = min([PVector.dist(c.pv, v) + c.r for c in avail])
+        while PVector.dist(v, points[-1]) > closest * 1.5:
+            weights = [10 * PVector.dist(points[-1], c.pv) / diag + PVector.angleBetween(v - points[-1], c.pv - points[-1]) for c in avail]  # Distance and new angle to each potential new point
             small = (-1, 1e6)
             for j, w in enumerate(weights):
-                if w < small[1] and circles[j].pv != points[-1]:
-                    small = (i, w)
-            if small[0] != -1 and circles[small[0]].pv not in points:
-                points.append(circles[small[0]].pv)
-                #print(weightss)
-                #print(weightss[small[0]])
+                if w < small[1] and avail[j].pv != points[-1]:
+                    small = (j, w)
+            if small[0] != -1:
+                points.append(avail[small[0]].pv)
+                avail.pop(small[0])
             else:
                 break
+    points.append(points[0])
     return points

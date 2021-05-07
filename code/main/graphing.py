@@ -1,5 +1,6 @@
 class node:
     def __init__(self, c):
+        self.c = c
         self.x = c.x
         self.y = c.y
         self.r = c.r
@@ -24,6 +25,13 @@ class node:
         return "{:.2f}, {:.2f}".format(self.x, self.y)
 
 
+def alter(graphs):
+    circles = []
+    for g in graphs:
+        circles += [o.c for o in g]
+    return creategraph(circles)
+
+
 def creategraph(circles):
     available = [node(c) for c in circles]
     graphs = []
@@ -35,4 +43,21 @@ def creategraph(circles):
     for n in available:
         if n.graph not in graphs:
             graphs.append(n.graph)
+    return graphs
+
+
+def condense(graphs):
+    while len(graphs) > 1:
+        minpair = (None, None, 1e6)
+        for c in [o.c for o in graphs[0]]:
+            for g in graphs[1:]:
+                for o in [e.c for e in g]:
+                    cd = c.circdist(o)
+                    if cd < minpair[2]:
+                        minpair = (c, o, cd)
+        move = minpair[1].pv - minpair[0].pv
+        move.setMag(move.mag() - minpair[0].r - minpair[1].r)
+        for c in [o.c for o in graphs[0]]:
+            c.move(move)
+        graphs = alter(graphs)
     return graphs

@@ -20,6 +20,10 @@ class circ:
     def drw(self, xoff=0, yoff=0):
         circle(self.x + xoff, self.y + yoff, self.r * 2)  # p5's circle() accepts diameter, not radius
     
+    def move(self, newpv):
+        self.pv += newpv
+        self.x, self.y, _ = self.pv.get()
+    
     def __repr__(self):
         return "Circle at ({:.2f}, {:.2f}) with radius {:.2f}".format(self.x, self.y, self.r)
     
