@@ -1,4 +1,5 @@
 import java.util.HashSet;
+import org.processing.wiki.triangulate.*;
 
 void condense(HashSet<Node> nodes) {
   ArrayList<HashSet<Node>> graphs = new ArrayList<HashSet<Node>>(createGraphs(nodes));
@@ -48,4 +49,12 @@ HashSet<HashSet<Node>> createGraphs(HashSet<Node> nodes) {
      graphs.add(n.graph);
   }
   return graphs;
+}
+
+ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
+  ArrayList<PVector> vectors = new ArrayList<PVector>();
+  for(Node n : nodes) {
+    vectors.add(n.pv);
+  }
+  return Triangulate.triangulate(vectors);
 }
