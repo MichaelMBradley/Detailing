@@ -1,8 +1,8 @@
-import java.util.ArrayList;
 import java.util.HashSet;
 
 ArrayList<PVector> vertices, traverse;
-ArrayList<Node> circles, graph;
+HashSet<Node> circles;
+HashSet<HashSet<Node>> graphs;
 PShape shape;
 int w, h;
 float[][] ends;
@@ -31,7 +31,20 @@ void draw() {
   float xoff, yoff;
   xoff = (w - (ends[1][0] - ends[0][0])) / 2;
   yoff = (h - (ends[1][1] - ends[0][1])) / 2;
+  fill(0);
+  text(String.format("Circles: %d", circles.size()), 10, 10);
+  noFill();
+  stroke(0);
   shape(shape, xoff, yoff);
+  for(Node c : circles) {
+    c.drw(xoff, yoff);
+  }
+  stroke(0, 0, 255);
+  for(Node n : circles) {
+    for(Node t : n.touching) {
+      line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
+    }
+  }
 }
 
 void keyPressed() {
@@ -39,5 +52,11 @@ void keyPressed() {
 }
 
 void calc() {
-  // Will be filled
+  int start;
+  start = millis();
+  circles = randomFillAware(vertices);
+  println(String.format("Circle packing: %.2f", (float) (millis() - start) / 1000));
+  start = millis();
+  condense(circles);
+  println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
 }

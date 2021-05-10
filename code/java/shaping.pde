@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 
 float[][] extremes(ArrayList<PVector> vertices) {

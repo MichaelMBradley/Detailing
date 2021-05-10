@@ -99,9 +99,9 @@ def randomfillaware(vertices):
     circles = []
     consecutivefailed = 0
     while consecutivefailed < 1000:
-        r = rng.uniform(minradius, maxradius) # Generate random size ond location
+        r = rng.uniform(minradius, maxradius) # Generate random size and location
         x = rng.uniform(r - offset, maxx + offset - r)
-        y = rng.uniform(r - offset, maxx + offset - r)
+        y = rng.uniform(r - offset, maxy + offset - r)
         try:
             maxrad = min([c.raddist(x, y) for c in circles])
         except ValueError:

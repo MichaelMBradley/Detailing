@@ -1,7 +1,6 @@
-import java.util.ArrayList;
 import java.util.HashSet;
 
-public class Node{
+public class Node {
   public HashSet<Node> touching, graph;
   public float x, y, r;
   public PVector pv;
@@ -11,6 +10,7 @@ public class Node{
     y = ypos;
     r = rad;
     pv = new PVector(x, y);
+    resetGraph();
   }
   
   public float distanceToCenter(float xpos, float ypos) {
@@ -25,7 +25,7 @@ public class Node{
     // Distance between the closest points of each node
     return distanceToRadius(c.x, c.y) - c.r;
   }
-  public void findTouching(ArrayList<Node> nodes) {
+  public void findTouching(HashSet<Node> nodes) {
     for(Node n : nodes) {
       if(this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors TODO: See if necessary
         touching.add(n);
@@ -36,7 +36,7 @@ public class Node{
     if(!graph.contains(n)) {
       graph.add(n);
       for(Node t : touching) {
-        t.graphing(t);
+        t.graphing(n);
       }
     }
   }
@@ -44,6 +44,11 @@ public class Node{
     pv.add(direction);
     x += direction.x;
     y += direction.y;
+  }
+  public void resetGraph() {
+    touching = new HashSet<Node>();
+    graph = new HashSet<Node>();
+    graph.add(this);
   }
   
   public void drw(float xoff, float yoff) {
