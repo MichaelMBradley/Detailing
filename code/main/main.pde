@@ -68,7 +68,7 @@ void calc() {
   int start;
   start = millis();
   circles = randomFillAware(vertices);
-  println(String.format("Circle packing: %.2f", (float) (millis() - start) / 1000));
+  println(String.format("Circle packing: %.3f", (float) (millis() - start) / 1000));
   start = millis();
   condense(circles);
   println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));

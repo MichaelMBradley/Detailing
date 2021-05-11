@@ -2,6 +2,10 @@ import java.awt.geom.Line2D;
 import java.util.HashSet;
 
 boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
+  /**
+  Returns if a given node is suitably close (cutoff) to any
+  of the line segments on the polyline described by the vertices.
+  */
   for(int i = 0; i < vertices.size(); i++) {
     int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
     PVector vi = vertices.get(i);
@@ -14,6 +18,9 @@ boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
 }
 
 HashSet<Node> randomFillAware(ArrayList<PVector> vertices) {
+  /**
+  Creates a circle packing of the given vertices.
+  */
   HashSet<Node> nodes = new HashSet<Node>();
   float x, y, r, closestCircle;
   Node current;
@@ -29,13 +36,16 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices) {
     y = random(r - offset, maxs[1] + offset - r);
     closestCircle = 1e6;
     for(Node n : nodes) {
+      // Find overall closest circle (the actual node is irrelevant)
       closestCircle = min(closestCircle, n.distanceToRadius(x, y));
     }
     if(closestCircle < minradius) {
+      // Fails if chosen position would require a node to be too small
       consecutiveFailed++;
     } else {
       current = new Node(x, y, min(maxradius, closestCircle));
       if(circleNearLine(cutoff, current, vertices)) {
+        // Adds new node if given circle is near any line
         nodes.add(current);
         consecutiveFailed = 0;
       } else {

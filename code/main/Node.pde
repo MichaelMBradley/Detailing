@@ -12,6 +12,13 @@ public class Node {
     pv = new PVector(x, y);
     resetGraph();
   }
+  public Node() {
+    x = 0;
+    y = 0;
+    r = 0;
+    pv = new PVector(x, y);
+    resetGraph();
+  }
   
   public float distanceToCenter(float xpos, float ypos) {
     // Distance from a point to the center of the node
@@ -27,12 +34,17 @@ public class Node {
   }
   public void findTouching(HashSet<Node> nodes) {
     for(Node n : nodes) {
-      if(this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors TODO: See if necessary
+      if(this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors
         touching.add(n);
       }
     }
   }
   public void graphing(Node n) {
+    /**
+    Tells every node it's touching to recursively run this code,
+    but only if it does not already have this node in it's graph
+    (prevents and infinite recursive loop).
+    */
     if(!graph.contains(n)) {
       graph.add(n);
       for(Node t : touching) {
@@ -46,6 +58,11 @@ public class Node {
     y += direction.y;
   }
   public void resetGraph() {
+    /**
+    Attempts to simply update the existing graph fail,
+    so when nodes have been moved this should be
+    called to help standardize graphs.
+    */
     touching = new HashSet<Node>();
     graph = new HashSet<Node>();
     graph.add(this);

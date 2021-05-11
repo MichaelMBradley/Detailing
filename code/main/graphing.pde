@@ -2,13 +2,18 @@ import java.util.HashSet;
 import org.processing.wiki.triangulate.*;
 
 void condense(HashSet<Node> nodes) {
+  /**
+  Combine many graphs into one by moving the first graph
+  to be touching it's closest neighbour. Keeps doing this
+  until there is only one graph left.
+  */
   ArrayList<HashSet<Node>> graphs = new ArrayList<HashSet<Node>>(createGraphs(nodes));
   Node closeBase, closeNode;
   PVector moveVector;
   float closeDistance, tempCD;
   while(graphs.size() > 1) {
-    closeBase = new Node(0, 0, 0);
-    closeNode = new Node(0, 0, 0);
+    closeBase = new Node();
+    closeNode = new Node();
     closeDistance = 1e6;  // Arbitrary large number
     // Find closest node oustide the first graph to the first graph
     for(Node n : graphs.get(0)) {  // For every node in the first graph
@@ -35,6 +40,9 @@ void condense(HashSet<Node> nodes) {
 }
 
 HashSet<HashSet<Node>> createGraphs(HashSet<Node> nodes) {
+  /**
+  Takes a list of nodes, returns the set of sets of touching nodes.
+  */
   HashSet<HashSet<Node>> graphs = new HashSet<HashSet<Node>>();
   for(Node n : nodes) {
     n.resetGraph();
@@ -52,6 +60,9 @@ HashSet<HashSet<Node>> createGraphs(HashSet<Node> nodes) {
 }
 
 ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
+  /**
+  Accepts a set of nodes, triangulates their centres.
+  */
   ArrayList<PVector> vectors = new ArrayList<PVector>();
   for(Node n : nodes) {
     vectors.add(n.pv);
