@@ -28,6 +28,19 @@ void scaleVertices(float scalingfactor, ArrayList<PVector> vertices) {
   }
 }
 
+Polygon toPolygon(ArrayList<PVector> vertices) {
+  int size = vertices.size();
+  int[] x = new int[size];
+  int[] y = new int[size];
+  float[] array;
+  for(int i = 0; i < size; i++) {
+    array = vertices.get(i).array();
+    x[i] = (int) array[0];
+    y[i] = (int) array[1];
+  }
+  return new Polygon(x, y, size);
+}
+
 ArrayList<PVector> toPVector(float[][] vertices) {
   /**
   Takes a list of vertices as an array of floats

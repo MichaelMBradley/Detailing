@@ -1,7 +1,7 @@
 import java.util.HashSet;
 
 public class Node {
-  public HashSet<Node> touching, graph;
+  public HashSet<Node> delaunay, graph, touching, kruskal, kruskalAdjacent;
   public float x, y, r;
   public PVector pv;
   
@@ -10,6 +10,8 @@ public class Node {
     y = ypos;
     r = rad;
     pv = new PVector(x, y);
+    kruskal = new HashSet<Node>();
+    kruskalAdjacent = new HashSet<Node>();
     resetGraph();
   }
   public Node() {
@@ -17,6 +19,8 @@ public class Node {
     y = 0;
     r = 0;
     pv = new PVector(x, y);
+    kruskal = new HashSet<Node>();
+    kruskalAdjacent = new HashSet<Node>();
     resetGraph();
   }
   
@@ -52,6 +56,18 @@ public class Node {
       }
     }
   }
+  public void addKruskal(Node n) {
+    if(kruskal.size() < 3 && !kruskal.contains(n)) {
+      ArrayList<Node> og = new ArrayList<Node>(kruskal);
+      kruskal.addAll(n.kruskal);
+      kruskal.add(n);
+      for(Node k : og) {
+        k.kruskal.addAll(kruskal);
+      }
+      kruskalAdjacent.add(n);
+      n.addKruskal(this);
+    }
+  }
   public void move(PVector direction) {
     pv.add(direction);
     x += direction.x;
@@ -63,6 +79,7 @@ public class Node {
     so when nodes have been moved this should be
     called to help standardize graphs.
     */
+    delaunay = new HashSet<Node>();
     touching = new HashSet<Node>();
     graph = new HashSet<Node>();
     graph.add(this);

@@ -1,13 +1,24 @@
 import java.util.HashSet;
 
-ArrayList<PVector> vertices, traverse;
-ArrayList<Triangle> triangles;
+ArrayList<PVector> vertices;
+ArrayList<Node> traverse;
 ArrayList<float[]> circumcircles;
-HashSet<Node> circles;
-HashSet<HashSet<Node>> graphs;
+HashSet<Node> circles, interior, exterior;
 PShape shape;
 int w, h;
 float[][] ends;
+
+final float minimise = 2;
+final boolean drawGrid = false;
+final boolean drawNumCircles = true;
+final boolean drawShape = true;
+final boolean drawInterior = true;
+final boolean drawExterior = true;
+final boolean drawTouching = false;
+final boolean drawDelaunay = false;
+final boolean drawCircumcircles = false;
+final boolean drawTraversal = false;
+final boolean drawKruskal = true;
 
 void setup() {
   size(800, 800);
@@ -33,30 +44,51 @@ void draw() {
   float xoff, yoff;
   xoff = (w - (ends[1][0] - ends[0][0])) / 2;
   yoff = (h - (ends[1][1] - ends[0][1])) / 2;
-  fill(0);
-  text(String.format("Circles: %d", circles.size()), 10, 10);
-  noFill();
-  strokeWeight(10);
-  stroke(0);
-  shape(shape, xoff, yoff);
-  strokeWeight(1);
-  for(Node c : circles) {
-    c.drw(xoff, yoff);
+  if(drawGrid) {
+    fill(127);
+    stroke(127);
+    strokeWeight(1);
+    int freq = 25;
+    for(int i = ((int) xoff / freq) * -freq; i < w - xoff; i += freq) {
+      line(i + xoff, 0, i + xoff, h);
+      text("" + i, i + xoff + 2, 10);
+    }
+    for(int i = ((int) yoff / freq) * -freq; i < h - yoff; i += freq) {
+      line(0, i + yoff, w, i + yoff);
+      text("" + i, 0, i + yoff + 12);
+    }
+    noFill();
   }
-  stroke(0, 0, 255);
-  strokeWeight(1);
-  for(Node n : circles) {
-    for(Node t : n.touching) {
-      //line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
+  if(drawNumCircles) {
+    fill(0);
+    text(String.format("Circles: %d", circles.size()), 30, 30);
+    noFill();
+  }
+  if(drawShape) {
+    stroke(0);
+    strokeWeight(1);
+    shape(shape, xoff, yoff);
+  }
+  if(drawInterior) {
+    drawNodes(interior, xoff, yoff);
+  }
+  if(drawExterior) {
+    drawNodes(exterior, xoff, yoff);
+  }
+  if(drawCircumcircles) {
+    stroke(255, 0, 0);
+    strokeWeight(1);
+    for(float[] info : circumcircles) {
+      circle(info[0] + xoff, info[1] + yoff, info[2] * 2);
     }
   }
-  stroke(255, 0, 0);
-  strokeWeight(1);
-  for(Triangle tri : triangles) {
-    triangle(tri.p1.x + xoff, tri.p1.y + yoff, tri.p2.x + xoff, tri.p2.y + yoff, tri.p3.x + xoff, tri.p3.y + yoff);
-  }
-  for(float[] info : circumcircles) {
-    circle(info[0] + xoff, info[1] + yoff, info[2] * 2);
+  if(drawTraversal) {
+    stroke(0);
+    strokeWeight(3);
+    for(int i = 0; i < traverse.size() - 1; i++) {
+      line(traverse.get(i).x + xoff, traverse.get(i).y + yoff, traverse.get(i+1).x + xoff, traverse.get(i+1).y + yoff);
+    }
+    line(traverse.get(traverse.size()-1).x + xoff, traverse.get(traverse.size()-1).y + yoff, traverse.get(0).x + xoff, traverse.get(0).y + yoff);
   }
 }
 
@@ -64,16 +96,67 @@ void keyPressed() {
   calc();
 }
 
+void mouseClicked() {
+  // Different code could be done here
+}
+
+void drawNodes(HashSet<Node> circles, float xoff, float yoff) {
+  for(Node n : circles) {
+    stroke(0);
+    strokeWeight(1);
+    n.drw(xoff, yoff);
+    if(drawTouching) {
+      stroke(0, 0, 255);
+      strokeWeight(1);
+      for(Node t : n.touching) {
+        line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
+      }
+    }
+    if(drawDelaunay) {
+      stroke(255, 0, 0);
+      strokeWeight(1);
+      for(Node t : n.delaunay) {
+        line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
+      }
+    }
+    if(drawKruskal) {
+      stroke(0, 255, 0);
+      strokeWeight(1);
+      for(Node t : n.kruskalAdjacent) {
+        line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
+      }
+    }
+  }
+}
+
 void calc() {
   int start;
+  println();
   start = millis();
-  circles = randomFillAware(vertices);
-  println(String.format("Circle packing: %.3f", (float) (millis() - start) / 1000));
+  circles = randomFillAware(vertices, minimise);
+  println(String.format("Rejection: %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
   start = millis();
-  condense(circles);
+  //condense(circles);
   println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
+  interior = containing(vertices, circles, true);
+  exterior = containing(vertices, circles, false);
+  analyze(interior);
+  analyze(exterior);
+  
+}
+
+void analyze(HashSet<Node> circles) {
+  int start;
   start = millis();
-  triangles = delaunay(circles);  // Triangulate.triangulate(vertices);
-  circumcircles= triangleToCircle(triangles);
+  ArrayList<Triangle> triangles = delaunay(circles);  // Triangulate.triangulate(vertices);
+  circumcircles = triangleToCircle(triangles);
+  updateDelaunay(circles, triangles);
   println(String.format("Triangulation: %.3f", (float) (millis() - start) / 1000));
+  start = millis();
+  traverse = delaunayTraverse(circles, vertices);
+  println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
+  start = millis();
+  kruskal(circles);
+  println(String.format("Kruskal: %.3f", (float) (millis() - start) / 1000));
+  kruskalTraverse(circles, vertices);
 }

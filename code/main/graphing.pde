@@ -1,3 +1,6 @@
+import java.awt.Polygon;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import org.processing.wiki.triangulate.*;
 
@@ -39,6 +42,28 @@ void condense(HashSet<Node> nodes) {
   }
 }
 
+void drawContaining(ArrayList<PVector> vertices, HashSet<Node> nodes, float xoff, float yoff) {
+  int size = vertices.size();
+  int[] x = new int[size];
+  int[] y = new int[size];
+  float[] array;
+  for(int i = 0; i < size; i++) {
+    array = vertices.get(i).array();
+    x[i] = (int) array[0];
+    y[i] = (int) array[1];
+  }
+  Polygon p = new Polygon(x, y, size);
+  for(Node n : nodes) {
+    if(p.contains(n.x, n.y)) {
+      stroke(255, 0, 0);
+    } else {
+      stroke(0, 255, 0);
+    }
+    n.drw(xoff, yoff);
+  }
+  stroke(0);
+}
+
 HashSet<HashSet<Node>> createGraphs(HashSet<Node> nodes) {
   /**
   Takes a list of nodes, returns the set of sets of touching nodes.
@@ -68,4 +93,44 @@ ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
     vectors.add(n.pv);
   }
   return Triangulate.triangulate(vectors);
+}
+
+void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
+  HashMap<PVector, Node> conv = new HashMap<PVector, Node>();
+  HashMap<PVector, HashSet<PVector>> dict = new HashMap<PVector, HashSet<PVector>>();
+  Node base, con;
+  for(Node n : nodes) {
+    conv.put(n.pv, n);
+    dict.put(n.pv, new HashSet<PVector>());
+  }
+  for(Triangle tri : triangles) {
+    dict.get(tri.p1).add(tri.p2);
+    dict.get(tri.p1).add(tri.p3);
+    dict.get(tri.p2).add(tri.p1);
+    dict.get(tri.p2).add(tri.p3);
+    dict.get(tri.p3).add(tri.p1);
+    dict.get(tri.p3).add(tri.p2);
+  }
+  for(PVector pv : dict.keySet()) {
+    base = conv.get(pv);
+    for(PVector connect : dict.get(pv)) {
+      con = conv.get(connect);
+      //if(PVector.dist(pv, connect) < (base.r + con.r) * 3) {
+        base.delaunay.add(con);
+      //}
+    }
+  }
+}
+
+void kruskal(HashSet<Node> nodes) {
+  ArrayList<Edge> edges = new ArrayList<Edge>();
+  for(Node b : nodes) {
+    for(Node t : b.delaunay) {
+      edges.add(new Edge(b, t));
+    }
+  }
+  Collections.sort(edges);
+  for(Edge e : edges) {
+    e.n1.addKruskal(e.n2);
+  }
 }
