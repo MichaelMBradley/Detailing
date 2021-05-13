@@ -35,7 +35,7 @@ In the first two trees, I traverse to a leaf, and then traverse across leaves in
 Going clockwise around the polyline, here is the order in which my first algorithm plans to visit the nodes:
 
 {: style="text-align:center"}
-![Each node in a circle packing is visited.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/CompleteTraversal.gif)
+![Each node in a circle packing is visited.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/CompleteTraverse.gif)
 
 My algorithm still has bugs. As mentioned earlier, the tree selection algorithm is not great. As well, I attempt to traverse every exterior tree in a clockwise manner and every interior tree in a counter-clockwise manner but it seems like my current implementation is bugged.
 
