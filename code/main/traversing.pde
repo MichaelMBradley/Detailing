@@ -1,3 +1,5 @@
+import java.awt.geom.Line2D;
+
 Node closestNode(HashSet<Node> nodes, PVector vertex) {
   Node close = new Node();
   float tempdist;
@@ -12,8 +14,12 @@ Node closestNode(HashSet<Node> nodes, PVector vertex) {
   return close;
 }
 
-PVector closestPoint(PVector p1, PVector p2, Node node) {
-  PVector p0 = node.pv;
+PVector closestPoint(PVector p1, PVector p2, PVector p0) {
+  /**
+  Uses basic point-slope formulas to find the intersection of (p1, p2)
+  and the line perpendicular to (p1, p2) passing through the node.
+  Slightly slower.
+  */
   if(p1.x == p2.x) {
     return new PVector(p1.x, p0.y);
   }
@@ -25,6 +31,16 @@ PVector closestPoint(PVector p1, PVector p2, Node node) {
   float x = (p1.x * m - p0.x * mi + p0.y - p1.y)/(m - mi);
   float y = m * (x - p1.x) + p1.y;
   return new PVector(x, y);
+}
+
+PVector closestPoint2(PVector p1, PVector p2, PVector p0) {
+  /**
+  Projects the node onto the vector between (p1, p2) to find the closest point.
+  Slightly faster.
+  */
+  PVector y = PVector.sub(p0, p1);
+  PVector u = PVector.sub(p2, p1);
+  return u.mult(y.dot(u)/u.magSq()).add(p1);
 }
 
 HashSet<Node> containing(ArrayList<PVector> vertices, HashSet<Node> nodes, boolean inside) {
@@ -79,18 +95,23 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
   Returns one node of each MST. Each node is
   in order around the perimeter of the shape.
   */
-  HashMap<PVector, Node> options = new HashMap<PVector, Node>();
+  ArrayList<HashMap<PVector, Node>> options = new ArrayList<HashMap<PVector, Node>>();
   ArrayList<Node> traversal = new ArrayList<Node>();
   HashSet<HashSet<Node>> MSTs = new HashSet<HashSet<Node>>();
-  float test, close;
-  int j;
+  float test, close, distance, testdist, mult;
+  int j, q;
   Node closest = new Node();
-  PVector testpv;
+  PVector testpv, vi, vj;
+  PVector next = new PVector();
   PVector touch = new PVector();
   for(Node n : nodes) {
     MSTs.add(n.kruskal);
   }
+  for(int _=0;_<vertices.size();_++) {
+    options.add(new HashMap<PVector, Node>());
+  }
   for(HashSet<Node> MST : MSTs) {
+    q = -1;
     close = 1e6;  // Arbitrary big number
     for(Node n : MST) {
       for(int i = 0; i < vertices.size(); i++) {
@@ -98,21 +119,80 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
         if(j == vertices.size()) {
           j = 0;
         }
-        testpv = closestPoint(vertices.get(i), vertices.get(j), n);
-        test = PVector.dist(testpv, n.pv);
+        vi = vertices.get(i);
+        vj = vertices.get(j);
+        testpv = closestPoint2(vi, vj, n.pv);
+        test = (float) Line2D.ptSegDist(vi.x, vi.y, vj.x, vj.y, n.x, n.y) - n.r;
         if(test<close) {
           touch = testpv;
           close = test;
           closest = n;
+          q = i;
         }
       }
     }
-    options.put(touch, closest);
+    options.get(q).put(touch, closest);
   }
-  //Iterate through edges, iterate through PVector keys, find those ons same line, order by distance in direction of next vertex
+  for(int i = 0; i < vertices.size(); i++) {
+    j = i + 1;
+    if(j == vertices.size()) {
+      j = 0;
+    }
+    vi = vertices.get(i);
+    vj = vertices.get(j);
+    HashMap<PVector, Node> current = options.get(i);
+    while(!current.isEmpty()) {
+      distance = 1e6;
+      for(PVector pv : current.keySet()) {
+        if(PVector.angleBetween(PVector.sub(vj, vi), PVector.sub(pv, vi)) < 1) {
+          mult = 1;
+        } else {
+          mult = -1;
+        }
+        testdist = PVector.dist(pv, vi) * mult;
+        if(testdist < distance) {
+          distance = testdist;
+          next = pv;
+        }
+      }
+      traversal.add(current.get(next));
+      current.remove(next);
+    }
+  }
   return traversal;
 }
 
+ArrayList<Node> traverseKruskalTree(ArrayList<Node> kruskal, HashSet<Node> exterior, ArrayList<PVector> vertices) {
+  ArrayList<Node> traverse = new ArrayList<Node>();
+  Node edge = new Node();
+  float dist, test;
+  int j, k, l;
+  for(Node n : kruskal) {
+    dist = 1e6;
+    k = 0;
+    l = 0;
+    for(int i = 0; i < vertices.size(); i++) {
+      j = i + 1;
+      if(j == vertices.size()) {
+        j = 0;
+      }
+      test = distanceToSegment(vertices.get(i), vertices.get(j), n.pv);
+      if(test<dist) {
+        k = i;
+        l = j;
+      }
+    }
+    edge = new Node(PVector.sub(vertices.get(l), vertices.get(k)));
+    traverse.addAll(n.getAllKruskal(edge, exterior.contains(n)));
+  }
+  return traverse;
+}
+
 boolean inLine(PVector p1, PVector p2, PVector test) {
-  return (p2.y-p1.y)/(p2.x-p1.x)==(test.y-p1.y)/(test.x-p1.x);
+  /**
+  Tests if PVector test is in the line described by p1, p2
+  by determining of it's distance to the closest point on that
+  line is approximately 0 (for rounding errors).
+  */
+  return PVector.dist(test, closestPoint2(p1, p2, test)) < 1;
 }

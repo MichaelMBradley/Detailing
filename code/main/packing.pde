@@ -9,13 +9,15 @@ boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
   */
   for(int i = 0; i < vertices.size(); i++) {
     int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
-    PVector vi = vertices.get(i);
-    PVector vj = vertices.get(j);
-    if(Line2D.ptSegDist(vi.x, vi.y, vj.x, vj.y, c.x, c.y) - c.r <= cutoff) {
+    if(distanceToSegment(vertices.get(i), vertices.get(j), c.pv) - c.r <= cutoff) {
       return true;
     }
   }
   return false;
+}
+
+float distanceToSegment(PVector v1, PVector v2, PVector test) {
+  return (float) Line2D.ptSegDist(v1.x, v1.y, v2.x, v2.y, test.x, test.y);
 }
 
 HashSet<Node> randomFillAware(ArrayList<PVector> vertices) {
@@ -32,8 +34,8 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
   float[] maxs = extremes(vertices)[1];
   float minradius = max(maxs[0], maxs[1]) / (60 * minimise);
   float maxradius = minradius * 4;
-  float offset = maxradius * 2;
-  float cutoff = ((maxs[0] + maxs[1] + offset * 4 ) / 60) * (2 * minimise / 3);
+  float cutoff = ((maxs[0] + maxs[1] + maxradius * 8) / 60) * (2 * minimise / 3);
+  float offset = cutoff + maxradius;
   int consecutiveFailed = 0;
   while(consecutiveFailed < 1000) {
     r = random(minradius, maxradius);

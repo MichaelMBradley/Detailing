@@ -2,10 +2,11 @@ import java.util.HashSet;
 
 ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
-ArrayList<float[]> circumcircles;
+ArrayList<float[]> interiorCircumcircles, exteriorCircumcircles;
 HashSet<Node> circles, interior, exterior;
 PShape shape;
 int w, h;
+int p, q;
 float[][] ends;
 
 final float minimise = 2;
@@ -24,6 +25,8 @@ void setup() {
   size(800, 800);
   w = 800;
   h = w;
+  p = 0;
+  q = 1;
   noFill();
   // Tilted Square:
   // float m = 0; // 0 for no tilt
@@ -78,26 +81,47 @@ void draw() {
   if(drawCircumcircles) {
     stroke(255, 0, 0);
     strokeWeight(1);
-    for(float[] info : circumcircles) {
+    for(float[] info : interiorCircumcircles) {
+      circle(info[0] + xoff, info[1] + yoff, info[2] * 2);
+    }
+    for(float[] info : exteriorCircumcircles) {
       circle(info[0] + xoff, info[1] + yoff, info[2] * 2);
     }
   }
   if(drawTraversal) {
-    stroke(0);
-    strokeWeight(3);
+    stroke(255, 0, 0);
+    strokeWeight(1);
     for(int i = 0; i < traverse.size() - 1; i++) {
+      if(!traverse.get(i).kruskal.contains(traverse.get(i+1))) {
+        stroke(0, 0, 255);
+      } else {
+        stroke(255, 0, 0);
+      }
       line(traverse.get(i).x + xoff, traverse.get(i).y + yoff, traverse.get(i+1).x + xoff, traverse.get(i+1).y + yoff);
     }
+    stroke(0, 0, 255);
     line(traverse.get(traverse.size()-1).x + xoff, traverse.get(traverse.size()-1).y + yoff, traverse.get(0).x + xoff, traverse.get(0).y + yoff);
   }
+  stroke(255, 0, 0);
+  strokeWeight(3);
+  line(traverse.get(p).x + xoff, traverse.get(p).y + yoff, traverse.get(q).x + xoff, traverse.get(q).y + yoff);
 }
 
 void keyPressed() {
-  calc();
+  p++;
+  q++;
+  if(p >= traverse.size()) {
+    p = 0;
+  }
+  if(q >= traverse.size()) {
+    q = 0;
+  }
 }
 
 void mouseClicked() {
-  // Different code could be done here
+  p = 0;
+  q = 1;
+  calc();
 }
 
 void drawNodes(HashSet<Node> circles, float xoff, float yoff) {
@@ -120,7 +144,8 @@ void drawNodes(HashSet<Node> circles, float xoff, float yoff) {
       }
     }
     if(drawKruskal) {
-      stroke(0, 255, 0);
+      stroke(0, 0, 255);
+      //stroke(0, 255, 0);
       strokeWeight(1);
       for(Node t : n.kruskalAdjacent) {
         line(n.x + xoff, n.y + yoff, t.x + xoff, t.y + yoff);
@@ -134,29 +159,29 @@ void calc() {
   println();
   start = millis();
   circles = randomFillAware(vertices, minimise);
-  println(String.format("Rejection: %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
-  start = millis();
+  println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
+  //start = millis();
   //condense(circles);
-  println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
+  //println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
   interior = containing(vertices, circles, true);
   exterior = containing(vertices, circles, false);
-  analyze(interior);
-  analyze(exterior);
-  
+  interiorCircumcircles = analyze(interior);
+  exteriorCircumcircles = analyze(exterior);
+  start = millis();
+  traverse = traverseKruskalTree(kruskalTraverse(circles, vertices), exterior, vertices);
+  println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 }
 
-void analyze(HashSet<Node> circles) {
+ArrayList<float[]> analyze(HashSet<Node> aCircles) {
+  ArrayList<float[]> circum;
   int start;
   start = millis();
-  ArrayList<Triangle> triangles = delaunay(circles);  // Triangulate.triangulate(vertices);
-  circumcircles = triangleToCircle(triangles);
-  updateDelaunay(circles, triangles);
+  ArrayList<Triangle> triangles = delaunay(aCircles);  // Triangulate.triangulate(vertices);
+  circum = triangleToCircle(triangles);
+  updateDelaunay(aCircles, triangles);
   println(String.format("Triangulation: %.3f", (float) (millis() - start) / 1000));
   start = millis();
-  traverse = delaunayTraverse(circles, vertices);
-  println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
-  start = millis();
-  kruskal(circles);
+  kruskal(aCircles);
   println(String.format("Kruskal: %.3f", (float) (millis() - start) / 1000));
-  kruskalTraverse(circles, vertices);
+  return circum;
 }
