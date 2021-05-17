@@ -69,6 +69,14 @@ PShape toShape(ArrayList<PVector> vertices) {
 }
 
 ArrayList<float[]> triangleToCircle(ArrayList<Triangle> triangles) {
+  ArrayList<float[]> info = new ArrayList<float[]>();
+  for(Triangle tri : triangles) {
+    info.add(triangleToCircle(tri.p1.x, tri.p1.y, tri.p2.x, tri.p2.y, tri.p3.x, tri.p3.y));
+  }
+  return info;
+}
+
+float[] triangleToCircle(float x1, float y1, float x2, float y2, float x3, float y3) {
   /**
   Calculates the circumcircle of a triangle.
   In short, it calculates the intersection point
@@ -76,36 +84,50 @@ ArrayList<float[]> triangleToCircle(ArrayList<Triangle> triangles) {
   splitting (p1, p2) in half and the same line for
   (p2, p3).
   */
-  float x, y, r, x1, x2, x3, y1, y2, y3;
-  ArrayList<float[]> info = new ArrayList<float[]>();
-  for(Triangle tri : triangles) {
-    x1 = tri.p1.x;
-    y1 = tri.p1.y;
-    x2 = tri.p2.x;
-    y2 = tri.p2.y;
-    x3 = tri.p3.x;
-    y3 = tri.p3.y;
-    if((x1 == x2 && x2 == x3) || (y1 == y2 && y2 == y3)) {
-      // Impossible to find circumcircle for points in a straight line
-      x = Float.NaN;
-      y = Float.NaN;
-      r = Float.NaN;
-    } else if(y1 == y2) {
-      // Preventing div/0 errors for when points
-      // 1 and 2 have the same y value
-      x = (x1 + x2) / 2;
-      y = -((x3 - x2) / (y3 - y2)) * (x - ((x2 + x3) / 2)) + ((y2 + y3) / 2);
-    } else if(y2 == y3) {
-      // Preventing div/0 errors for when points
-      // 2 and 3 have the same y value
-      x = (x2 + x3) / 2;
-      y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
-    } else {
-      x = (((x2 * x2 - x1 * x1) / (y2 - y1)) - ((x3 * x3 - x2 * x2) / (y3 - y2)) + (y1 - y3)) / (2 * (((x2 - x1) / (y2 - y1)) - ((x3 - x2) / (y3 - y2))));
-      y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
-    }
-    r = dist(x, y, x1, y1);
-    info.add(new float[] {x, y, r});
+  float x, y, r;
+  if((x1 == x2 && x2 == x3) || (y1 == y2 && y2 == y3)) {
+    // Impossible to find circumcircle for points in a straight line
+    x = Float.NaN;
+    y = Float.NaN;
+    r = Float.NaN;
+  } else if(y1 == y2) {
+    // Preventing div/0 errors for when points
+    // 1 and 2 have the same y value
+    x = (x1 + x2) / 2;
+    y = -((x3 - x2) / (y3 - y2)) * (x - ((x2 + x3) / 2)) + ((y2 + y3) / 2);
+  } else if(y2 == y3) {
+    // Preventing div/0 errors for when points
+    // 2 and 3 have the same y value
+    x = (x2 + x3) / 2;
+    y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
+  } else {
+    x = (((x2 * x2 - x1 * x1) / (y2 - y1)) - ((x3 * x3 - x2 * x2) / (y3 - y2)) + (y1 - y3)) / (2 * (((x2 - x1) / (y2 - y1)) - ((x3 - x2) / (y3 - y2))));
+    y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
   }
-  return info;
+  r = dist(x, y, x1, y1);
+  return new float[] {x, y, r};
+}
+
+float[] getArc(Node n1, Node n2) {
+  ArrayList<Node> n3arr = new ArrayList<Node>();
+  float[] arcinfo = new float[3];
+  float ang1 = 0;
+  float ang2 = 0;
+  for(Node d : n1.delaunay) {
+    if(d.delaunay.contains(n2)) {
+      n3arr.add(d);
+    }
+  }
+  for(Node n3 : n3arr) {
+    arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
+    ang1 = PVector.sub(n1.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
+    ang2 = PVector.sub(n2.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
+    if(ang1 > ang2) {
+      ang2 += TWO_PI;
+    }
+    if(ang2 - ang1 < PI) {
+      break;
+    }
+  }
+  return new float[] {arcinfo[0], arcinfo[1], arcinfo[2], arcinfo[2], ang1, ang2};
 }

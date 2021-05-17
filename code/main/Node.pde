@@ -110,9 +110,6 @@ public class Node {
     graph = new HashSet<Node>();
     graph.add(this);
   }
-  ArrayList<Node> getAllKruskal(boolean clockwise) {
-    return getAllKruskal(new Node(), clockwise);
-  }
   ArrayList<Node> getAllKruskal(Node call, boolean clockwise) {
     ArrayList<Node> below = new ArrayList<Node>();
     ArrayList<Node> orderedChildren = new ArrayList<Node>(kruskalAdjacent);
@@ -127,7 +124,7 @@ public class Node {
       return below;
     }
     headings = getRelativeHeadings(orderedChildren, call, clockwise);
-    println(this);
+    //println(this);
     sortChildrenByHeading(orderedChildren, headings, clockwise);
     for(Node n : orderedChildren) {
       for(Node k : n.getAllKruskal(this, clockwise)) {
@@ -142,13 +139,13 @@ public class Node {
     float heading;
     for(Node n : orderedChildren) {
       heading = PVector.sub(n.pv, this.pv).heading();
-      if(heading > call.pv.heading()) {
+      if(heading > PVector.sub(call.pv, this.pv).heading()) {
         if(clockwise) {
           heading -= TWO_PI;
         }
       } else {
         if(!clockwise) {
-          heading -= TWO_PI;
+          heading += TWO_PI;
         }
       }
       headings.put(n, heading);
@@ -169,7 +166,7 @@ public class Node {
         }
       }
     }
-    println("\t" + orderedChildren + "\n\t" + headings + "\n\t" + clockwise + "\n");
+    //println("\t" + orderedChildren + "\n\t" + headings + "\n\t" + clockwise + "\n");
   }
   
   public void drw(float xoff, float yoff) {

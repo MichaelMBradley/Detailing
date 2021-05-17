@@ -2,15 +2,16 @@ import java.util.HashSet;
 
 ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
-ArrayList<float[]> interiorCircumcircles, exteriorCircumcircles;
+ArrayList<float[]> interiorCircumcircles, exteriorCircumcircles, traverseArcs;
 HashSet<Node> circles, interior, exterior;
 PShape shape;
 int w, h;
 int p, q;
 float[][] ends;
 
-final float minimise = 1;
-final boolean drawGrid = true;
+final float minimise = 3;
+final boolean iterate = false;
+final boolean drawGrid = false;
 final boolean drawNumCircles = true;
 final boolean drawShape = true;
 final boolean drawInterior = true;
@@ -19,14 +20,17 @@ final boolean drawTouching = false;
 final boolean drawDelaunay = false;
 final boolean drawCircumcircles = false;
 final boolean drawTraversal = false;
-final boolean drawKruskal = true;
+final boolean drawTraversalArcs = true;
+final boolean drawKruskal = false;
 
 void setup() {
   size(800, 800);
   w = 800;
   h = w;
-  p = 0;
-  q = 1;
+  if(iterate) {
+    p = 0;
+    q = 1;
+  }
   noFill();
   // Tilted Square:
   // float m = 0; // 0 for no tilt
@@ -65,8 +69,6 @@ void draw() {
   if(drawNumCircles) {
     fill(0);
     text(String.format("Circles: %d", circles.size()), 30, 30);
-    text(""+traverse.get(p), 30, 60);
-    text(""+traverse.get(q), 30, 73);
     noFill();
   }
   if(drawShape) {
@@ -104,26 +106,41 @@ void draw() {
     stroke(0, 0, 255);
     line(traverse.get(traverse.size()-1).x + xoff, traverse.get(traverse.size()-1).y + yoff, traverse.get(0).x + xoff, traverse.get(0).y + yoff);
   }
-  stroke(255, 0, 0);
-  strokeWeight(3);
-  line(traverse.get(p).x + xoff, traverse.get(p).y + yoff, traverse.get(q).x + xoff, traverse.get(q).y + yoff);
-  //keyPressed();
+  if(drawTraversalArcs) {
+    strokeWeight(1);
+    stroke(255, 0, 0);
+    for(float[] a : traverseArcs) {
+      if(a.length == 6) {
+        arc(a[0] + xoff, a[1] + yoff, a[2] * 2, a[3] * 2, a[4], a[5]);
+      } else {
+        line(a[0] + xoff, a[1] + yoff, a[2] + xoff, a[3] + yoff);
+      }
+    }
+  }
+  if(iterate) {
+    //codestuffs with p and q
+    //keyPressed();
+  }
 }
 
 void keyPressed() {
-  p++;
-  q++;
-  if(p >= traverse.size()) {
-    p = 0;
-  }
-  if(q >= traverse.size()) {
-    q = 0;
+  if(iterate) {
+    p++;
+    q++;
+    if(p >= traverse.size()) {
+      p = 0;
+    }
+    if(q >= traverse.size()) {
+      q = 0;
+    }
   }
 }
 
 void mouseClicked() {
-  p = 0;
-  q = 1;
+  if(iterate) {
+    p = 0;
+    q = 1;
+  }
   calc();
 }
 
@@ -172,6 +189,7 @@ void calc() {
   exteriorCircumcircles = analyze(exterior);
   start = millis();
   traverse = traverseKruskalTree(kruskalTraverse(circles, vertices), exterior, vertices);
+  traverseArcs = traversalToArcs(traverse);
   println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 }
 
