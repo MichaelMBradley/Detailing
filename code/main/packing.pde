@@ -37,7 +37,7 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
   float cutoff = ((maxs[0] + maxs[1] + maxradius * 8) / 60) * (2 * minimise / 3);
   float offset = cutoff + maxradius;
   int consecutiveFailed = 0;
-  while(consecutiveFailed < 1000) {
+  while(consecutiveFailed < 3000 / minimise) {
     r = random(minradius, maxradius);
     x = random(r - offset, maxs[0] + offset - r);
     y = random(r - offset, maxs[1] + offset - r);
@@ -72,7 +72,7 @@ HashSet<Node> randomFill(int w, int h, float minimise) {
   float minradius = (w + h) / (60 * minimise);
   float maxradius = minradius * 4;
   int consecutiveFailed = 0;
-  while(consecutiveFailed < 1000) {
+  while(consecutiveFailed < 3000 / minimise) {
     r = random(minradius, maxradius);
     x = random(r, w - r);
     y = random(r, h - r);
