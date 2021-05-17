@@ -1,17 +1,15 @@
-# A simple program to create shapes to avoid typing out many tuples manually
+# A simple program to create shapes to avoid typing out many arrays manually
 # LMB = Place vertex
 # RMB = Remove last vertex
 
-w = h = 400
+w = h = 800
 create = []
-stable = []
 compression = 10
 
 def setup():
     size(w, h)
 
 def draw():
-    global create, stable, compression
     l = len(create)
     background(255)
     if l > 0:
@@ -37,7 +35,6 @@ def draw():
 
 
 def mouseClicked():
-    global create, stable, compression
     if mouseButton == LEFT:
         create.append((mouseX, mouseY))  # Adds new coordinate
     elif mouseButton == RIGHT:
@@ -47,13 +44,11 @@ def mouseClicked():
         minx, miny = min([x for (x, y) in create]), min([y for (x, y) in create])
         stable = create[:]  # Shallow copy
         for i in range(len(stable)):
-            stable[i] = (stable[i][0] - minx, stable[i][1] - miny)  # ALters 'stable' array to be touching x=0 and y=0 at some vertex
-        
-        print("Full: {}\nCompressed ({}x): {}".format(stable, compression, [(int(x / compression), int(y / compression)) for (x, y) in stable]))
+            stable[i] = (stable[i][0] - minx, stable[i][1] - miny)  # Alters 'stable' array to be touching x=0 and y=0 at some vertex
         out = "{"
         for i, (x, y) in enumerate(stable):
-            out +="{}{}, {}{}".format("{", int(x/compression), int(y/compression), "}")
+            out += "{}{}, {}{}".format("{", int(x/compression), int(y/compression), "}")
             if i != len(stable)-1:
                 out += ", "
         out += "}"
-        print(out)
+        print out

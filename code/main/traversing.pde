@@ -182,8 +182,9 @@ ArrayList<Node> traverseKruskalTree(ArrayList<Node> kruskal, HashSet<Node> exter
         l = j;
       }
     }
-    edge = new Node(PVector.sub(vertices.get(l), vertices.get(k)));
+    edge = new Node(PVector.sub(n.pv, closestPoint2(vertices.get(k), vertices.get(l), n.pv)));
     traverse.addAll(n.getAllKruskal(edge, exterior.contains(n)));
+    println();
   }
   return traverse;
 }

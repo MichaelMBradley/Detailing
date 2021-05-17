@@ -9,8 +9,8 @@ int w, h;
 int p, q;
 float[][] ends;
 
-final float minimise = 2;
-final boolean drawGrid = false;
+final float minimise = 1;
+final boolean drawGrid = true;
 final boolean drawNumCircles = true;
 final boolean drawShape = true;
 final boolean drawInterior = true;
@@ -65,6 +65,8 @@ void draw() {
   if(drawNumCircles) {
     fill(0);
     text(String.format("Circles: %d", circles.size()), 30, 30);
+    text(""+traverse.get(p), 30, 60);
+    text(""+traverse.get(q), 30, 73);
     noFill();
   }
   if(drawShape) {
@@ -105,6 +107,7 @@ void draw() {
   stroke(255, 0, 0);
   strokeWeight(3);
   line(traverse.get(p).x + xoff, traverse.get(p).y + yoff, traverse.get(q).x + xoff, traverse.get(q).y + yoff);
+  //keyPressed();
 }
 
 void keyPressed() {

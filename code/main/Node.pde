@@ -116,8 +116,7 @@ public class Node {
   ArrayList<Node> getAllKruskal(Node call, boolean clockwise) {
     ArrayList<Node> below = new ArrayList<Node>();
     ArrayList<Node> orderedChildren = new ArrayList<Node>(kruskalAdjacent);
-    HashMap<Node, Float> headings = new HashMap<Node, Float>();
-    float heading;
+    HashMap<Node, Float> headings;
     if(orderedChildren.contains(call)) {
       orderedChildren.remove(call);
     }
@@ -127,17 +126,36 @@ public class Node {
     } else if(kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
       return below;
     }
+    headings = getRelativeHeadings(orderedChildren, call, clockwise);
+    println(this);
+    sortChildrenByHeading(orderedChildren, headings, clockwise);
+    for(Node n : orderedChildren) {
+      for(Node k : n.getAllKruskal(this, clockwise)) {
+        below.add(k);
+      }
+      below.add(this);
+    }
+    return below;
+  }
+  private HashMap<Node, Float> getRelativeHeadings(ArrayList<Node> orderedChildren, Node call, boolean clockwise) {
+    HashMap<Node, Float> headings = new HashMap<Node, Float>();
+    float heading;
     for(Node n : orderedChildren) {
       heading = PVector.sub(n.pv, this.pv).heading();
-      if(heading > call.pv.heading() == clockwise) {
+      if(heading > call.pv.heading()) {
         if(clockwise) {
           heading -= TWO_PI;
-        } else {
-          heading += TWO_PI;
+        }
+      } else {
+        if(!clockwise) {
+          heading -= TWO_PI;
         }
       }
       headings.put(n, heading);
     }
+    return headings;
+  }
+  private void sortChildrenByHeading(ArrayList<Node> orderedChildren, HashMap<Node, Float> headings, boolean clockwise) {
     boolean swap = true;
     Node temp;
     while(swap) {
@@ -151,13 +169,7 @@ public class Node {
         }
       }
     }
-    for(Node n : orderedChildren) {
-      for(Node k : n.getAllKruskal(this, clockwise)) {
-        below.add(k);
-      }
-      below.add(this);
-    }
-    return below;
+    println("\t" + orderedChildren + "\n\t" + headings + "\n\t" + clockwise + "\n");
   }
   
   public void drw(float xoff, float yoff) {
