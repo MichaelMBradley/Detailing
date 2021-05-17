@@ -15,7 +15,7 @@ In this blog I keep track of what I've tried, what's worked, and what hasn't.
   {% for post in site.posts %}
     <li>
       <h3><a href="https://michaelmbradley.github.io/Detailing{{ post.url }}">{{ post.title }}</a></h3>
-      <h4>{{ post.date | date_to_string }}</h4>
+      <p><em>{{ post.date | date_to_string }}</em></p>
       {{ post.excerpt }}
     </li>
   {% endfor %}
