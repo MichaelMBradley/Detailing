@@ -1,10 +1,7 @@
-import java.util.List;
-
-float[][] extremes(ArrayList<PVector> vertices) {
+PVector[] extremes(ArrayList<PVector> vertices) {
   /**
-  Returns the highest and lowest x and y values of a list of PVectors.
-  [[LowX, LowY], [HighX, HighY]]
-  TODO: Return two new PVectors?
+  Returns two PVectors bounding a list of PVectors.
+  [min, max]
   */
   float[][] ends = {{vertices.get(0).x, vertices.get(0).y}, {vertices.get(0).x, vertices.get(0).y}};
   for(PVector pv : vertices) {
@@ -19,7 +16,7 @@ float[][] extremes(ArrayList<PVector> vertices) {
       ends[1][1] = pv.y;
     }
   }
-  return ends;
+  return new PVector[] {new PVector(ends[0][0], ends[0][1]), new PVector(ends[1][0], ends[1][1])};
 }
 
 void scaleVertices(float scalingfactor, ArrayList<PVector> vertices) {
@@ -29,6 +26,9 @@ void scaleVertices(float scalingfactor, ArrayList<PVector> vertices) {
 }
 
 Polygon toPolygon(ArrayList<PVector> vertices) {
+  /**
+  Returns a polygon object with given vertices.
+  */
   int size = vertices.size();
   int[] x = new int[size];
   int[] y = new int[size];
@@ -69,6 +69,9 @@ PShape toShape(ArrayList<PVector> vertices) {
 }
 
 ArrayList<float[]> triangleToCircle(ArrayList<Triangle> triangles) {
+  /**
+  Return list of circumcircles for the triangles.
+  */
   ArrayList<float[]> info = new ArrayList<float[]>();
   for(Triangle tri : triangles) {
     info.add(triangleToCircle(tri.p1.x, tri.p1.y, tri.p2.x, tri.p2.y, tri.p3.x, tri.p3.y));
@@ -108,26 +111,17 @@ float[] triangleToCircle(float x1, float y1, float x2, float y2, float x3, float
   return new float[] {x, y, r};
 }
 
-float[] getArc(Node n1, Node n2) {
-  ArrayList<Node> n3arr = new ArrayList<Node>();
-  float[] arcinfo = new float[3];
-  float ang1 = 0;
-  float ang2 = 0;
-  for(Node d : n1.delaunay) {
-    if(d.delaunay.contains(n2)) {
-      n3arr.add(d);
-    }
-  }
-  for(Node n3 : n3arr) {
-    arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
-    ang1 = PVector.sub(n1.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
-    ang2 = PVector.sub(n2.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
-    if(ang1 > ang2) {
-      ang2 += TWO_PI;
-    }
-    if(ang2 - ang1 < PI) {
-      break;
-    }
+float[] getArc(Node n1, Node n2, Node n3) {
+  /**
+  Returns data about the arc between n1 and n2, passing through n3.
+  [x, y, w, h, start, end]
+  w = h
+  */
+  float[] arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
+  float ang1 = PVector.sub(n1.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
+  float ang2 = PVector.sub(n2.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
+  if(ang1 > ang2) {
+    ang2 += TWO_PI;
   }
   return new float[] {arcinfo[0], arcinfo[1], arcinfo[2], arcinfo[2], ang1, ang2};
 }

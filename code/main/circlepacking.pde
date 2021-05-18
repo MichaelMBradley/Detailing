@@ -1,7 +1,3 @@
-import java.awt.geom.Line2D;
-import java.util.HashSet;
-import java.util.Stack;
-
 boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
   /**
   Returns if a given node is suitably close (cutoff) to any
@@ -20,10 +16,6 @@ float distanceToSegment(PVector v1, PVector v2, PVector test) {
   return (float) Line2D.ptSegDist(v1.x, v1.y, v2.x, v2.y, test.x, test.y);
 }
 
-HashSet<Node> randomFillAware(ArrayList<PVector> vertices) {
-  return randomFillAware(vertices, 3.0f);
-}
-
 HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
   /**
   Creates a circle packing of the given vertices.
@@ -31,16 +23,16 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
   HashSet<Node> nodes = new HashSet<Node>();
   float x, y, r, closestCircle;
   Node current;
-  float[] maxs = extremes(vertices)[1];
-  float minradius = max(maxs[0], maxs[1]) / (60 * minimise);
+  PVector max = extremes(vertices)[1];
+  float minradius = max(max.x, max.y) / (60 * minimise);
   float maxradius = minradius * 4;
-  float cutoff = ((maxs[0] + maxs[1] + maxradius * 8) / 60) * (2 * minimise / 3);
+  float cutoff = ((max.x + max.y + maxradius * 8) / 60) * (2 * minimise / 3);
   float offset = cutoff + maxradius;
   int consecutiveFailed = 0;
   while(consecutiveFailed < 3000 / minimise) {
     r = random(minradius, maxradius);
-    x = random(r - offset, maxs[0] + offset - r);
-    y = random(r - offset, maxs[1] + offset - r);
+    x = random(r - offset, max.x + offset - r);
+    y = random(r - offset, max.y + offset - r);
     closestCircle = 1e6;
     for(Node n : nodes) {
       // Find overall closest circle (the actual node is irrelevant)
