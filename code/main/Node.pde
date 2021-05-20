@@ -188,6 +188,9 @@ public class Node {
     y += direction.y;
   }
   
+  public void draw() {
+    this.draw(new PVector());
+  }
   public void draw(PVector offset) {
     circle(x + offset.x, y + offset.y, r * 2);  // p5 accepts diameter, not radius
   }
