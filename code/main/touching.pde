@@ -72,90 +72,95 @@ ArrayList<float[]> surroundingArcs(ArrayList<Node> nodes) {
     trees.get(trees.size() - 1).add(n);
   }
   trees.get(0).remove(0);
-  for(ArrayList<Node> tree : trees) {
-    arcs.addAll(surroundingArcsTree(tree));
+  for(int i = 0; i < trees.size(); i++) {
+    if(i == trees.size() - 1) {
+      arcs.addAll(surroundingArcsTree(trees.get(i)));
+    } else {
+      arcs.addAll(surroundingArcsTree(trees.get(i), trees.get(i+1).get(0)));
+    }
   }
   return arcs;
 }
 
+ArrayList<float[]> surroundingArcsTree(ArrayList<Node> nodes, Node next) {
+  ArrayList<Node> n = (ArrayList<Node>) nodes.clone();
+  n.add(next);
+  return surroundingArcsTree(n);
+}
+
 ArrayList<float[]> surroundingArcsTree(ArrayList<Node> nodes) {
+  if(nodes.size() == 0) {
+    return new ArrayList<float[]>();
+  }
   ArrayList<float[]> arcs = new ArrayList<float[]>();
-  Node ni, nj, nc;
-  float[] ah, ai, aj, se, arc;
-  int choose, index;
-  float start, end;
-  for(int i = 0; i < nodes.size(); i++) {
+  ArrayList<Node> arcNodes = new ArrayList<Node>();
+  ArrayList<Integer> tri = new ArrayList<Integer>();
+  Node ni, nj, nc, n;
+  float[] se;
+  int choose;
+  boolean in;
+  //nodes.add(0, nodes.get(0));
+  //nodes.add(0, nodes.get(0));
+  //nodes.add(nodes.size(), nodes.get(nodes.size() - 1));
+  //nodes.add(nodes.size(), nodes.get(nodes.size() - 1));
+  for(int i = 1; i < nodes.size() - 1; i++) {
     ni = nodes.get(i);
     nj = nodes.get(i == 0 ? nodes.size() - 1 : i - 1);
     // Choosing which side of the circle to put the arc on based on the direction
     if(ni.x == nj.x) {
-      choose = 0;
+      choose = ni.y > nj.y ? 0 : 1;
     } else if(ni.y == nj.y) {
-      choose = 1;
+      choose = ni.x > nj.x ? 1 : 0;
     } else if(nj.y > ni.y) {
       choose = 1;
     } else {
       choose = 0;
     }
     nc = getAdjacent(ni, nj)[choose];
-    arcs.add(new float[] {nc.x, nc.y, nc.r, nc.r, 0, TWO_PI});
-    arcs.add(new float[] {ni.x, ni.y, ni.r, ni.r, 0, TWO_PI});
+    arcNodes.add(nc);
+    arcNodes.add(ni);
   }
-  for(int i = 0; i < arcs.size(); i++) {
-    ah = arcs.get(i == arcs.size() - 1 ? 0 : i + 1);
-    ai = arcs.get(i);
-    aj = arcs.get(i == 0 ? arcs.size() - 1 : i - 1);
-    if(ai[4] != -1f) {
-      // Start / stop for the arc
-      se = order(new PVector(aj[0], aj[1]), new PVector(ai[0], ai[1]), new PVector(ah[0], ah[1]), true, i);
-      start = se[0]; end = se[1];
-      if(abs(start - end) > (3f / 4f) * TWO_PI) {
-        index = (i - 1) / 2;
-        index = index < 0 ? nodes.size() - index : index;
-        ni = triCircleAdjacent(nodes.get(index - 1), nodes.get(index), nodes.get(index + 1))[1];
-        arcs.set(i, new float[] {ni.x, ni.y, ni.r, ni.r, 0, TWO_PI});
-        se = order(nodes.get(index - 1).pv, ni.pv, nodes.get(index + 1).pv, false, i);
-        start = se[0]; end = se[1];
-        ah[4] = -1f;
-        ah[5] = -1f;
-        aj[4] = -1f;
-        aj[5] = -1f;
-      }
-      arcs.get(i)[4] = start;
-      arcs.get(i)[5] = end;
+  for(int i = 3; i < arcNodes.size() - 3; i+=2) {
+    if(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) < HALF_PI * 1.25f && arcNodes.get(i+2) != arcNodes.get(i-2)) {
+      arcNodes.set(i, triCircleAdjacent(arcNodes.get(i-2), arcNodes.get(i+2), arcNodes.get(i))[1]);
+      arcNodes.remove(i+1);
+      arcNodes.remove(i-1);
+      tri.add(i);
     }
   }
-  for(int i = 2; i < arcs.size() - 2; i++) {
-    if(arcs.get(i-1)[5] == -1 && arcs.get(i+1)[5] == -1) {
-      arc = arcs.get(i-2);
-      arc[5] = PVector.sub(new PVector(arcs.get(i)[0], arcs.get(i)[1]), new PVector(arc[0], arc[1])).heading();
-      arc[4] = bindStart(arc[4], arc[5]);
-      arc = arcs.get(i+2);
-      arc[4] = PVector.sub(new PVector(arcs.get(i)[0], arcs.get(i)[1]), new PVector(arc[0], arc[1])).heading();
-      arc[4] = bindStart(arc[4], arc[5]);
+  for(int i = 0; i < arcNodes.size(); i++) {
+    n = arcNodes.get(i);
+    in = (i % 2 == 0);
+    if(tri.contains(i+1)) {
+      in = true;
     }
+    se = order(arcNodes.get(i == 0 ? arcNodes.size() - 2 : i - 1).pv, n.pv, arcNodes.get(i >= arcNodes.size() - 2 ? arcNodes.size() - i : i + 1).pv, in);
+    arcs.add(new float[] {n.x, n.y, n.r, n.r, se[0], se[1]});
   }
   return arcs;
 }
 
-private float[] order(PVector pre, PVector curr, PVector next, boolean clockwise, int i) {
+private float[] order(PVector pre, PVector curr, PVector next, boolean crossing) {
   float start = PVector.sub(pre, curr).heading();
   float end = PVector.sub(next, curr).heading();
-  if(clockwise == (i % 2 == 0)) {
+  if(PVector.angleBetween(PVector.sub(pre, curr), PVector.sub(next, curr)) < PI == crossing) {
     float temp = start;
     start = end;
     end = temp;
   }
-  start = bindStart(start, end);
-  return new float[] {start, end};
+  return bindStart(start, end);
 }
 
-private float bindStart(float start, float end) {
+private float[] bindStart(float start, float end) {
   while(start > end) {
     start -= TWO_PI;
   }
   while(start < end - TWO_PI) {
     start += TWO_PI;
   }
-  return start;
+  while(end < 0) {
+    start += TWO_PI;
+    end += TWO_PI;
+  }
+  return new float[] {start, end};
 }

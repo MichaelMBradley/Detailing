@@ -16,9 +16,9 @@ PShape shape;
 PVector offset;
 boolean blue = true;
 
-final float minimise = 2;
+final float minimise = 3;
 final boolean iterate = false;
-final boolean noDraw = true;
+final boolean noDraw = false;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
@@ -38,9 +38,9 @@ void setup() {
   // float m = 0; // 0 for no tilt
   // float[][] initvertices = {{0, m}, {100 - m, 0}, {100, 100 - m}, {m, 100}};
   // Mouse input example:
-  // float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
+   float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
   // More complex vertices:
-  float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
+  //float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
   vertices = toPVector(initvertices);
   scaleVertices((float) w / 40, vertices);
   shape = toShape(vertices);
@@ -115,66 +115,11 @@ void draw() {
     // codestuffs with p and q (will be valid for traverse indices)
     // keyPressed(); // ?
   }
-  ArrayList<Node> ns = new ArrayList<Node>();
-  iter = mouseX / 60f;//+= 0.01f;
-  Node n1 = new Node(400, 400, 50);
-  Node n2 = new Node(n1.x + 100 * cos(iter), n1.y + 100 * sin(iter), 50);
-  Node n3 = new Node(n2.x + 100 * cos(1.5 * iter), n2.y + 100 * sin(1.5 * iter), 50);
-  Node n4 = new Node(n2.x + 100 * cos(1.5 * iter + HALF_PI), n2.y + 100 * sin(1.5 * iter + HALF_PI), 50);
-  //Node n1 = new Node(300, 200, 50);
-  //Node n2 = new Node(300, 300, 50);
-  //Node n3 = new Node(200, 300, 50);
-  //Node n4 = new Node(115, 355, 50);
-  //Node n5 = new Node(300, 400, 50);
-  //Node n6 = new Node(300, 480, 30);
-  //Node n7 = new Node(400, 300, 50);
-  //Node n8 = new Node(470, 230, 50);
-  //Node n9 = new Node(470, 370, 50);
-  ns.add(n1);
-  ns.add(n2);
-  ns.add(n3);
-  ns.add(n2);ns.add(n4);
-  //ns.add(n4);
-  //ns.add(n3);
-  //ns.add(n2);
-  //ns.add(n5);
-  //ns.add(n6);
-  //ns.add(n5);
-  //ns.add(n2);
-  //ns.add(n7);
-  //ns.add(n8);
-  //ns.add(n7);
-  //ns.add(n9);
-  //ns.add(n7);
-  ns.add(n2);
-  ns.add(n1);
-  //strokeWeight(2);
-  //stroke(255, 0, 0);
-  //n1.draw();
-  //n2.draw();
-  //n3.draw();
-  //n4.draw();
-  //n5.draw();
-  //n6.draw();
-  //n7.draw();
-  //n8.draw();
-  //n9.draw();
-  strokeWeight(1);
-  stroke(0);
-  String out = "";
-  for(float[] arr : surroundingArcsTree(ns)) {
-    arc(arr[0], arr[1], arr[2] * 2, arr[3] * 2, arr[4], arr[5]);
-    text(arr[5], arr[0], arr[1]);
-    out += String.format("x: %.2f, y: %.2f, r: %.2f, start: %.2f, stop: %.2f\n", arr[0], arr[1], arr[2], arr[4], arr[5]);
+  if(noDraw) {
+    test3();
+  } else {
+    noLoop();
   }
-  fill(0);
-  text(out, 10, 10);
-  noFill();
-  //stroke(0, 0, 255);
-  //for(int i = 0; i < ns.size() - 1; i++) {
-  //  line(ns.get(i).x, ns.get(i).y, ns.get(i+1).x, ns.get(i+1).y);
-  //}
-  //noLoop();
 }
 
 void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles) {
@@ -217,6 +162,10 @@ void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles) {
   }
 }
 
+void drawArc(float[] arc) {
+  arc(arc[0], arc[1], arc[2] * 2, arc[3] * 2, arc[4], arc[5]);
+}
+
 ArrayList<float[]> analyze(HashSet<Node> aCircles) {
   /**
   The Delaunay Triangulation and tree generation is done seperately for the interior and exterior circles.
@@ -244,25 +193,27 @@ void calc() {
   /**
   Completes all relevant calculations.
   */
-  int start;
-  start = millis();
-  circles = randomFillAware(vertices, minimise);
-  println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
-  start = millis();
-  condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
-  println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
-  println("-Interior-");
-  interior = containing(vertices, circles, true);
-  interiorCircumcircles = analyze(interior);
-  println("-Exterior-");
-  exterior = containing(vertices, circles, false);
-  exteriorCircumcircles = analyze(exterior);
-  start = millis();
-  traverse = traverseKruskalTrees(circles, exterior, vertices);
-  //traverseArcs = traversalToArcs(traverse);
-  traverseArcs = surroundingArcs(traverse);
-  println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
-  println("\n");
+  if(!noDraw) {
+    int start;
+    start = millis();
+    circles = randomFillAware(vertices, minimise);
+    println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
+    start = millis();
+    condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
+    println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
+    println("-Interior-");
+    interior = containing(vertices, circles, true);
+    interiorCircumcircles = analyze(interior);
+    println("-Exterior-");
+    exterior = containing(vertices, circles, false);
+    exteriorCircumcircles = analyze(exterior);
+    start = millis();
+    traverse = traverseKruskalTreesSmart(circles, exterior, vertices, false);
+    traverseArcs = delaunayTraversalToArcs(traverse);
+    //traverseArcs = surroundingArcs(traverse);
+    println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
+    println("\n");
+  }
 }
 
 void calcOffset() {
@@ -302,7 +253,11 @@ void keyPressed() {
       println(cmd + ": " + draw.get(cmd));
       loop();
     } else {
-      mouseClicked();
+      //mouseClicked();
+      boolean s = random(0, 2) > 1.0f;
+      traverse = s ? traverseKruskalTrees(circles, exterior, vertices, false) : traverseKruskalTreesSmart(circles, exterior, vertices, false);
+      println(s);
+      loop();
     }
   }
 }

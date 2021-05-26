@@ -1,3 +1,13 @@
+float[] arcLine(PVector p1, PVector p2) {
+  float[] circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, random(min(p1.x, p2.x), max(p1.x, p2.x)), random(min(p1.y, p2.y), max(p1.y, p2.y)));
+  float[] se = order(p1, new PVector(circ[0], circ[1]), p2, true);
+  if(se[1] - se[0] > PI) {
+    return new float[] {circ[0], circ[1], circ[2], circ[2], se[1] - TWO_PI, se[0]};
+  } else {
+    return new float[] {circ[0], circ[1], circ[2], circ[2], se[0], se[1]};
+  }
+}
+
 PVector[] extremes(ArrayList<PVector> vertices) {
   /**
   Returns two PVectors bounding a list of PVectors.
@@ -127,7 +137,13 @@ float[] getArc(Node n1, Node n2, Node n3) {
 }
 
 Node[] getAdjacent(Node n1, Node n2) {
-  return getAdjacent(n1, n2, max((n1.r + n2.r) / 4, n1.distanceToCircle(n2) + n1.r));
+  float r = max((n1.r + n2.r) / 4, n1.distanceToCircle(n2) + n1.r / 2, n2.distanceToCircle(n1) + n2.r / 2);
+  Node[] test = getAdjacent(n1, n2, r);
+  while(test[0].distanceToCircle(test[1]) < 0) {
+    r *= 1.1;
+    test = getAdjacent(n1, n2, r);
+  }
+  return test;
 }
 
 Node[] getAdjacent(Node n1, Node n2, float r0) {
@@ -154,7 +170,7 @@ Node[] getAdjacent(Node n1, Node n2, float r0) {
   float x2 = n2.x;
   float y2 = n2.y;
   float r2 = n2.r;
-  if(y1 != y2) {
+  if(abs(y1 - y2) > 1) {
     ml = - (x2 - x1) / (y2 - y1);
     bl = (-pow(x1, 2) + pow(x2, 2) - pow(y1, 2) + pow(y2, 2) + pow(r1, 2) - pow(r2, 2) + (2 * r0 * (r1 - r2))) / (2 * (y2 - y1));
     aq = 1 + pow(ml, 2);
