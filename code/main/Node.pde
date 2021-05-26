@@ -120,7 +120,11 @@ public class Node {
     kruskalAdjacent.add(n);
   }
   
-  ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise) {
+  ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents) {
+    return kruskalTreeTraverse(call, clockwise, includeParents, null);
+  }
+  
+  ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents, Node exit) {
     /**
     Recursive function that returns a list of all nodes below it
     in it's kruskal-esque tree, in cw or ccw order.
@@ -139,10 +143,16 @@ public class Node {
     }
     orderedChildren = sortRelativeHeadings(orderedChildren, call, clockwise);
     for(Node n : orderedChildren) {
-      for(Node k : n.kruskalTreeTraverse(this, clockwise)) {
+      for(Node k : n.kruskalTreeTraverse(this, clockwise, includeParents)) {
         below.add(k);
+        if(k == exit) {
+          println("out");
+          break;
+        }
       }
-      below.add(this);
+      if(includeParents && below.get(-1) != exit) {
+        below.add(this);
+      }
     }
     return below;
   }
@@ -188,6 +198,9 @@ public class Node {
     y += direction.y;
   }
   
+  public void draw() {
+    this.draw(new PVector());
+  }
   public void draw(PVector offset) {
     circle(x + offset.x, y + offset.y, r * 2);  // p5 accepts diameter, not radius
   }

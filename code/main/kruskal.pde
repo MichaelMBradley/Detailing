@@ -91,34 +91,58 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
   return traversal;
 }
 
-ArrayList<Node> traverseKruskalTrees(HashSet<Node> nodes, HashSet<Node> exterior, ArrayList<PVector> vertices) {
+ArrayList<Node> traverseKruskalTrees(HashSet<Node> nodes, HashSet<Node> exterior, ArrayList<PVector> vertices, boolean includeParents) {
   /**
   Visits every kruskal-esque tree in order, and traverses those trees in a relevant manner.
   */
   ArrayList<Node> traverse = new ArrayList<Node>();
   ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);
   Node edge = new Node();
-  float dist, test;
-  int j, k, l;
+  float dist;
+  int j;
+  int k = 0;
+  int l = 0;
   for(Node n : kruskal) {
     dist = 1e6;
-    k = 0;
-    l = 0;
     for(int i = 0; i < vertices.size(); i++) {
-      j = i + 1;
-      if(j == vertices.size()) {
-        j = 0;
-      }
-      test = distanceToSegment(vertices.get(i), vertices.get(j), n.pv);
-      if(test<dist) {
+      j = i + 1 == vertices.size() ? 0 : i + 1;  // Next vertex w/ wraparound
+      if(distanceToSegment(vertices.get(i), vertices.get(j), n.pv) < dist) {
         k = i;
         l = j;
       }
     }
     edge = new Node(PVector.sub(n.pv, closestPoint2(vertices.get(k), vertices.get(l), n.pv)));
     //println("\n" + edge + "\t" + PVector.sub(n.pv, edge.pv).heading());
-    traverse.addAll(n.kruskalTreeTraverse(edge, exterior.contains(n)));
+    traverse.addAll(n.kruskalTreeTraverse(edge, exterior.contains(n), includeParents));
   }
+  return traverse;
+}
+
+ArrayList<Node> traverseKruskalTreesSmart(HashSet<Node> nodes, HashSet<Node> exterior, ArrayList<PVector> vertices, boolean includeParents) {
+  /**
+  Visits every kruskal-esque tree in order, and traverses those trees in a relevant manner.
+  */
+  ArrayList<Node> traverse = new ArrayList<Node>();
+  ArrayList<Node> order = new ArrayList<Node>();
+  ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);
+  Node edge = new Node();
+  Node close = new Node();
+  float dist;
+  for(int i = 0; i < kruskal.size(); i++) {
+    dist = 1e6;
+    for(Node n : kruskal.get(i).kruskal) {
+      for(Node m : kruskal.get(i + 1 == kruskal.size() ? 0 : i + 1).kruskal) {
+        if(m.distanceToCircle(n) < dist) {
+          close = m;
+        }
+      }
+    }
+    order.add(close);
+  }
+  for(int i = 0; i < order.size(); i++) {
+    traverse.addAll(order.get(i).kruskalTreeTraverse(edge, exterior.contains(order.get(i)), includeParents, order.get(i + 1 == order.size() ? 0 : i + 1)));
+  }
+  //print(order);
   return traverse;
 }
 
