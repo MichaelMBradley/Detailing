@@ -1,5 +1,9 @@
 float[] arcLine(PVector p1, PVector p2) {
-  float[] circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, random(min(p1.x, p2.x), max(p1.x, p2.x)), random(min(p1.y, p2.y), max(p1.y, p2.y)));
+  float minx = min(p1.x, p2.x) * (2.0f / 3.0f) + max(p1.x, p2.x) * (1.0f / 3.0f);
+  float miny = min(p1.y, p2.y) * (2.0f / 3.0f) + max(p1.y, p2.y) * (1.0f / 3.0f);
+  float maxx = min(p1.x, p2.x) * (1.0f / 3.0f) + max(p1.x, p2.x) * (2.0f / 3.0f);
+  float maxy = min(p1.y, p2.y) * (1.0f / 3.0f) + max(p1.y, p2.y) * (2.0f / 3.0f);
+  float[] circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, random(minx, maxx), random(miny, maxy));
   float[] se = order(p1, new PVector(circ[0], circ[1]), p2, true);
   if(se[1] - se[0] > PI) {
     return new float[] {circ[0], circ[1], circ[2], circ[2], se[1] - TWO_PI, se[0]};

@@ -10,6 +10,11 @@ ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
 }
 
 
+void updateDelaunay(HashSet<Node> nodes) {
+  updateDelaunay(nodes, delaunay(nodes));
+}
+
+
 void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
   /**
   Adds the delaunay triangulation information to the nodes.
@@ -40,13 +45,16 @@ void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
   }
 }
 
-
 ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
+  return delaunayTraverse(nodes, vertices, (float) mouseX * 10f / w);
+}
+
+ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
   /**
   Visits many nodes in order around the polyline, based on the delaunay triangulation.
   */
   ArrayList<Node> traversal = new ArrayList<Node>();
-  float closest, angle;
+  float closest, angle, distance;
   Node goal;
   Node next = new Node();
   Node current = closestNode(nodes, vertices.get(vertices.size() - 1));
@@ -56,15 +64,16 @@ ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertice
       if(current.delaunay.contains(goal)) {
         next = goal;
       } else {
-        closest = PI * 3;
+        closest = Float.MAX_VALUE;
         for(Node d : current.delaunay) {
           angle = PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv));
-          if(angle < closest && !traversal.contains(d)) {
+          distance = PVector.dist(d.pv, goal.pv);
+          if(angle < closest && distanceWeight < (d.r + current.r) * 4 && !traversal.contains(d)) {
             closest = angle;
             next = d;
           }
         }
-        if(closest == PI * 3) {
+        if(closest == Float.MAX_VALUE) {
           //println("skip");
           next = goal;
         }

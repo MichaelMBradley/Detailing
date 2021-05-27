@@ -146,7 +146,6 @@ public class Node {
       for(Node k : n.kruskalTreeTraverse(this, clockwise, includeParents)) {
         below.add(k);
         if(k == exit) {
-          println("out");
           break;
         }
       }
@@ -206,6 +205,6 @@ public class Node {
   }
   
   public String toString() {
-    return String.format("(x: %.2f, y: %.2f r: %.2f)", x, y, r);
+    return String.format("(x: %.2f, y: %.2f, r: %.2f)", x, y, r);
   }
 }

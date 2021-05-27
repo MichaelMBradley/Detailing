@@ -15,10 +15,11 @@ float iter = 0f;
 PShape shape;
 PVector offset;
 boolean blue = true;
+boolean smart = false;
 
-final float minimise = 3;
-final boolean iterate = false;
+final float minimise = 4;
 final boolean noDraw = false;
+final boolean iterate = false;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
@@ -38,11 +39,11 @@ void setup() {
   // float m = 0; // 0 for no tilt
   // float[][] initvertices = {{0, m}, {100 - m, 0}, {100, 100 - m}, {m, 100}};
   // Mouse input example:
-   float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
+   //float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
   // More complex vertices:
-  //float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
+  float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
   vertices = toPVector(initvertices);
-  scaleVertices((float) w / 40, vertices);
+  scaleVertices((float) w / 30, vertices);
   shape = toShape(vertices);
   calcOffset();
   calc();
@@ -75,12 +76,8 @@ void draw() {
     strokeWeight(1);
     shape(shape, offset.x, offset.y);
   }
-  if(draw.get("interior")) {
-    drawNodes(interior, interiorCircumcircles);
-  }
-  if(draw.get("exterior")) {
-    drawNodes(exterior, exteriorCircumcircles);
-  }
+  drawNodes(interior, interiorCircumcircles, draw.get("interior"));
+  drawNodes(exterior, exteriorCircumcircles, draw.get("exterior"));
   if(draw.get("traversal")) {
     stroke(255, 0, 0);
     strokeWeight(1);
@@ -98,17 +95,21 @@ void draw() {
   if(draw.get("traversalArcs")) {
     strokeWeight(1);
     stroke(255, 0, 0);
+    float r = 255;
+    float b = 0;
+    float chn = 255.0f / (float) traverseArcs.size();
     for(float[] a : traverseArcs) {
-      stroke(255, 0, 0);
-      if(blue) {
+      if(draw.get("gradient")) {
+        stroke(r, 0, b);
+        r -= chn;
+        b += chn;
+      }
+      //stroke(255, 0, 0);
+      //if(blue) {
         //stroke(0, 0, 255);
-      }
-      blue = !blue;
-      if(a.length == 6) {
-        arc(a[0] + offset.x, a[1] + offset.y, a[2] * 2, a[3] * 2, a[4], a[5]);
-      } else {
-        line(a[0] + offset.x, a[1] + offset.y, a[2] + offset.x, a[3] + offset.y);
-      }
+      //}
+      //blue = !blue;
+      drawArc(a);
     }
   }
   if(iterate) {
@@ -122,15 +123,17 @@ void draw() {
   }
 }
 
-void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles) {
+void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles, boolean drawCircles) {
   /**
   Nodes may be stored in multiple discrete sets.
   This function draws relevant information for all nodes in a given set.
   */
   for(Node n : circles) {
-    stroke(0);
-    strokeWeight(1);
-    n.draw(offset);
+    if(drawCircles) {
+      stroke(0);
+      strokeWeight(1);
+      n.draw(offset);
+    }
     if(draw.get("touching")) {
       stroke(0, 0, 255);
       strokeWeight(1);
@@ -162,8 +165,12 @@ void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles) {
   }
 }
 
-void drawArc(float[] arc) {
-  arc(arc[0], arc[1], arc[2] * 2, arc[3] * 2, arc[4], arc[5]);
+void drawArc(float[] a) {
+  if(a.length == 6) {
+        arc(a[0] + offset.x, a[1] + offset.y, a[2] * 2, a[3] * 2, a[4], a[5]);
+      } else {
+        line(a[0] + offset.x, a[1] + offset.y, a[2] + offset.x, a[3] + offset.y);
+      }
 }
 
 ArrayList<float[]> analyze(HashSet<Node> aCircles) {
@@ -179,7 +186,7 @@ ArrayList<float[]> analyze(HashSet<Node> aCircles) {
   ArrayList<float[]> circum;
   int start;
   start = millis();
-  ArrayList<Triangle> triangles = delaunay(aCircles);  // Triangulate.triangulate(vertices);
+  ArrayList<Triangle> triangles = delaunay(aCircles);
   circum = triangleToCircle(triangles);
   updateDelaunay(aCircles, triangles);
   println(String.format("\tTriangulation: %.3f", (float) (millis() - start) / 1000));
@@ -198,9 +205,16 @@ void calc() {
     start = millis();
     circles = randomFillAware(vertices, minimise);
     println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size()/((float) (millis() - start) / 1000)));
-    start = millis();
-    condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
-    println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
+    if(draw.get("condense")) {
+      start = millis();
+      condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
+      println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
+    }
+    if(draw.get("getTouching") && !draw.get("condense")) {
+      start = millis();
+      createTouchingGraphs(circles);
+      println(String.format("Touching: %.3f", (float) (millis() - start) / 1000));
+    }
     println("-Interior-");
     interior = containing(vertices, circles, true);
     interiorCircumcircles = analyze(interior);
@@ -208,7 +222,8 @@ void calc() {
     exterior = containing(vertices, circles, false);
     exteriorCircumcircles = analyze(exterior);
     start = millis();
-    traverse = traverseKruskalTreesSmart(circles, exterior, vertices, false);
+    //traverse = traverseKruskalTrees(circles, vertices, false);
+    traverse = traverseKruskalTrees2(circles, vertices, false);
     traverseArcs = delaunayTraversalToArcs(traverse);
     //traverseArcs = surroundingArcs(traverse);
     println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
@@ -221,7 +236,11 @@ void calcOffset() {
   Calculates the amount all geometry should be offset to center it.
   */
   PVector[] ends = extremes(vertices);
-  offset = new PVector((w - (ends[1].x - ends[0].x)) / 2, (h - (ends[1].y - ends[0].y)) / 2);
+  if(noDraw) {
+    offset = new PVector();
+  } else {
+    offset = new PVector((w - (ends[1].x - ends[0].x)) / 2, (h - (ends[1].y - ends[0].y)) / 2);
+  }
 }
 
 void drawLineOffset(PVector p1, PVector p2) {
@@ -254,9 +273,8 @@ void keyPressed() {
       loop();
     } else {
       //mouseClicked();
-      boolean s = random(0, 2) > 1.0f;
-      traverse = s ? traverseKruskalTrees(circles, exterior, vertices, false) : traverseKruskalTreesSmart(circles, exterior, vertices, false);
-      println(s);
+      traverse = traverseKruskalTrees2(circles, vertices, false);
+      traverseArcs = delaunayTraversalToArcs(traverse);
       loop();
     }
   }
@@ -285,7 +303,10 @@ void initializeKeys() {
   {'c', "circumcircles", false},
   {'r', "traversal", false},
   {'a', "traversalArcs", true},
-  {'k', "kruskal", false}
+  {'k', "kruskal", false},
+  {'m', "gradient", true},
+  {'q', "getTouching", false},
+  {'o', "condense", false},
   };
   conv = new HashMap<Character, String>();
   draw = new HashMap<String, Boolean>();
