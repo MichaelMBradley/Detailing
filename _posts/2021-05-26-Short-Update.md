@@ -8,7 +8,7 @@ In the past two days since the long weekend, I've been spending most of my time 
 While I hope to have much more to show tomorrow as I was close to finishing some work today, for now I'll just show you a variation on a tree traversal method.
 
 {: style="text-align:center"}
-![A series of arcs travel around a polyline.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-25/KruskalTraverse.png)
+![A series of arcs travel around a polyline.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-26/KruskalTraverse.png)
 
 For this method, instead of including the parent node in between child nodes, I have entirely omitted them. As well, since there is only one arc connecting any two nodes it lends itself much better to a connecting method I showed off a few posts ago where I draw an arc between the nodes that represents a portion of the circumcircle these nodes were a part of due to the delaunay triangulation.
 
