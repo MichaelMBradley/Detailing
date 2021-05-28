@@ -17,7 +17,7 @@ PVector offset;
 boolean blue = true;
 boolean smart = false;
 
-final float minimise = 4;
+final float minimise = 7;
 final boolean noDraw = false;
 final boolean iterate = false;
 
@@ -272,10 +272,7 @@ void keyPressed() {
       println(cmd + ": " + draw.get(cmd));
       loop();
     } else {
-      //mouseClicked();
-      traverse = traverseKruskalTrees2(circles, vertices, false);
-      traverseArcs = delaunayTraversalToArcs(traverse);
-      loop();
+      mouseClicked();
     }
   }
 }
@@ -288,6 +285,12 @@ void mouseClicked() {
     calc();
   }
   loop();
+}
+
+void mouseMoved() {
+  //traverse = traverseKruskalTrees2(circles, vertices, false);
+  //traverseArcs = delaunayTraversalToArcs(traverse);
+  //loop();
 }
 
 void initializeKeys() {

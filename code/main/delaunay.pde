@@ -46,13 +46,14 @@ void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
 }
 
 ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-  return delaunayTraverse(nodes, vertices, (float) mouseX * 10f / w);
+  return delaunayTraverse(nodes, vertices, 1f);//(float) mouseX * 20f / w);
 }
 
 ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
   /**
   Visits many nodes in order around the polyline, based on the delaunay triangulation.
   */
+  println();
   ArrayList<Node> traversal = new ArrayList<Node>();
   float closest, angle, distance;
   Node goal;
@@ -65,16 +66,26 @@ ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertice
         next = goal;
       } else {
         closest = Float.MAX_VALUE;
-        for(Node d : current.delaunay) {
-          angle = PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv));
+        for(Node d : current.kruskal) {
+          angle = abs(PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
           distance = PVector.dist(d.pv, goal.pv);
-          if(angle < closest && distanceWeight < (d.r + current.r) * 4 && !traversal.contains(d)) {
-            closest = angle;
+          if(angle + distance / ((goal.r + d.r) / 2) * distanceWeight < closest && !traversal.contains(d)) {
+            closest = angle + distance / ((goal.r + d.r) / 2) * distanceWeight;
             next = d;
           }
         }
         if(closest == Float.MAX_VALUE) {
-          //println("skip");
+          for(Node d : current.delaunay) {
+            angle = abs(PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
+            distance = PVector.dist(d.pv, goal.pv);
+            if(angle + distance / ((goal.r + d.r) / 2) * distanceWeight < closest && !traversal.contains(d)) {
+              closest = angle + distance / ((goal.r + d.r) / 2) * distanceWeight;
+              next = d;
+            }
+          }
+        }
+        if(closest == Float.MAX_VALUE) {
+          println("skip");
           next = goal;
         }
       }

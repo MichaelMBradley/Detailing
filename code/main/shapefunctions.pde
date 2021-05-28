@@ -12,6 +12,24 @@ float[] arcLine(PVector p1, PVector p2) {
   }
 }
 
+boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
+  /**
+  Returns if a given node is suitably close (cutoff) to any
+  of the line segments on the polyline described by the vertices.
+  */
+  for(int i = 0; i < vertices.size(); i++) {
+    int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
+    if(distanceToSegment(vertices.get(i), vertices.get(j), c.pv) - c.r <= cutoff) {
+      return true;
+    }
+  }
+  return false;
+}
+
+float distanceToSegment(PVector v1, PVector v2, PVector test) {
+  return (float) Line2D.ptSegDist(v1.x, v1.y, v2.x, v2.y, test.x, test.y);
+}
+
 PVector[] extremes(ArrayList<PVector> vertices) {
   /**
   Returns two PVectors bounding a list of PVectors.

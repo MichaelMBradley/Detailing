@@ -149,7 +149,7 @@ public class Node {
           break;
         }
       }
-      if(includeParents && below.get(-1) != exit) {
+      if(includeParents && below.get(below.size() - 1) != exit) {
         below.add(this);
       }
     }

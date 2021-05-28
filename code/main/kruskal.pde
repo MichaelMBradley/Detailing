@@ -25,8 +25,6 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
   HashSet<HashSet<Node>> MSTs = new HashSet<HashSet<Node>>();
   HashMap<PVector, Node> current;
   float distance, testdist;
-  int j;
-  PVector vi, vj;
   PVector next = new PVector();
   for(Node n : nodes) {
     MSTs.add(n.kruskal);
@@ -34,17 +32,11 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
   options = MSTClosestNode(MSTs, vertices);
   // Finding closest edge to node
   for(int i = 0; i < vertices.size(); i++) {
-    j = i + 1;
-    if(j == vertices.size()) {
-      j = 0;
-    }
-    vi = vertices.get(i);
-    vj = vertices.get(j);
     current = options.get(i);
     while(!current.isEmpty()) {
       distance = 1e6;
       for(PVector pv : current.keySet()) {
-        testdist = PVector.dist(pv, vi);
+        testdist = PVector.dist(pv, vertices.get(i));
         if(testdist < distance) {
           distance = testdist;
           next = pv;
@@ -70,7 +62,7 @@ private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>>
   // Finding closest node to edge
   for(HashSet<Node> MST : MSTs) {
     q = 0;
-    close = 1e6;  // Arbitrary big number
+    close = Float.MAX_VALUE;
     for(Node n : MST) {
       for(int i = 0; i < vertices.size(); i++) {
         j = i + 1;
