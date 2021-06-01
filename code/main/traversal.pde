@@ -65,11 +65,11 @@ boolean inLine(PVector p1, PVector p2, PVector test) {
   return PVector.dist(test, closestPoint2(p1, p2, test)) < 1;
 }
 
-ArrayList<float[]> delaunayTraversalToArcs(ArrayList<Node> traversal) {
+ArrayList<float[]> delaunayTraversalToArcs(ArrayList<Node> traversal, ArrayList<PVector> vertices) {
   ArrayList<float[]> arcs = new ArrayList<float[]>();
   for(int i = 0; i < traversal.size() - 1; i++) {
     if(traversal.get(i).kruskalAdjacent.contains(traversal.get(i+1))) {
-      arcs.add(getArcKruskal(traversal.get(i), traversal.get(i+1)));
+      arcs.add(getArcKruskal(traversal.get(i), traversal.get(i+1))[0]);
     } else {
       arcs.add(arcLine(traversal.get(i).pv, traversal.get(i+1).pv));
     }

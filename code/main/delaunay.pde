@@ -1,4 +1,4 @@
-ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
+ArrayList<Triangle> delaunayTriangulation(HashSet<Node> nodes) {
   /**
   Accepts a set of nodes, creates a triangulation of their centres.
   */
@@ -11,7 +11,7 @@ ArrayList<Triangle> delaunay(HashSet<Node> nodes) {
 
 
 void updateDelaunay(HashSet<Node> nodes) {
-  updateDelaunay(nodes, delaunay(nodes));
+  updateDelaunay(nodes, delaunayTriangulation(nodes));
 }
 
 
@@ -46,19 +46,17 @@ void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
 }
 
 ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-  return delaunayTraverse(nodes, vertices, 1f);//(float) mouseX * 20f / w);
+  return delaunayTraverse(nodes, vertices, 1f);
+  //return delaunayTraverse(nodes, vertices, (float) mouseX * 20f / w);
 }
 
 ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
   /**
   Visits many nodes in order around the polyline, based on the delaunay triangulation.
   */
-  println();
   ArrayList<Node> traversal = new ArrayList<Node>();
   float closest, angle, distance;
-  Node goal;
-  Node next = new Node();
-  Node current = closestNode(nodes, vertices.get(vertices.size() - 1));
+  Node goal, next = new Node(), current = closestNode(nodes, vertices.get(vertices.size() - 1));
   for(int i = 0; i < vertices.size(); i++) {
     goal = closestNode(nodes, vertices.get(i));
     while(current != goal) {

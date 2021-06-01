@@ -1,20 +1,3 @@
-void kruskal(HashSet<Node> nodes) {
-  /**
-  Creates a minimum spanning tree of the nodes.
-  */
-  int restrictSize = (int) sqrt(sqrt(nodes.size()));
-  ArrayList<Edge> edges = new ArrayList<Edge>();
-  for(Node b : nodes) {
-    for(Node t : b.delaunay) {
-      edges.add(new Edge(b, t));
-    }
-  }
-  Collections.sort(edges);
-  for(Edge e : edges) {
-    e.n1.addKruskal(e.n2, restrictSize);
-  }
-}
-
 ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
   /**
   Returns one node of each MST. Each node is
@@ -50,6 +33,10 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
 }
 
 private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>> MSTs, ArrayList<PVector> vertices) {
+  /**
+  Returns a list of pairs of points, where each HashMap on the list corresponds to a line, and each entry in the hashmap
+  represents the closest point on that line to a minimum spanning tree.
+  */
   ArrayList<HashMap<PVector, Node>> options = new ArrayList<HashMap<PVector, Node>>();
   float close, test;
   int j;
@@ -86,7 +73,7 @@ private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>>
   return options;
 }
 
-ArrayList<Node> traverseKruskalTrees(HashSet<Node> nodes, ArrayList<PVector> vertices, boolean includeParents) {
+ArrayList<Node> traverseTreesBase(HashSet<Node> nodes, ArrayList<PVector> vertices, boolean includeParents) {
   /**
   Visits every kruskal-esque tree in order, and traverses those trees in a relevant manner.
   */
@@ -99,7 +86,7 @@ ArrayList<Node> traverseKruskalTrees(HashSet<Node> nodes, ArrayList<PVector> ver
   int l = 0;
   Polygon shape = toPolygon(vertices);
   for(Node n : kruskal) {
-    dist = 1e6;
+    dist = Float.MAX_VALUE;
     for(int i = 0; i < vertices.size(); i++) {
       j = i + 1 == vertices.size() ? 0 : i + 1;  // Next vertex w/ wraparound
       if(distanceToSegment(vertices.get(i), vertices.get(j), n.pv) < dist) {
@@ -109,24 +96,74 @@ ArrayList<Node> traverseKruskalTrees(HashSet<Node> nodes, ArrayList<PVector> ver
     }
     edge = new Node(PVector.sub(n.pv, closestPoint2(vertices.get(k), vertices.get(l), n.pv)));
     //println("\n" + edge + "\t" + PVector.sub(n.pv, edge.pv).heading());
-    traverse.addAll(n.kruskalTreeTraverse(edge, shape.contains(n.x, n.y), includeParents));
+    traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.x, n.y), includeParents));
   }
   return traverse;
 }
 
-float[] getArcKruskal(Node n1, Node n2) {
-  ArrayList<Node> n3arr = new ArrayList<Node>();
-  float[] arcinfo = new float[6];
-  for(Node d : n1.delaunay) {
-    if(d.delaunay.contains(n2)) {
-      n3arr.add(d);
+ArrayList<Node> traverseTreesSkip(HashSet<Node> nodes, ArrayList<PVector> vertices, boolean includeParents) {
+  /**
+  Visits every kruskal-esque tree in order, and traverses those trees in a relevant manner.
+  This method starts and stops on the closest nodes to the adjacent trees.
+  */
+  ArrayList<Node> traverse = new ArrayList<Node>();
+  ArrayList<Node> order = new ArrayList<Node>();
+  ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);//kruskalRecursive(nodes, vertices);//
+  Node empty = new Node();
+  Node next = new Node();
+  Node end = new Node();
+  float dist;
+  Polygon shape = toPolygon(vertices);
+  for(int i = 0; i < kruskal.size(); i++) {
+    dist = Float.MAX_VALUE;
+    for(Node n : kruskal.get(i).kruskal) {
+      for(Node m : kruskal.get(i + 1 == kruskal.size() ? 0 : i + 1).kruskal) {
+        if(m.distanceToCircle(n) < dist) {
+          next = m;
+          end = n;
+          dist = m.distanceToCircle(n);
+        }
+      }
     }
+    order.add(end);
+    order.add(next);
   }
-  for(Node n3 : n3arr) {
-    arcinfo = getArc(n1, n2, n3);
-    if(arcinfo[5] - arcinfo[4] < PI) {
-      break;
+  for(int i = 1; i < order.size(); i+=2) {
+    traverse.addAll(order.get(i).kruskalTreeTraverse(empty, shape.contains(order.get(i).x, order.get(i).y), includeParents, order.get(i + 1 == order.size() ? 0 : i + 1)));
+  }
+  //println(order);
+  return traverse;
+}
+
+ArrayList<Node> kruskalRecursive(HashSet<Node> nodes, ArrayList<PVector> vertices) {
+  /**
+  Traverses the minimum spanning trees by traversing the minimum spanning tree of the minimum spanning trees.
+  */
+  HashSet<Node> base = new HashSet<Node>();
+  HashMap<PVector, Node> conv = new HashMap<PVector, Node>();
+  HashSet<HashSet<Node>> MSTs = getMSTs(nodes);
+  ArrayList<Node> traverse;
+  float t;
+  int i;
+  Node temp = new Node();
+  for(HashSet<Node> MST : MSTs) {
+    t = random(0, MST.size());
+    i = 0;
+    for(Node n : MST) {
+      temp = n; //random element
+      i++;
+      if(i>=t) {
+        break;
+      }
     }
+    conv.put(temp.pv, temp);
+    base.add(new Node(temp.x, temp.y, temp.r));
   }
-  return arcinfo;
+  updateDelaunay(base);
+  kruskal(base);
+  traverse = traverseTreesBase(base, vertices, true);
+  for(i = 0; i < traverse.size(); i++) {
+    traverse.set(i, conv.get(traverse.get(i).pv));
+  }
+  return traverse;
 }

@@ -8,9 +8,7 @@ public class Node {
     y = ypos;
     r = rad;
     pv = new PVector(x, y);
-    kruskal = new HashSet<Node>();
-    kruskalAdjacent = new HashSet<Node>();
-    resetGraph();
+    init();
   }
   
   public Node(PVector PVec) {
@@ -18,9 +16,7 @@ public class Node {
     y = PVec.y;
     r = 0;
     pv = PVec;
-    kruskal = new HashSet<Node>();
-    kruskalAdjacent = new HashSet<Node>();
-    resetGraph();
+    init();
   }
   
   public Node() {
@@ -28,11 +24,15 @@ public class Node {
     y = 0;
     r = 0;
     pv = new PVector(x, y);
+    init();
+  }
+  
+  
+  public void init() {
     kruskal = new HashSet<Node>();
     kruskalAdjacent = new HashSet<Node>();
     resetGraph();
   }
-  
   
   public void resetGraph() {
     /**
