@@ -1,29 +1,23 @@
-public class Node {
+public class Node extends Circle {
   public HashSet<Node> delaunay, graph, touching, kruskal, kruskalAdjacent;
-  public float x, y, r;
-  public PVector pv;
   
   public Node(float xpos, float ypos, float rad) {
-    x = xpos;
-    y = ypos;
-    r = rad;
-    pv = new PVector(x, y);
+    super(xpos, ypos, rad);
+    init();
+  }
+  
+  public Node(PVector PVec, float rad) {
+    super(PVec, rad);
     init();
   }
   
   public Node(PVector PVec) {
-    x = PVec.x;
-    y = PVec.y;
-    r = 0;
-    pv = PVec;
+    super(PVec);
     init();
   }
   
   public Node() {
-    x = 0;
-    y = 0;
-    r = 0;
-    pv = new PVector(x, y);
+    super();
     init();
   }
   
@@ -44,22 +38,6 @@ public class Node {
     touching = new HashSet<Node>();
     graph = new HashSet<Node>();
     graph.add(this);
-  }
-  
-  
-  public float distanceToCenter(float xpos, float ypos) {
-    // Distance from a point to the center of the node
-    return dist(x, y, xpos, ypos);
-  }
-  
-  public float distanceToRadius(float xpos, float ypos) {
-    // Distance from a point to the perimeter of the node
-    return distanceToCenter(xpos, ypos) - r;
-  }
-  
-  public float distanceToCircle(Node c) {
-    // Distance between the closest points of each node
-    return distanceToRadius(c.x, c.y) - c.r;
   }
   
   
@@ -188,23 +166,5 @@ public class Node {
       sortedNodes.add(headings.get(h));
     }
     return sortedNodes;
-  }
-  
-  
-  public void move(PVector direction) {
-    pv.add(direction);
-    x += direction.x;
-    y += direction.y;
-  }
-  
-  public void draw() {
-    this.draw(new PVector());
-  }
-  public void draw(PVector offset) {
-    circle(x + offset.x, y + offset.y, r * 2);  // p5 accepts diameter, not radius
-  }
-  
-  public String toString() {
-    return String.format("(x: %.2f, y: %.2f, r: %.2f)", x, y, r);
   }
 }

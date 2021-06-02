@@ -9,23 +9,23 @@ void test1() {
   Node n2 = new Node(300, 300, 50);
   Node n3 = new Node(200, 300, 50);
   Node n4 = new Node(115, 355, 50);
-  Node n5 = new Node(mouseX, mouseY, 50);//300, 400, 50);
+  Node n5 = new Node(300, 400, 50);
   Node n6 = new Node(300, 480, 30);
   Node n7 = new Node(400, 300, 50);
   Node n8 = new Node(470, 230, 50);
   Node n9 = new Node(470, 370, 50);
-  //
-  fill(0);
-  text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
-  text(2 + "\n" + n2.x + " " + n2.y, n2.x, n2.y);
-  text(3 + "\n" + n3.x + " " + n3.y, n3.x, n3.y);
-  text(4 + "\n" + n4.x + " " + n4.y, n4.x, n4.y);
-  text(5 + "\n" + n5.x + " " + n5.y, n5.x, n5.y);
-  text(6 + "\n" + n6.x + " " + n6.y, n6.x, n6.y);
-  text(7 + "\n" + n7.x + " " + n7.y, n7.x, n7.y);
-  text(8 + "\n" + n8.x + " " + n8.y, n8.x, n8.y);
-  text(9 + "\n" + n9.x + " " + n9.y, n9.x, n9.y);
-  noFill();
+  //mouseX, mouseY, mouseX/10);//
+  //fill(0);
+  //text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
+  //text(2 + "\n" + n2.x + " " + n2.y, n2.x, n2.y);
+  //text(3 + "\n" + n3.x + " " + n3.y, n3.x, n3.y);
+  //text(4 + "\n" + n4.x + " " + n4.y, n4.x, n4.y);
+  //text(5 + "\n" + n5.x + " " + n5.y, n5.x, n5.y);
+  //text(6 + "\n" + n6.x + " " + n6.y, n6.x, n6.y);
+  //text(7 + "\n" + n7.x + " " + n7.y, n7.x, n7.y);
+  //text(8 + "\n" + n8.x + " " + n8.y, n8.x, n8.y);
+  //text(9 + "\n" + n9.x + " " + n9.y, n9.x, n9.y);
+  //noFill();
   ns.add(n1);
   ns.add(n2);
   ns.add(n7);
@@ -57,8 +57,8 @@ void test1() {
   strokeWeight(1);
   stroke(0);
   println();
-  for(float[] arr : surroundingArcsTree(ns)) {
-    drawArc(arr);
+  for(Arc arc : surroundingArcsTree(ns)) {
+    arc.draw();
   }
   //ArrayList<float[]> arr = surroundingArcsTree(ns);
   //for(int i = 0; i < arr.size() * (float) mouseX / w; i++) {
@@ -94,8 +94,7 @@ void test3() {
   strokeWeight(1);
   stroke(0);
   randomSeed(0l);
-  float[] a = arcLine(new PVector(100, 100), new PVector(mouseX, mouseY));
-  drawArc(a);
+  arcLine(new PVector(100, 100), new PVector(mouseX, mouseY)).draw();
 }
 
 void test4() {
@@ -140,4 +139,65 @@ void test4() {
   //  n.draw();
   //}
   //noLoop();
+}
+
+void test5() {
+  float t_s = (mouseX - w / 2) / 20f;
+  float arc = mouseY * 1.25 * TWO_PI / h;
+  new Arc(new PVector(w / 2, h / 2), 50, t_s, arc).draw();
+  fill(0);
+  text(String.format("Start: %.2f\nLength: %.2f\nEnd: %.2f\n", t_s, arc, t_s + arc), mouseX, mouseY);
+  noFill();
+}
+
+void test6() {
+  Node n1 = new Node(400, 400, 50);
+  Node n2 = new Node(400, 500, 50);
+  float r = mouseX/20f;
+  Node n3 = new Node(n2.x + (r + n2.r) * cos(mouseX / 100f), n2.y + (r + n2.r) * sin(mouseX / 100f), r);
+  Node n4 = new Node(n2.x + (r + n2.r) * cos(mouseY / 100f), n2.y + (r + n2.r) * sin(mouseY / 100f), r);
+  n1.draw();
+  n2.draw();
+  n3.draw();
+  n4.draw();
+  for(Node n :  getExterior(n1, n2)) {
+    n.draw();
+  }
+  for(Node n :  getExterior(n2, n3)) {
+    n.draw();
+  }
+  for(Node n :  getExterior(n2, n4)) {
+    n.draw();
+  }
+}
+
+void test7() {
+  boolean works = false;
+  Node n1 = new Node(w / 2, h / 2, 50 * mouseX / w);
+  if(works) {
+    Node n2 = new Node(mouseX, mouseY, 25);
+    n1.draw();
+    n2.draw();
+    Node[] ext = getExterior(n1, n2);
+    for(Node n : ext) {
+      n.draw();
+    }
+    fill(0);
+    text("" + ext[0].overlaps(ext[1]), mouseX, mouseY);
+    noFill();
+  } else {
+    color f;
+    loadPixels();
+    for(int x = 0; x < w; x++) {
+      for(int y = 0; y < h; y++) {
+        if(getExterior(n1, new Node(x, y, 50 * mouseX / w))[0].x > Float.MIN_VALUE){
+          f = color(0, 255, 0);
+        } else {
+          f = color(255, 0, 0);
+        }
+        pixels[x * w + y] = f;
+      }
+    }
+    updatePixels();
+  }
 }

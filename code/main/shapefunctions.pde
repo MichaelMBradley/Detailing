@@ -1,14 +1,14 @@
-float[] arcLine(PVector p1, PVector p2) {
+Arc arcLine(PVector p1, PVector p2) {
   float minx = min(p1.x, p2.x) * (2.0f / 3.0f) + max(p1.x, p2.x) * (1.0f / 3.0f);
   float miny = min(p1.y, p2.y) * (2.0f / 3.0f) + max(p1.y, p2.y) * (1.0f / 3.0f);
   float maxx = min(p1.x, p2.x) * (1.0f / 3.0f) + max(p1.x, p2.x) * (2.0f / 3.0f);
   float maxy = min(p1.y, p2.y) * (1.0f / 3.0f) + max(p1.y, p2.y) * (2.0f / 3.0f);
-  float[] circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, random(minx, maxx), random(miny, maxy));
-  float[] se = order(p1, new PVector(circ[0], circ[1]), p2, true);
+  Circle circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, random(minx, maxx), random(miny, maxy));
+  float[] se = order(p1, circ.pv, p2, true);
   if(se[1] - se[0] > PI) {
-    return new float[] {circ[0], circ[1], circ[2], circ[2], se[1] - TWO_PI, se[0]};
+    return new Arc(circ, se[1] - TWO_PI, se[0]);
   } else {
-    return new float[] {circ[0], circ[1], circ[2], circ[2], se[0], se[1]};
+    return new Arc(circ, se[0], se[1]);
   }
 }
 
@@ -51,30 +51,29 @@ PVector[] extremes(ArrayList<PVector> vertices) {
   return new PVector[] {new PVector(ends[0][0], ends[0][1]), new PVector(ends[1][0], ends[1][1])};
 }
 
-float[] getArc(Node n1, Node n2, Node n3) {
+Arc getArc(Node n1, Node n2, Node n3) {
   /**
   Returns data about the arc between n1 and n2, passing through n3.
   [x, y, w, h, start, end]
   w = h
   */
-  float[] arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
-  float ang1 = PVector.sub(n1.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
-  float ang2 = PVector.sub(n2.pv, new PVector(arcinfo[0], arcinfo[1])).heading();
+  Circle arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
+  float ang1 = PVector.sub(n1.pv, arcinfo.pv).heading();
+  float ang2 = PVector.sub(n2.pv, arcinfo.pv).heading();
   if(ang1 > ang2) {
       ang2 += TWO_PI;
   }
-  return new float[] {arcinfo[0], arcinfo[1], arcinfo[2], arcinfo[2], ang1, ang2};
+  return new Arc(arcinfo, ang1, ang2);
 }
 
-float[][] getArcKruskal(Node n1, Node n2) {
+Arc[] getArcKruskal(Node n1, Node n2) {
   ArrayList<Node> n3arr = new ArrayList<Node>();
-  println();
   for(Node d : n1.delaunay) {
     if(d.delaunay.contains(n2)) {
       n3arr.add(d);
     }
   }
-  float[][] arcs = new float[n3arr.size()][6];
+  Arc[] arcs = new Arc[n3arr.size()];
   for(int i = 0; i < n3arr.size(); i++) {
     arcs[i] = getArc(n1, n2, n3arr.get(i));
   }
@@ -87,18 +86,18 @@ void scaleVertices(float scalingfactor, ArrayList<PVector> vertices) {
   }
 }
 
-ArrayList<float[]> triangleToCircle(ArrayList<Triangle> triangles) {
+ArrayList<Circle> triangleToCircle(ArrayList<Triangle> triangles) {
   /**
   Return list of circumcircles for the triangles.
   */
-  ArrayList<float[]> info = new ArrayList<float[]>();
+  ArrayList<Circle> info = new ArrayList<Circle>();
   for(Triangle tri : triangles) {
     info.add(triangleToCircle(tri.p1.x, tri.p1.y, tri.p2.x, tri.p2.y, tri.p3.x, tri.p3.y));
   }
   return info;
 }
 
-float[] triangleToCircle(float x1, float y1, float x2, float y2, float x3, float y3) {
+Circle triangleToCircle(float x1, float y1, float x2, float y2, float x3, float y3) {
   /**
   Calculates the circumcircle of a triangle.
   In short, it calculates the intersection point
@@ -127,7 +126,7 @@ float[] triangleToCircle(float x1, float y1, float x2, float y2, float x3, float
     y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
   }
   r = dist(x, y, x1, y1);
-  return new float[] {x, y, r};
+  return new Circle(x, y, r);
 }
 
 Polygon toPolygon(ArrayList<PVector> vertices) {

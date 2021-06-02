@@ -53,18 +53,14 @@ Node[] getAdjacent(Node n1, Node n2, float r0, boolean exterior) {
   return new Node[] {new Node(xa1, ya1, r0), new Node(xa2, ya2, r0)};
 }
 
-Node[] getExteriorFix(Node n1, Node n2) {
-  float r = max((n1.r + n2.r) / 4, n1.distanceToCircle(n2) + n1.r / 2, n2.distanceToCircle(n1) + n2.r / 2);
-  Node[] test = getAdjacent(n1, n2, r, true);
-  while(test[0].distanceToCircle(test[1]) < 0) {
-    r *= 1.1;
-    test = getAdjacent(n1, n2, r, true);
-  }
-  return test;
-}
-
 Node[] getExterior(Node n1, Node n2) {
-  return getAdjacent(n1, n2, max((n1.r + n2.r) / 4, n1.distanceToCircle(n2) + n1.r / 2, n2.distanceToCircle(n1) + n2.r / 2), true);
+  Node[] adj = getAdjacent(n1, n2, triCircleAdjacent(n1, n2, getExterior(n1, n2, min(n1.r, n2.r))[0])[1].r * 0.9, true);
+  if(!adj[0].overlaps(adj[1]) && n1.distanceToCircle(n2) < min(n1.r, n2.r) / 2) {
+    return adj;
+  }
+  float angle = PVector.sub(n2.pv, n1.pv).heading() + 0.01;
+  float avoidTouching = triCircleAdjacent(n1, n2, new Node((n1.x + n1.r * cos(PI + angle) + n2.x + n2.r * cos(angle)) / 2f, (n1.y + n1.r * sin(PI + angle) + n2.y + n2.r * sin(angle)) / 2f, (n1.r + n2.r) / 8))[0].r;
+  return getAdjacent(n1, n2, avoidTouching, true);
 }
 
 Node[] getExterior(Node n1, Node n2, float r0) {
@@ -111,9 +107,9 @@ Node[] triCircleAdjacent(Node n1, Node n2, Node n3) {
 }
 
 
-ArrayList<float[]> surroundingArcs(ArrayList<Node> nodes) {
+ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes) {
   ArrayList<ArrayList<Node>> trees = new ArrayList<ArrayList<Node>>();
-  ArrayList<float[]> arcs = new ArrayList<float[]>();
+  ArrayList<Arc> arcs = new ArrayList<Arc>();
   trees.add(new ArrayList<Node>());
   trees.get(0).add(new Node());
   for(Node n : nodes) {
@@ -133,17 +129,17 @@ ArrayList<float[]> surroundingArcs(ArrayList<Node> nodes) {
   return arcs;
 }
 
-ArrayList<float[]> surroundingArcsTree(ArrayList<Node> nodes, Node next) {
+ArrayList<Arc> surroundingArcsTree(ArrayList<Node> nodes, Node next) {
   ArrayList<Node> n = (ArrayList<Node>) nodes.clone();
   n.add(next);
   return surroundingArcsTree(n);
 }
 
-ArrayList<float[]> surroundingArcsTree(ArrayList<Node> nodes) {
+ArrayList<Arc> surroundingArcsTree(ArrayList<Node> nodes) {
   if(nodes.size() == 0) {
-    return new ArrayList<float[]>();
+    return new ArrayList<Arc>();
   }
-  ArrayList<float[]> arcs = new ArrayList<float[]>();
+  ArrayList<Arc> arcs = new ArrayList<Arc>();
   ArrayList<Node> arcNodes = new ArrayList<Node>();
   ArrayList<Integer> tri = new ArrayList<Integer>();
   Node ni, nj, nc, n;
@@ -166,23 +162,23 @@ ArrayList<float[]> surroundingArcsTree(ArrayList<Node> nodes) {
     arcNodes.add(nc);
     arcNodes.add(ni);
   }
-  for(int i = 3; i <= arcNodes.size() - 3; i+=2) {
-    //println(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) + "\t" + 
-    //(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) < HALF_PI * 1.25f && arcNodes.get(i+2) != arcNodes.get(i-2)));
-    //println("\t" + arcNodes.get(i-2).pv + "\t" + arcNodes.get(i).pv + "\t" + arcNodes.get(i+2).pv);
-    if(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) < HALF_PI * 1.25f && arcNodes.get(i+2) != arcNodes.get(i-2)) {
-      arcNodes.set(i, triCircleAdjacent(arcNodes.get(i-2), arcNodes.get(i+2), arcNodes.get(i))[1]);
-      arcNodes.remove(i+1);
-      arcNodes.remove(i-1);
-      tri.add(i - 1);
-    }
-  }
+  //for(int i = 3; i <= arcNodes.size() - 3; i+=2) {
+  //  //println(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) + "\t" + 
+  //  //(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) < HALF_PI * 1.25f && arcNodes.get(i+2) != arcNodes.get(i-2)));
+  //  //println("\t" + arcNodes.get(i-2).pv + "\t" + arcNodes.get(i).pv + "\t" + arcNodes.get(i+2).pv);
+  //  if(PVector.angleBetween(PVector.sub(arcNodes.get(i+2).pv, arcNodes.get(i).pv), PVector.sub(arcNodes.get(i-2).pv, arcNodes.get(i).pv)) < HALF_PI * 1.25f && arcNodes.get(i+2) != arcNodes.get(i-2)) {
+  //    arcNodes.set(i, triCircleAdjacent(arcNodes.get(i-2), arcNodes.get(i+2), arcNodes.get(i))[1]);
+  //    arcNodes.remove(i+1);
+  //    arcNodes.remove(i-1);
+  //    tri.add(i - 1);
+  //  }
+  //}
   for(int i = 0; i < arcNodes.size(); i++) {
     n = arcNodes.get(i);
     ni = arcNodes.get(i == 0 ? arcNodes.size() - 2 : i - 1);
     nj = arcNodes.get(i >= arcNodes.size() - 2 ? arcNodes.size() - i : i + 1);
     se = order(ni.pv, n.pv, nj.pv, (i % 2 == 0));
-    arcs.add(new float[] {n.x, n.y, n.r, n.r, se[0], se[1]});
+    arcs.add(new Arc(n, se[0], se[1]));
   }
   return arcs;
 }

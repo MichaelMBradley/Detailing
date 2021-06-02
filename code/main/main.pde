@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Stack;
 import org.processing.wiki.triangulate.*;
 
-ArrayList<float[]> traverseArcs, interiorCircumcircles, exteriorCircumcircles;
+ArrayList<Arc> traverseArcs;
+ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
 HashSet<Node> circles, interior, exterior;
@@ -15,8 +16,8 @@ PShape shape;
 PVector offset;
 boolean smart = false;
 
-final float minimise = 4;
-final boolean noDraw = true;
+final float minimise = 2;
+final boolean noDraw = false;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
@@ -40,7 +41,7 @@ void setup() {
   vertices = toPVector(initvertices);
   scaleVertices((float) w / 30, vertices);
   shape = toShape(vertices);
-  if(noDraw) {
+  if(!noDraw) {
     calcOffset();
   } else {
     offset = new PVector();
@@ -102,13 +103,13 @@ void draw() {
     float r = 255;
     float b = 0;
     float chn = 255.0f / (float) traverseArcs.size();
-    for(float[] a : traverseArcs) {
+    for(Arc a : traverseArcs) {
       if(draw.get("gradient")) {
         stroke(r, 0, b);
         r -= chn;
         b += chn;
       }
-      drawArc(a);
+      a.draw(offset);
     }
   }
   if(draw.get("iterate")) {
@@ -116,14 +117,14 @@ void draw() {
     // keyPressed(); // ?
     maxIter = traverseArcs.size();
     stroke(0, 255, 0);
-    drawArc(traverseArcs.get(p));
+    traverseArcs.get(p).draw(offset);
   }
   if(noDraw) {
-    test1();
+    test7();
   }
 }
 
-void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles, boolean drawCircles) {
+void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
   /**
   Nodes may be stored in multiple discrete sets.
   This function draws relevant information for all nodes in a given set.
@@ -160,22 +161,14 @@ void drawNodes(HashSet<Node> circles, ArrayList<float[]> circumcircles, boolean 
     if(draw.get("circumcircles")) {
       stroke(255, 0, 0);
       strokeWeight(1);
-      for(float[] info : circumcircles) {
-        circle(info[0] + offset.x, info[1] + offset.y, info[2] * 2);
+      for(Circle c : circumcircles) {
+        c.draw(offset);;
       }
     }
   }
 }
 
-void drawArc(float[] a) {
-  if(a.length == 6) {
-    new Arc(a).draw(offset);
-  } else {
-    line(a[0] + offset.x, a[1] + offset.y, a[2] + offset.x, a[3] + offset.y);
-  }
-}
-
-ArrayList<float[]> analyze(HashSet<Node> aCircles) {
+ArrayList<Circle> analyze(HashSet<Node> aCircles) {
   /**
   The Delaunay Triangulation and tree generation is done seperately for the interior and exterior circles.
   This was made into a function to avoid repeating code.
@@ -183,9 +176,9 @@ ArrayList<float[]> analyze(HashSet<Node> aCircles) {
   Accepts:
     HashSet<Node> representing interior/exterior circles
   Returns:
-    ArrayList<float[]> representing the circumcircles of the delaunay triangulation
+    ArrayList<Arc> representing the circumcircles of the delaunay triangulation
   */
-  ArrayList<float[]> circum;
+  ArrayList<Circle> circum;
   int start;
   start = millis();
   ArrayList<Triangle> triangles = delaunayTriangulation(aCircles);
@@ -227,19 +220,19 @@ void calc() {
     exteriorCircumcircles = analyze(exterior);
     start = millis();
     traverse = traverseTreesBase(circles, vertices, true);
-    traverseArcs = delaunayTraversalToArcs(traverse, vertices);
+    //traverseArcs = delaunayTraversalToArcs(traverse, vertices);
     //traverse = traverseTreesSkip(circles, vertices, true);
-    //traverseArcs = surroundingArcs(traverse);
+    traverseArcs = surroundingArcs(traverse);
     //traverse = new ArrayList<Node>();
-    //traverseArcs = new ArrayList<float[]>();
+    //traverseArcs = new ArrayList<Arc>();
     println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
     println("\n");
   } else {
     circles = new HashSet<Node>();
-    interiorCircumcircles = new ArrayList<float[]>();
-    exteriorCircumcircles = new ArrayList<float[]>();
+    interiorCircumcircles = new ArrayList<Circle>();
+    exteriorCircumcircles = new ArrayList<Circle>();
     traverse = new ArrayList<Node>();
-    traverseArcs = new ArrayList<float[]>();
+    traverseArcs = new ArrayList<Arc>();
   }
 }
 
@@ -313,7 +306,7 @@ void initializeKeys() {
   {'m', "gradient", true},
   {'q', "getTouching", false},
   {'o', "condense", false},
-  {'p', "iterate", true},
+  {'p', "iterate", false},
   };
   conv = new HashMap<Character, String>();
   draw = new HashMap<String, Boolean>();
