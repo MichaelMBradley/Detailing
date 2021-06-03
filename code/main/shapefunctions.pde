@@ -51,7 +51,7 @@ PVector[] extremes(ArrayList<PVector> vertices) {
   return new PVector[] {new PVector(ends[0][0], ends[0][1]), new PVector(ends[1][0], ends[1][1])};
 }
 
-Arc getArc(Node n1, Node n2, Node n3) {
+Arc getArc(Circle n1, Circle n2, Circle n3) {
   /**
   Returns data about the arc between n1 and n2, passing through n3.
   [x, y, w, h, start, end]

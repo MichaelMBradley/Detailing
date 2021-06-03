@@ -40,24 +40,51 @@ void mouseClicked() {
 void bezierMain(ArrayList<PVector> points, int mult) {
   ArrayList<PVector> nodes = new ArrayList<PVector>();
   int detail = mult * points.size();
+  int t = millis();
+  for(float i = 0f; i < 1f; i += 0.00001f) { bezierGetPolynomial(points, i); }
+  println((float) (millis() - t) / 1000f);
+  t = millis();
+  for(float i = 0f; i < 1f; i += 0.00001f) { bezierGetRecursive(points, i); }
+  println((float) (millis() - t) / 1000f);
   for(int i = 0; i <= detail; i++) {
-    nodes.add(bezierGet(points, i, detail));
+    nodes.add(bezierGetPolynomial(points, (float) i / detail));
     if(i != 0) {
       line(nodes.get(i - 1).x, nodes.get(i - 1).y, nodes.get(i).x, nodes.get(i).y);
     }
   }
 }
 
-PVector bezierGet(ArrayList<PVector> points, int through, int detail) {
+PVector bezierGetRecursive(ArrayList<PVector> points, float through) {
   if(points.size() == 1) {
     return points.get(0);
   } else {
     ArrayList<PVector> newPoints = new ArrayList<PVector>();
     for(int i = 0; i < points.size() - 1; i++) {
-      float x = points.get(i).x * ((float) through / detail) + points.get(i + 1).x * (1 - ((float) through / detail));
-      float y = points.get(i).y * ((float) through / detail) + points.get(i + 1).y * (1 - ((float) through / detail));
+      float x = points.get(i).x * through + points.get(i + 1).x * (1 - through);
+      float y = points.get(i).y * through + points.get(i + 1).y * (1 - through);
       newPoints.add(new PVector(x, y));
     }
-    return bezierGet(newPoints, through, detail);
+    return bezierGetRecursive(newPoints, through);
   }
+}
+
+PVector bezierGetPolynomial(ArrayList<PVector> points, float through) {
+  int s = points.size();
+  PVector r = new PVector();
+  for(int i = 0; i < s; i++) {
+    r.add(points.get(i).copy().mult(pow(1f - through, s - i - 1) * pow(through, i) * ncr(s - 1, i)));
+  }
+  return r;
+}
+
+float ncr(int n, int r) {
+  return (float) ((f(n)) / (f(r) * f(n - r)));
+}
+
+double f(int n) {
+  double f = 1;
+  for(int i = 1; i <= n; i++) {
+    f *= i;
+  }
+  return f;
 }

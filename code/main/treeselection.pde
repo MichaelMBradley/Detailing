@@ -29,6 +29,7 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
       current.remove(next);
     }
   }
+  println(traversal);
   return traversal;
 }
 
@@ -52,10 +53,7 @@ private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>>
     close = Float.MAX_VALUE;
     for(Node n : MST) {
       for(int i = 0; i < vertices.size(); i++) {
-        j = i + 1;
-        if(j == vertices.size()) {
-          j = 0;
-        }
+        j = i + 1 == vertices.size() ? 0 : i + 1;
         vi = vertices.get(i);
         vj = vertices.get(j);
         testpv = closestPoint2(vi, vj, n.pv);
@@ -67,6 +65,9 @@ private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>>
           q = i;
         }
       }
+    }
+    if(close == Float.MAX_VALUE) {
+      println("broke");
     }
     options.get(q).put(touch, closest);
   }
@@ -80,21 +81,19 @@ ArrayList<Node> traverseTreesBase(HashSet<Node> nodes, ArrayList<PVector> vertic
   ArrayList<Node> traverse = new ArrayList<Node>();
   ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);
   Node edge = new Node();
+  PVector j, k = new PVector(), l = new PVector();
   float dist;
-  int j;
-  int k = 0;
-  int l = 0;
   Polygon shape = toPolygon(vertices);
   for(Node n : kruskal) {
     dist = Float.MAX_VALUE;
     for(int i = 0; i < vertices.size(); i++) {
-      j = i + 1 == vertices.size() ? 0 : i + 1;  // Next vertex w/ wraparound
-      if(distanceToSegment(vertices.get(i), vertices.get(j), n.pv) < dist) {
-        k = i;
+      j = vertices.get(i + 1 == vertices.size() ? 0 : i + 1);  // Next vertex w/ wraparound
+      if(distanceToSegment(vertices.get(i), j, n.pv) < dist) {
+        k = vertices.get(i);
         l = j;
       }
     }
-    edge = new Node(PVector.sub(n.pv, closestPoint2(vertices.get(k), vertices.get(l), n.pv)));
+    edge = new Node(PVector.sub(n.pv, closestPoint2(k, l, n.pv)));
     //println("\n" + edge + "\t" + PVector.sub(n.pv, edge.pv).heading());
     traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.x, n.y), includeParents));
   }

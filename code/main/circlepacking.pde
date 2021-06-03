@@ -6,8 +6,8 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
   float x, y, r, closestCircle;
   Node current;
   PVector max = extremes(vertices)[1];
-  float minradius = max(max.x, max.y) / (60 * minimise);
-  float maxradius = minradius * 4;
+  float maxradius = max(max.x, max.y) / (60 * minimise) * 4;
+  float minradius = maxradius / 2;
   float cutoff = ((max.x + max.y + maxradius * 8) / 60) * (2 * minimise / 3);
   float offset = cutoff + maxradius;
   int consecutiveFailed = 0;

@@ -1,4 +1,4 @@
-void altTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
+void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
   /**
   Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
   */
@@ -76,7 +76,7 @@ void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
   /**
   Creates trees based on the closest node touching the polyline to each node available.
   */
-  HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);;
+  HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
   HashMap<Node, HashSet<Node>> groups = new HashMap<Node, HashSet<Node>>();
   float dist, testdist;
   Node close = new Node();
@@ -115,6 +115,7 @@ private HashSet<Node> getNodesTouchingPolyline(HashSet<Node> nodes, ArrayList<PV
       if(distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {
         touching.add(n);
         n.kruskal.add(n);
+        //println(n.pv, distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv), vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1));
         break;
       }
     }

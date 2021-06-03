@@ -1,3 +1,19 @@
+void calcOffset() {
+  /**
+  Calculates the amount all geometry should be offset to center it.
+  */
+  PVector[] ends = extremes(vertices);
+  if(noDraw) {
+    offset = new PVector();
+  } else {
+    offset = new PVector((w - (ends[1].x - ends[0].x)) / 2, (h - (ends[1].y - ends[0].y)) / 2);
+  }
+}
+
+void drawLineOffset(PVector p1, PVector p2) {
+  line(p1.x + offset.x, p1.y + offset.y, p2.x + offset.x, p2.y + offset.y);
+}
+
 HashSet<HashSet<Node>> getMSTs(HashSet<Node> nodes) {
   /**
   Returns a HashSet of the minimum spanning trees.

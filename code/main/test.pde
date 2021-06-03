@@ -1,19 +1,19 @@
 void test1() {
-  ArrayList<Node> ns = new ArrayList<Node>();
+  ArrayList<Circle> ns = new ArrayList<Circle>();
   //iter = (int(mouseX)/5)*5 * PI / 180f;//+= 0.01f;
-  //Node n1 = new Node(400, 400, 50);
-  //Node n2 = new Node(n1.x + 100 * cos(iter), n1.y + 100 * sin(iter), 50);
-  //Node n3 = new Node(n2.x + 100 * cos(1.5 * iter), n2.y + 100 * sin(1.5 * iter), 50);
-  //Node n4 = new Node(n2.x + 100 * cos(1.5 * iter + HALF_PI), n2.y + 100 * sin(1.5 * iter + HALF_PI), 50);
-  Node n1 = new Node(300, 200, 50);
-  Node n2 = new Node(300, 300, 50);
-  Node n3 = new Node(200, 300, 50);
-  Node n4 = new Node(115, 355, 50);
-  Node n5 = new Node(300, 400, 50);
-  Node n6 = new Node(300, 480, 30);
-  Node n7 = new Node(400, 300, 50);
-  Node n8 = new Node(470, 230, 50);
-  Node n9 = new Node(470, 370, 50);
+  //Circle n1 = new Circle(400, 400, 50);
+  //Circle n2 = new Circle(n1.x + 100 * cos(iter), n1.y + 100 * sin(iter), 50);
+  //Circle n3 = new Circle(n2.x + 100 * cos(1.5 * iter), n2.y + 100 * sin(1.5 * iter), 50);
+  //Circle n4 = new Circle(n2.x + 100 * cos(1.5 * iter + HALF_PI), n2.y + 100 * sin(1.5 * iter + HALF_PI), 50);
+  Circle n1 = new Circle(300, 200, 50);
+  Circle n2 = new Circle(300, 300, 50);
+  Circle n3 = new Circle(200, 300, 50);
+  Circle n4 = new Circle(115, 355, 50);
+  Circle n5 = new Circle(300, 400, 50);
+  Circle n6 = new Circle(300, 480, 30);
+  Circle n7 = new Circle(400, 300, 50);
+  Circle n8 = new Circle(470, 230, 50);
+  Circle n9 = new Circle(470, 370, 50);
   //mouseX, mouseY, mouseX/10);//
   //fill(0);
   //text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
@@ -70,16 +70,16 @@ void test1() {
 }
 
 void test2() {
-  Node n1 = new Node(mouseX, mouseY, 50);
-  Node n2 = new Node(300, 300, 50);
+  Circle n1 = new Circle(mouseX, mouseY, 50);
+  Circle n2 = new Circle(300, 300, 50);
   strokeWeight(1);
   stroke(0);
   n1.draw();
   n2.draw();
-  for(Node n : getExterior(n1, n2)) {
+  for(Circle n : getExterior(n1, n2)) {
     stroke(255, 0, 0);
     n.draw();
-    for(Node j : triCircleAdjacent(n1, n2, n)) {
+    for(Circle j : triCircleAdjacent(n1, n2, n)) {
       stroke(0, 0, 255);
       j.draw();
     }
@@ -100,7 +100,7 @@ void test3() {
 void test4() {
   strokeWeight(1);
   stroke(0);
-  //Node n1 = new Node(w / 2, h / 2, (w + h) / 4);//new Node(mouseY, mouseX, (w + h) / 4);//
+  //Circle n1 = new Circle(w / 2, h / 2, (w + h) / 4);//new Circle(mouseY, mouseX, (w + h) / 4);//
   loadPixels();
   float r0, ml, bl, aq, bq, cq;
   float r1 = (w + h) / 4;
@@ -125,17 +125,17 @@ void test4() {
         cq = pow(y1, 2) + pow(bl - x1, 2) - pow(r1 - r0, 2);
       }
       t = pow(bq, 2) - 4 * aq * cq;
-      pixels[x * w + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Node(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
-      //println(getInterior(n1, new Node(x, y, 100))[0].x);
+      pixels[x * w + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Circle(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
+      //println(getInterior(n1, new Circle(x, y, 100))[0].x);
       //println((log(abs(t)) * t / abs(t)) * 5 + 127);
     }
   }
   updatePixels();
-  //Node n1 = new Node(400, 400, 100);
-  //Node n2 = new Node(mouseX, mouseY, 100);
+  //Circle n1 = new Circle(400, 400, 100);
+  //Circle n2 = new Circle(mouseX, mouseY, 100);
   //n1.draw();
   //n2.draw();
-  //for(Node n : getInterior(n1, n2)) {
+  //for(Circle n : getInterior(n1, n2)) {
   //  n.draw();
   //}
   //noLoop();
@@ -151,35 +151,35 @@ void test5() {
 }
 
 void test6() {
-  Node n1 = new Node(400, 400, 50);
-  Node n2 = new Node(400, 500, 50);
+  Circle n1 = new Circle(400, 400, 50);
+  Circle n2 = new Circle(400, 500, 50);
   float r = mouseX/20f;
-  Node n3 = new Node(n2.x + (r + n2.r) * cos(mouseX / 100f), n2.y + (r + n2.r) * sin(mouseX / 100f), r);
-  Node n4 = new Node(n2.x + (r + n2.r) * cos(mouseY / 100f), n2.y + (r + n2.r) * sin(mouseY / 100f), r);
+  Circle n3 = new Circle(n2.x + (r + n2.r) * cos(mouseX / 100f), n2.y + (r + n2.r) * sin(mouseX / 100f), r);
+  Circle n4 = new Circle(n2.x + (r + n2.r) * cos(mouseY / 100f), n2.y + (r + n2.r) * sin(mouseY / 100f), r);
   n1.draw();
   n2.draw();
   n3.draw();
   n4.draw();
-  for(Node n :  getExterior(n1, n2)) {
+  for(Circle n :  getExterior(n1, n2)) {
     n.draw();
   }
-  for(Node n :  getExterior(n2, n3)) {
+  for(Circle n :  getExterior(n2, n3)) {
     n.draw();
   }
-  for(Node n :  getExterior(n2, n4)) {
+  for(Circle n :  getExterior(n2, n4)) {
     n.draw();
   }
 }
 
 void test7() {
-  boolean works = false;
-  Node n1 = new Node(w / 2, h / 2, 50 * mouseX / w);
+  boolean works = !false;
+  Circle n1 = new Circle(w / 2, h / 2, 50);
   if(works) {
-    Node n2 = new Node(mouseX, mouseY, 25);
+    Circle n2 = new Circle(mouseX, mouseY, 25);
     n1.draw();
     n2.draw();
-    Node[] ext = getExterior(n1, n2);
-    for(Node n : ext) {
+    Circle[] ext = getExterior(n1, n2);
+    for(Circle n : ext) {
       n.draw();
     }
     fill(0);
@@ -190,7 +190,7 @@ void test7() {
     loadPixels();
     for(int x = 0; x < w; x++) {
       for(int y = 0; y < h; y++) {
-        if(getExterior(n1, new Node(x, y, 50 * mouseX / w))[0].x > Float.MIN_VALUE){
+        if(getExterior(n1, new Circle(x, y, 100 * mouseX / w))[0].x > Float.MIN_VALUE){
           f = color(0, 255, 0);
         } else {
           f = color(255, 0, 0);

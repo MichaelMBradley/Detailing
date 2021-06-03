@@ -5,22 +5,18 @@ public class Node extends Circle {
     super(xpos, ypos, rad);
     init();
   }
-  
   public Node(PVector PVec, float rad) {
     super(PVec, rad);
     init();
   }
-  
   public Node(PVector PVec) {
     super(PVec);
     init();
   }
-  
   public Node() {
     super();
     init();
   }
-  
   
   public void init() {
     kruskal = new HashSet<Node>();

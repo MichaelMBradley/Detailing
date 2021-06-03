@@ -1,3 +1,14 @@
+/*
+Issues to fix after break:
+- Implement smoothing for connections between delaunay arcs
+- Fix smoothing for arcs connecting touching circles
+- On larger packings, some trees will generate far from the polyline
+- On larger packings(?), sometimes tree trraversal will skip to a random tree
+
+- Assign a random weight to nodes touching polyline, multiply potential nodes to add to the tree by that weight, should randomize tree size in a nice way
+- Add a check to remove one-node trees and just add them to a nearby tree
+*/
+
 import java.awt.geom.Line2D;
 import java.awt.Polygon;
 import java.util.Collections;
@@ -11,13 +22,12 @@ ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
 HashSet<Node> circles, interior, exterior;
-int w, h, p, q, maxIter = 0;
+int w, h, p, q, mx, my, maxIter = 0;
 PShape shape;
 PVector offset;
-boolean smart = false;
 
-final float minimise = 2;
-final boolean noDraw = false;
+final float minimise = 20;
+final boolean noDraw = !true;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
@@ -51,6 +61,20 @@ void setup() {
 
 void draw() {
   background(255);
+  if(noDraw) {
+    test7();
+  }
+  if(draw.get("snap")) {
+    mx = mouseX - (int) offset.x;
+    my = mouseY - (int) offset.y;
+    for(Node n : circles) {
+      if(n.distanceToCenter(mx, my) < n.r) {
+        mouseX = (int) (n.x + offset.x);
+        mouseY = (int) (n.y + offset.y);
+        break;
+      }
+    }
+  }
   if(draw.get("grid")) {
     fill(127);
     stroke(127);
@@ -119,9 +143,6 @@ void draw() {
     stroke(0, 255, 0);
     traverseArcs.get(p).draw(offset);
   }
-  if(noDraw) {
-    test7();
-  }
 }
 
 void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
@@ -172,11 +193,6 @@ ArrayList<Circle> analyze(HashSet<Node> aCircles) {
   /**
   The Delaunay Triangulation and tree generation is done seperately for the interior and exterior circles.
   This was made into a function to avoid repeating code.
-  
-  Accepts:
-    HashSet<Node> representing interior/exterior circles
-  Returns:
-    ArrayList<Arc> representing the circumcircles of the delaunay triangulation
   */
   ArrayList<Circle> circum;
   int start;
@@ -236,22 +252,6 @@ void calc() {
   }
 }
 
-void calcOffset() {
-  /**
-  Calculates the amount all geometry should be offset to center it.
-  */
-  PVector[] ends = extremes(vertices);
-  if(noDraw) {
-    offset = new PVector();
-  } else {
-    offset = new PVector((w - (ends[1].x - ends[0].x)) / 2, (h - (ends[1].y - ends[0].y)) / 2);
-  }
-}
-
-void drawLineOffset(PVector p1, PVector p2) {
-  line(p1.x + offset.x, p1.y + offset.y, p2.x + offset.x, p2.y + offset.y);
-}
-
 // Input
 void keyPressed() {
   String cmd;
@@ -292,14 +292,14 @@ void mouseMoved() {
 void initializeKeys() {
   // key, name, value
   Object[][] cmd = new Object[][] {
-  {'g', "grid", false},
-  {'n', "numCircles", true},
+  {'g', "grid", true},
+  {'c', "numCircles", true},
   {'s', "shape", true},
   {'i', "interior", false},
   {'e', "exterior", false},
   {'t', "touching", false},
   {'d', "delaunay", false},
-  {'c', "circumcircles", false},
+  {'u', "circumcircles", false},
   {'r', "traversal", true},
   {'a', "traversalArcs", false},
   {'k', "kruskal", false},
@@ -307,6 +307,7 @@ void initializeKeys() {
   {'q', "getTouching", false},
   {'o', "condense", false},
   {'p', "iterate", false},
+  {'n', "snap", true},
   };
   conv = new HashMap<Character, String>();
   draw = new HashMap<String, Boolean>();
