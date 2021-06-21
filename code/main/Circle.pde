@@ -76,10 +76,7 @@ public class Circle {
   }
   
   public void draw() {
-    circle(x, y, r * 2);
-  }
-  public void draw(PVector offset) {
-    circle(x + offset.x, y + offset.y, r * 2);  // p5 accepts diameter, not radius
+    circle(x, y, r * 2);  // p5 accepts diameter, not radius
   }
   
   public String toString() {

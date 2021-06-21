@@ -29,7 +29,7 @@ ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices
       current.remove(next);
     }
   }
-  println(traversal);
+  //println(traversal);
   return traversal;
 }
 

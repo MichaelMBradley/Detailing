@@ -38,9 +38,9 @@ void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
     base = conv.get(pv);
     for(PVector connect : dict.get(pv)) {
       con = conv.get(connect);
-      //if(PVector.dist(pv, connect) < (base.r + con.r) * 3) {
+      if(PVector.dist(pv, connect) < (base.r + con.r) * 3) {
         base.delaunay.add(con);
-      //}
+      }
     }
   }
 }

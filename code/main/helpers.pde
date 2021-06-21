@@ -10,8 +10,8 @@ void calcOffset() {
   }
 }
 
-void drawLineOffset(PVector p1, PVector p2) {
-  line(p1.x + offset.x, p1.y + offset.y, p2.x + offset.x, p2.y + offset.y);
+void drawLine(PVector p1, PVector p2) {
+  line(p1.x, p1.y, p2.x, p2.y);
 }
 
 HashSet<HashSet<Node>> getMSTs(HashSet<Node> nodes) {

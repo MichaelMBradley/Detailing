@@ -44,10 +44,6 @@ public class Arc extends Circle {
   
   @Override
   public void draw() {
-    draw(new PVector());
-  }
-  @Override
-  public void draw(PVector offset) {
-    arc(pv.x + offset.x, pv.y + offset.y, r * 2, r * 2, start, end);
+    arc(pv.x, pv.y, r * 2, r * 2, start, end);
   }
 }

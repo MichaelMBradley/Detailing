@@ -1,39 +1,3 @@
-void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-  /**
-  Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
-  */
-  HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
-  HashSet<Node> valid;
-  Node use;
-  boolean add = true;
-  // While there are still more nodes to add
-  while(add) {
-    add = false;
-    for(Node n : touching) {
-      valid = new HashSet<Node>();
-      for(Node k : n.kruskal) {
-        for(Node d : k.delaunay) {
-          if(d.kruskal.size() == 0 && !touching.contains(d)) {
-            // Add node connected by triangulation if it is unclaimed and is not touching the polyline
-            valid.add(d);
-          }
-        }
-      }
-      if(valid.size() > 0) {
-        add = true;
-        use = randomFromHashSet(valid);
-        // Add random available node, if one is available
-        for(Node k : n.kruskal) {
-          if(k.delaunay.contains(use)) {
-            k.addKruskal(use, -1);
-            break;
-          }
-        }
-      }
-    }
-  }
-}
-
 void kruskal(HashSet<Node> nodes) {
   kruskal(nodes, (int) sqrt(sqrt(nodes.size())));
 }
@@ -72,15 +36,55 @@ void kruskalWithin(HashSet<Node> nodes, int restrictSize) {
   }
 }
 
+void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
+  /**
+  Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
+  */
+  HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
+  HashSet<Node> valid;
+  Node use;
+  boolean add = true;
+  // While there are still more nodes to add
+  while(add) {
+    add = false;
+    for(Node n : touching) {
+      valid = new HashSet<Node>();
+      for(Node k : n.kruskal) {
+        for(Node d : k.delaunay) {
+          if(d.kruskal.size() == 0 && !touching.contains(d)) {
+            // Add node connected by triangulation if it is unclaimed and is not touching the polyline
+            valid.add(d);
+          }
+        }
+      }
+      if(valid.size() > 0) {
+        add = true;
+        use = randomFromHashSet(valid);
+        // Add random available node, if one is available
+        for(Node k : n.kruskal) {
+          if(k.delaunay.contains(use)) {
+            k.addKruskal(use, -1);
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
 void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
   /**
   Creates trees based on the closest node touching the polyline to each node available.
+  Uses a random weighting to create variability in the size of the trees.
   */
   HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
+  HashMap<Node, Float> weights = new HashMap<Node, Float>();
   HashMap<Node, HashSet<Node>> groups = new HashMap<Node, HashSet<Node>>();
   float dist, testdist;
+  boolean valid;
   Node close = new Node();
   for(Node t : touching) {
+    weights.put(t, random(1, 3));
     groups.put(t, new HashSet<Node>());
     groups.get(t).add(t);
   }
@@ -88,7 +92,7 @@ void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
     if(!touching.contains(n)) {
       dist = Float.MAX_VALUE;
       for(Node t : touching) {
-        testdist = n.distanceToCircle(t);
+        testdist = n.distanceToCircle(t) * weights.get(t);
         if(testdist < dist) {
           dist = testdist;
           close = t;
@@ -97,12 +101,49 @@ void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
       groups.get(close).add(n);
     }
   }
-  for(HashSet<Node> g : groups.values()) {
-    //println(g);
-    kruskalWithin(g, -1);
-    //break;
+  for(Node g : touching) {
+    if(groups.get(g).size() == 1) {
+      dist = Float.MAX_VALUE;
+      for(Node t : touching) {
+        testdist = g.distanceToCircle(t);
+        if(testdist > 0 && testdist < dist && groups.keySet().contains(t)) {
+          close = t;
+          dist = testdist;
+        }
+      }
+      groups.remove(g);
+      groups.get(close).add(g);
+    }
   }
-  //println(groups);
+  for(HashSet<Node> g : groups.values()) {
+    kruskalWithin(g, -1);
+  }
+  for(Node n : nodes) {
+    // Checks for trees that are unconnected to nodes touching the polyline
+    valid = false;
+    for(Node t : touching) {
+      if(n.kruskal.contains(t)) {
+        valid = true;
+        break;
+      }
+    }
+    if(!valid) {
+      dist = Float.MAX_VALUE;
+      close = new Node();
+      for(Node d : n.delaunay) {
+        if(!n.kruskal.contains(d)) {
+          testdist = n.distanceToCircle(d);
+          if(testdist < dist) {
+            close = d;
+            dist = testdist;
+          }
+        }
+      }
+      if(close.r != 0f) {
+        n.addKruskal(close);
+      }
+    }
+  }
 }
 
 private HashSet<Node> getNodesTouchingPolyline(HashSet<Node> nodes, ArrayList<PVector> vertices) {

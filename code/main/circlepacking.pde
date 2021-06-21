@@ -24,7 +24,7 @@ HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
       // Fails if chosen position would require a node to be too small
       consecutiveFailed++;
     } else {
-      current = new Node(x, y, min(maxradius, closestCircle));
+      current = new Node(x, y, min(maxradius * random(0.75, 1.25), closestCircle));
       if(circleNearLine(cutoff, current, vertices)) {
         // Adds new node if given circle is near any line
         nodes.add(current);

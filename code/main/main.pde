@@ -2,11 +2,11 @@
 Issues to fix after break:
 - Implement smoothing for connections between delaunay arcs
 - Fix smoothing for arcs connecting touching circles
-- On larger packings, some trees will generate far from the polyline
-- On larger packings(?), sometimes tree trraversal will skip to a random tree
+* On larger packings, some trees will generate far from the polyline
+* On larger packings(?), sometimes tree traversal will skip to a random tree
 
-- Assign a random weight to nodes touching polyline, multiply potential nodes to add to the tree by that weight, should randomize tree size in a nice way
-- Add a check to remove one-node trees and just add them to a nearby tree
+* Assign a random weight to nodes touching polyline, multiply potential nodes to add to the tree by that weight, should randomize tree size in a nice way
+* Add a check to remove one-node trees and just add them to a nearby tree
 */
 
 import java.awt.geom.Line2D;
@@ -23,17 +23,18 @@ ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
 HashSet<Node> circles, interior, exterior;
 int w, h, p, q, mx, my, maxIter = 0;
+float zoom = 2f;
 PShape shape;
 PVector offset;
 
-final float minimise = 20;
+final float minimise = 5;
 final boolean noDraw = !true;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
 
 void setup() {
-  size(1000, 1000);
+  size(900, 900);
   noFill();
   surface.setTitle("Detailing");
   initializeKeys();
@@ -60,11 +61,17 @@ void setup() {
 }
 
 void draw() {
+  resetMatrix();
+  scale(draw.get("zoom") ? zoom : 1);
+  translate(offset.x, offset.y);
+  if(draw.get("zoom")) {
+    translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
+  }
   background(255);
   if(noDraw) {
-    test7();
+    test1();
   }
-  if(draw.get("snap")) {
+  if(draw.get("snap") && draw.get("grid")) {
     mx = mouseX - (int) offset.x;
     my = mouseY - (int) offset.y;
     for(Node n : circles) {
@@ -81,29 +88,32 @@ void draw() {
     strokeWeight(1);
     int freq = 25;
     for(int i = ((int) offset.x / freq) * -freq; i < w - offset.x; i += freq) {
-      line(i + offset.x, 0, i + offset.x, h);
-      text("" + i, i + offset.x + 2, 10);
+      line(i, - offset.y, i, h - offset.y);
+      text("" + i, i + 2, 10 - offset.y);
     }
     for(int i = ((int) offset.y / freq) * -freq; i < h - offset.y; i += freq) {
-      line(0, i + offset.y, w, i + offset.y);
-      text("" + i, 0, i + offset.y + 12);
+      line(- offset.x, i, w - offset.x, i);
+      text("" + i, - offset.x, i + 12);
     }
     fill(0);
     stroke(0);
-    text("(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2, mouseY - 2);
-    line(mouseX, 0, mouseX, h);
-    line(0, mouseY, w, mouseY);
+    text("(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
+    line(mouseX - offset.x, - offset.y, mouseX - offset.x, h - offset.y);
+    line(- offset.x, mouseY - offset.y, w - offset.x, mouseY - offset.y);
     noFill();
   }
   if(draw.get("numCircles")) {
     fill(0);
-    text(String.format("Circles: %d", circles.size()), 30, 30);
+    text(String.format("Circles: %d", circles.size()), 30 - offset.x, 30 - offset.y);
+    if(draw.get("zoom")) {
+      text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
+    }
     noFill();
   }
   if(draw.get("shape")) {
     stroke(0);
     strokeWeight(1);
-    shape(shape, offset.x, offset.y);
+    shape(shape, 0, 0);
   }
   drawNodes(interior, interiorCircumcircles, draw.get("interior"));
   drawNodes(exterior, exteriorCircumcircles, draw.get("exterior"));
@@ -116,10 +126,10 @@ void draw() {
       } else {
         stroke(255, 0, 0);
       }
-      drawLineOffset(traverse.get(i).pv, traverse.get(i+1).pv);
+      drawLine(traverse.get(i).pv, traverse.get(i+1).pv);
     }
     stroke(0, 0, 255);
-    drawLineOffset(traverse.get(traverse.size()-1).pv, traverse.get(0).pv);
+    drawLine(traverse.get(traverse.size()-1).pv, traverse.get(0).pv);
   }
   if(draw.get("traversalArcs")) {
     strokeWeight(1);
@@ -133,7 +143,7 @@ void draw() {
         r -= chn;
         b += chn;
       }
-      a.draw(offset);
+      a.draw();
     }
   }
   if(draw.get("iterate")) {
@@ -141,7 +151,7 @@ void draw() {
     // keyPressed(); // ?
     maxIter = traverseArcs.size();
     stroke(0, 255, 0);
-    traverseArcs.get(p).draw(offset);
+    traverseArcs.get(p).draw();
   }
 }
 
@@ -155,27 +165,27 @@ void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean d
       if(drawCircles) {
         stroke(0);
         strokeWeight(1);
-        n.draw(offset);
+        n.draw();
       }
       if(draw.get("touching")) {
         stroke(0, 0, 255);
         strokeWeight(1);
         for(Node t : n.touching) {
-          drawLineOffset(n.pv, t.pv);
+          drawLine(n.pv, t.pv);
         }
       }
       if(draw.get("delaunay")) {
         stroke(255, 0, 0);
         strokeWeight(1);
         for(Node t : n.delaunay) {
-          drawLineOffset(n.pv, t.pv);
+          drawLine(n.pv, t.pv);
         }
       }
       if(draw.get("kruskal")) {
         stroke(0, 255, 0);
         strokeWeight(1);
         for(Node t : n.kruskalAdjacent) {
-          drawLineOffset(n.pv, t.pv);
+          drawLine(n.pv, t.pv);
         }
       }
     }
@@ -183,7 +193,7 @@ void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean d
       stroke(255, 0, 0);
       strokeWeight(1);
       for(Circle c : circumcircles) {
-        c.draw(offset);;
+        c.draw();
       }
     }
   }
@@ -289,14 +299,18 @@ void mouseMoved() {
   //loop();
 }
 
+void mouseWheel(MouseEvent event) {
+  zoom *= pow(0.9, event.getCount());
+}
+
 void initializeKeys() {
   // key, name, value
   Object[][] cmd = new Object[][] {
-  {'g', "grid", true},
+  {'g', "grid", false},
   {'c', "numCircles", true},
   {'s', "shape", true},
-  {'i', "interior", false},
-  {'e', "exterior", false},
+  {'i', "interior", true},
+  {'e', "exterior", true},
   {'t', "touching", false},
   {'d', "delaunay", false},
   {'u', "circumcircles", false},
@@ -308,6 +322,7 @@ void initializeKeys() {
   {'o', "condense", false},
   {'p', "iterate", false},
   {'n', "snap", true},
+  {'z', "zoom", false},
   };
   conv = new HashMap<Character, String>();
   draw = new HashMap<String, Boolean>();
