@@ -44,7 +44,7 @@ private ArrayList<HashMap<PVector, Node>> MSTClosestNode (HashSet<HashSet<Node>>
   PVector vi, vj, testpv;
   PVector touch = new PVector();
   Node closest = new Node();
-  for(int _=0;_<vertices.size();_++) {
+  for(int m = 0; m < vertices.size(); m++) {
     options.add(new HashMap<PVector, Node>());
   }
   // Finding closest node to edge

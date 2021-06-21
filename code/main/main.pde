@@ -1,12 +1,7 @@
 /*
-Issues to fix after break:
+Things to do:
 - Implement smoothing for connections between delaunay arcs
 - Fix smoothing for arcs connecting touching circles
-* On larger packings, some trees will generate far from the polyline
-* On larger packings(?), sometimes tree traversal will skip to a random tree
-
-* Assign a random weight to nodes touching polyline, multiply potential nodes to add to the tree by that weight, should randomize tree size in a nice way
-* Add a check to remove one-node trees and just add them to a nearby tree
 */
 
 import java.awt.geom.Line2D;
@@ -46,7 +41,7 @@ void setup() {
   // float m = 0; // 0 for no tilt
   // float[][] initvertices = {{0, m}, {100 - m, 0}, {100, 100 - m}, {m, 100}};
   // Mouse input example:
-   //float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
+  //float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
   // More complex vertices:
   float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
   vertices = toPVector(initvertices);

@@ -1,3 +1,5 @@
+# This program refuses to run in Processing 4 Alpha 4
+
 # A simple program to create shapes to avoid typing out many arrays manually
 # LMB = Place vertex
 # RMB = Remove last vertex

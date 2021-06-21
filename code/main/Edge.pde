@@ -15,7 +15,7 @@ public class Edge implements Comparable<Edge> {
   public boolean equals(Object obj) {
     if(obj instanceof Edge) {
       Edge edge = (Edge) obj;
-      if((n1.pv.equals(edge.n1.pv) && n2.equals(edge.n2.pv)) || (n1.equals(edge.n2.pv) && n2.equals(edge.n1.pv))) {
+      if((n1.pv.equals(edge.n1.pv) && n2.pv.equals(edge.n2.pv)) || (n1.pv.equals(edge.n2.pv) && n2.pv.equals(edge.n1.pv))) {
         return true;
       }
     }

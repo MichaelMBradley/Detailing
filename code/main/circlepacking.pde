@@ -112,7 +112,7 @@ HashSet<Node> randomFillPoisson(int w, int h, float minimise) {
           available.get(i).get(j).add(nodes.size()-1);
         }
       }
-      for(int _= 0;_<10;_++) {  // number is arbitrary
+      for(int m = 0; m < 10; m++) {  // number is arbitrary
         test.push(new Node(max(0, min(w, curr.x + random(-2 * maxradius, 2 * maxradius))), max(0, min(h, curr.y + random(-2 * maxradius, 2 * maxradius))), 0));
       }
     }

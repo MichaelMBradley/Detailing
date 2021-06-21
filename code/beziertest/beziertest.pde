@@ -27,7 +27,7 @@ void draw() {
 }
 
 void mouseClicked() {
-  if(mouseButton == LEFT) {
+  if(mouseButton == LEFT) {  // mouseButton only returns 0 (alpha bug)
     create.add(new PVector(mouseX, mouseY));
   } else if(mouseButton == RIGHT) {
     if(create.size() >= 1) {
