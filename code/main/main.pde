@@ -2,6 +2,7 @@
 Things to do:
 - Implement smoothing for connections between delaunay arcs
 - Fix smoothing for arcs connecting touching circles
+- Add more space in between trees
 */
 
 import java.awt.geom.Line2D;
@@ -17,13 +18,13 @@ ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 ArrayList<PVector> vertices;
 ArrayList<Node> traverse;
 HashSet<Node> circles, interior, exterior;
-int w, h, p, q, mx, my, maxIter = 0;
+int w, h, p, q, mx, my, ogmx, ogmy, maxIter = 0;
 float zoom = 2f;
 PShape shape;
 PVector offset;
 
 final float minimise = 5;
-final boolean noDraw = !true;
+final boolean noDraw = true;
 
 HashMap<Character, String> conv;
 HashMap<String, Boolean> draw;
@@ -56,7 +57,8 @@ void setup() {
 }
 
 void draw() {
-  resetMatrix();
+  ogmx = mouseX;
+  ogmy = mouseY;
   scale(draw.get("zoom") ? zoom : 1);
   translate(offset.x, offset.y);
   if(draw.get("zoom")) {
@@ -148,6 +150,8 @@ void draw() {
     stroke(0, 255, 0);
     traverseArcs.get(p).draw();
   }
+  mouseX = ogmx;
+  mouseY = ogmy;
 }
 
 void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {

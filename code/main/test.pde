@@ -1,4 +1,7 @@
 void test1() {
+  /*
+  Attempts to smooth a series of circles.
+  */
   ArrayList<Circle> ns = new ArrayList<Circle>();
   //iter = (int(mouseX)/5)*5 * PI / 180f;//+= 0.01f;
   //Circle n1 = new Circle(400, 400, 50);
@@ -13,7 +16,7 @@ void test1() {
   Circle n6 = new Circle(300, 480, 30);
   Circle n7 = new Circle(400, 300, 50);
   Circle n8 = new Circle(470, 230, 50);
-  Circle n9 = new Circle(470, 370, 50);
+  Circle n9 = new Circle(mouseX, mouseY, mouseX/10);//470, 370, 50);
   //mouseX, mouseY, mouseX/10);//
   //fill(0);
   //text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
@@ -70,6 +73,9 @@ void test1() {
 }
 
 void test2() {
+  /*
+  Attempts to create a safe (non-overlapping) intermediate circle.
+  */
   Circle n1 = new Circle(mouseX, mouseY, 50);
   Circle n2 = new Circle(300, 300, 50);
   strokeWeight(1);
@@ -87,6 +93,9 @@ void test2() {
 }
 
 void test3() {
+  /*
+  Creates a slight curve.
+  */
   strokeWeight(5);
   stroke(255, 0, 0);
   point(100, 100);
@@ -98,59 +107,68 @@ void test3() {
 }
 
 void test4() {
+  /*
+  Creates a circle in the overlapping area two existing circles.
+  */
   strokeWeight(1);
   stroke(0);
   //Circle n1 = new Circle(w / 2, h / 2, (w + h) / 4);//new Circle(mouseY, mouseX, (w + h) / 4);//
-  loadPixels();
-  float r0, ml, bl, aq, bq, cq;
-  float r1 = (w + h) / 4;
-  float r2 = (w + h) / 4;
-  float x1 = w / 2;
-  float y1 = h / 2;
-  float t;
-  for(int x = 0; x < w; x++) {
-    for(int y = 0; y < h; y++) {
-      r0 = r1 + r2 - dist(x1, y1, x, y);;
-      if(abs(y1 - y) > 1) {
-        ml = - (x - x1) / (y - y1);
-        bl = (-pow(x1, 2) + pow(x, 2) - pow(y1, 2) + pow(y, 2) + pow(r1, 2) - pow(r2, 2) - (2 * r0 * (r1 - r2))) / (2 * (y - y1));
-        aq = 1 + pow(ml, 2);
-        bq = 2 * (ml * (bl - y1) - x1);
-        cq = pow(x1, 2) + pow(bl - y1, 2) - pow(r1 - r0, 2);
-      } else {
-        ml = - (y - y1) / (x - x1);
-        bl = (-pow(x1, 2) + pow(x, 2) - pow(y1, 2) + pow(y, 2) + pow(r1, 2) - pow(r2, 2) - (2 * r0 * (r1 - r2))) / (2 * (x - x1));
-        aq = 1 + pow(ml, 2);
-        bq = 2 * (ml * (bl - x1) - y1);
-        cq = pow(y1, 2) + pow(bl - x1, 2) - pow(r1 - r0, 2);
-      }
-      t = pow(bq, 2) - 4 * aq * cq;
-      pixels[x * w + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Circle(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
-      //println(getInterior(n1, new Circle(x, y, 100))[0].x);
-      //println((log(abs(t)) * t / abs(t)) * 5 + 127);
-    }
-  }
-  updatePixels();
-  //Circle n1 = new Circle(400, 400, 100);
-  //Circle n2 = new Circle(mouseX, mouseY, 100);
-  //n1.draw();
-  //n2.draw();
-  //for(Circle n : getInterior(n1, n2)) {
-  //  n.draw();
+  //loadPixels();
+  //float r0, ml, bl, aq, bq, cq;
+  //float r1 = (w + h) / 4;
+  //float r2 = (w + h) / 4;
+  //float x1 = w / 2;
+  //float y1 = h / 2;
+  //float t;
+  //for(int x = 0; x < w; x++) {
+  //  for(int y = 0; y < h; y++) {
+  //    r0 = r1 + r2 - dist(x1, y1, x, y);;
+  //    if(abs(y1 - y) > 1) {
+  //      ml = - (x - x1) / (y - y1);
+  //      bl = (-pow(x1, 2) + pow(x, 2) - pow(y1, 2) + pow(y, 2) + pow(r1, 2) - pow(r2, 2) - (2 * r0 * (r1 - r2))) / (2 * (y - y1));
+  //      aq = 1 + pow(ml, 2);
+  //      bq = 2 * (ml * (bl - y1) - x1);
+  //      cq = pow(x1, 2) + pow(bl - y1, 2) - pow(r1 - r0, 2);
+  //    } else {
+  //      ml = - (y - y1) / (x - x1);
+  //      bl = (-pow(x1, 2) + pow(x, 2) - pow(y1, 2) + pow(y, 2) + pow(r1, 2) - pow(r2, 2) - (2 * r0 * (r1 - r2))) / (2 * (x - x1));
+  //      aq = 1 + pow(ml, 2);
+  //      bq = 2 * (ml * (bl - x1) - y1);
+  //      cq = pow(y1, 2) + pow(bl - x1, 2) - pow(r1 - r0, 2);
+  //    }
+  //    t = pow(bq, 2) - 4 * aq * cq;
+  //    pixels[x * w + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Circle(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
+  //    //println(getInterior(n1, new Circle(x, y, 100))[0].x);
+  //    //println((log(abs(t)) * t / abs(t)) * 5 + 127);
+  //  }
   //}
+  //updatePixels();
+  Circle n1 = new Circle(400, 400, 100);
+  Circle n2 = new Circle(mouseX, mouseY, 100);
+  n1.draw();
+  n2.draw();
+  for(Circle n : getInterior(n1, n2)) {
+    n.draw();
+  }
   //noLoop();
 }
 
 void test5() {
+  /*
+  Tests out the Arc class.
+  */
   float t_s = (mouseX - w / 2) / 20f;
   float arc = mouseY * 1.25 * TWO_PI / h;
-  new Arc(new PVector(w / 2, h / 2), 50, t_s, arc).draw();
+  new Arc(new PVector(w / 2, h / 2), 50, t_s, t_s + arc).draw();
   fill(0);
   text(String.format("Start: %.2f\nLength: %.2f\nEnd: %.2f\n", t_s, arc, t_s + arc), mouseX, mouseY);
   noFill();
 }
 
 void test6() {
+  /*
+  Tests out safe exteriors.
+  */
   Circle n1 = new Circle(400, 400, 50);
   Circle n2 = new Circle(400, 500, 50);
   float r = mouseX/20f;
@@ -172,6 +190,9 @@ void test6() {
 }
 
 void test7() {
+  /*
+  Mixing safe connections with good looking ones.
+  */
   boolean works = !false;
   Circle n1 = new Circle(w / 2, h / 2, 50);
   if(works) {
@@ -200,4 +221,26 @@ void test7() {
     }
     updatePixels();
   }
+}
+
+void test8() {
+  PVector p1 = new PVector(0, 1), p2 = new PVector(1, 2);
+  float j;
+  float num = 1e9;
+  int t = millis();
+  for(int i = 0; i < num; i++) {
+    j = PVector.dist(p1, p2);
+  }
+  println(".dist: " + (millis() - t));
+  t = millis();
+  for(int i = 0; i < num; i++) {
+    j = PVector.sub(p1, p2).magSq();
+  }
+  println(".sub.magSq: " + (millis() - t));
+  t = millis();
+  for(int i = 0; i < num; i++) {
+    j = pow(p1.x - p2.x, 2) + pow(p2.y - p2.y, 2);
+  }
+  println("custom: " + (millis() - t));
+  exit();
 }

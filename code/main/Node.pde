@@ -113,6 +113,9 @@ public class Node extends Circle {
     if(kruskalAdjacent.size() == 0) {
       return below;
     } else if(kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
+      float small = (float) mouseX / w;//0.5f;
+      r *= small;
+      move(PVector.sub(call.pv, pv).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
       return below;
     }
     orderedChildren = sortRelativeHeadings(orderedChildren, call, clockwise);
