@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class traversal {
+public class Traversal {
     public static Node closestNode(HashSet<Node> nodes, PVector vertex) {
         Node close = new Node();
         float tempdist;
@@ -20,11 +20,11 @@ public class traversal {
     }
 
     public static PVector closestPoint(PVector p1, PVector p2, PVector p0) {
-        /**
-         Uses basic point-slope formulas to find the intersection of (p1, p2)
-         and the line perpendicular to (p1, p2) passing through the node.
-         Slightly slower.
-         */
+        /*
+        Uses basic point-slope formulas to find the intersection of (p1, p2)
+        and the line perpendicular to (p1, p2) passing through the node.
+        Slightly slower.
+        */
         if (p1.x == p2.x) {
             return new PVector(p1.x, p0.y);
         }
@@ -39,22 +39,22 @@ public class traversal {
     }
 
     public static PVector closestPoint2(PVector p1, PVector p2, PVector p0) {
-        /**
-         Projects the node onto the vector between (p1, p2) to find the closest point.
-         Slightly faster.
-         */
+        /*
+        Projects the node onto the vector between (p1, p2) to find the closest point.
+        Slightly faster.
+        */
         PVector y = PVector.sub(p0, p1);
         PVector u = PVector.sub(p2, p1);
         return u.mult(y.dot(u) / u.magSq()).add(p1);
     }
 
     public static HashSet<Node> containing(ArrayList<PVector> vertices, HashSet<Node> nodes, boolean inside) {
-        /**
-         Accepts a set of nodes, returns the subset
-         that is either inside or outside the shape.
-         */
+        /*
+        Accepts a set of nodes, returns the subset
+        that is either inside or outside the shape.
+        */
         HashSet<Node> side = new HashSet<Node>();
-        Polygon shape = shapefunctions.toPolygon(vertices);
+        Polygon shape = ShapeFunctions.toPolygon(vertices);
         for (Node n : nodes) {
             if (shape.contains(n.x, n.y) == inside) {
                 side.add(n);
@@ -64,11 +64,11 @@ public class traversal {
     }
 
     public static boolean inLine(PVector p1, PVector p2, PVector test) {
-        /**
-         Tests if PVector test is in the line described by p1, p2
-         by determining of it's distance to the closest point on that
-         line is approximately 0 (for rounding errors).
-         */
+        /*
+        Tests if PVector test is in the line described by p1, p2
+        by determining of it's distance to the closest point on that
+        line is approximately 0 (for rounding errors).
+        */
         return PVector.dist(test, closestPoint2(p1, p2, test)) < 1;
     }
 
@@ -76,12 +76,12 @@ public class traversal {
         ArrayList<Arc> arcs = new ArrayList<Arc>();
         for (int i = 0; i < traversal.size() - 1; i++) {
             if (traversal.get(i).kruskalAdjacent.contains(traversal.get(i + 1))) {
-                arcs.add(shapefunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);
+                arcs.add(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);
             } else {
-                arcs.add(shapefunctions.arcLine(traversal.get(i).pv, traversal.get(i + 1).pv));
+                arcs.add(ShapeFunctions.arcLine(traversal.get(i).pv, traversal.get(i + 1).pv));
             }
         }
-        arcs.add(shapefunctions.arcLine(traversal.get(traversal.size() - 1).pv, traversal.get(0).pv));
+        arcs.add(ShapeFunctions.arcLine(traversal.get(traversal.size() - 1).pv, traversal.get(0).pv));
         return arcs;
     }
 }

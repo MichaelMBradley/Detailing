@@ -7,24 +7,24 @@ import java.util.Stack;
 import static processing.core.PApplet.max;
 import static processing.core.PApplet.min;
 
-public class circlepacking {
+public class CirclePacking {
     public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
-        /**
-         Creates a circle packing of the given vertices.
-         */
+        /*
+        Creates a circle packing of the given vertices.
+        */
         HashSet<Node> nodes = new HashSet<Node>();
         float x, y, r, closestCircle;
         Node current;
-        PVector max = shapefunctions.extremes(vertices)[1];
+        PVector max = ShapeFunctions.extremes(vertices)[1];
         float maxradius = max(max.x, max.y) / (60 * minimise) * 4;
         float minradius = maxradius / 2;
         float cutoff = ((max.x + max.y + maxradius * 8) / 60) * (2 * minimise / 3);
         float offset = cutoff + maxradius;
         int consecutiveFailed = 0;
         while (consecutiveFailed < 3000 / minimise) {
-            r = helpers.random(minradius, maxradius);
-            x = helpers.random(r - offset, max.x + offset - r);
-            y = helpers.random(r - offset, max.y + offset - r);
+            r = Helpers.random(minradius, maxradius);
+            x = Helpers.random(r - offset, max.x + offset - r);
+            y = Helpers.random(r - offset, max.y + offset - r);
             closestCircle = 1e6f;
             for (Node n : nodes) {
                 // Find overall closest circle (the actual node is irrelevant)
@@ -34,8 +34,8 @@ public class circlepacking {
                 // Fails if chosen position would require a node to be too small
                 consecutiveFailed++;
             } else {
-                current = new Node(x, y, min(maxradius * helpers.random(0.75f, 1.25f), closestCircle));
-                if (shapefunctions.circleNearLine(cutoff, current, vertices)) {
+                current = new Node(x, y, min(maxradius * Helpers.random(0.75f, 1.25f), closestCircle));
+                if (ShapeFunctions.circleNearLine(cutoff, current, vertices)) {
                     // Adds new node if given circle is near any line
                     nodes.add(current);
                     consecutiveFailed = 0;
@@ -48,18 +48,18 @@ public class circlepacking {
     }
 
     public static HashSet<Node> randomFill(int w, int h, float minimise) {
-        /**
-         Creates a circle packing in the given area.
-         */
+        /*
+        Creates a circle packing in the given area.
+        */
         HashSet<Node> nodes = new HashSet<Node>();
         float x, y, r, closestCircle;
         float minradius = (w + h) / (60 * minimise);
         float maxradius = minradius * 4;
         int consecutiveFailed = 0;
         while (consecutiveFailed < 3000 / minimise) {
-            r = helpers.random(minradius, maxradius);
-            x = helpers.random(r, w - r);
-            y = helpers.random(r, h - r);
+            r = Helpers.random(minradius, maxradius);
+            x = Helpers.random(r, w - r);
+            y = Helpers.random(r, h - r);
             closestCircle = min(new float[]{x, y, w - x, h - y});
             for (Node n : nodes) {
                 // Find overall closest circle (the actual node is irrelevant)
@@ -77,11 +77,11 @@ public class circlepacking {
     }
 
     public static HashSet<Node> randomFillPoisson(int w, int h, float minimise) {
-        /**
-         This implementation is worse than dart throwing.
-         It attempts to use a 2D array to determine the
-         closest other node.
-         */
+        /*
+        This implementation is worse than dart throwing.
+        It attempts to use a 2D array to determine the
+        closest other node.
+        */
         ArrayList<Node> nodes = new ArrayList<Node>();
         float minradius = (w + h) / (60 * minimise);
         float maxradius = minradius * 4;
@@ -95,7 +95,7 @@ public class circlepacking {
         Node curr;
         Stack<Node> test = new Stack<Node>();
         HashSet<Node> nearby;
-        test.push(new Node(helpers.random(minradius, w - minradius), helpers.random(minradius, h - minradius), 0));
+        test.push(new Node(Helpers.random(minradius, w - minradius), Helpers.random(minradius, h - minradius), 0));
         int locx, locy;
         float nearest;
         while (!test.empty()) {
@@ -123,7 +123,7 @@ public class circlepacking {
                     }
                 }
                 for (int m = 0; m < 10; m++) {  // number is arbitrary
-                    test.push(new Node(max(0, min(w, curr.x + helpers.random(-2 * maxradius, 2 * maxradius))), max(0, min(h, curr.y + helpers.random(-2 * maxradius, 2 * maxradius))), 0));
+                    test.push(new Node(max(0, min(w, curr.x + Helpers.random(-2 * maxradius, 2 * maxradius))), max(0, min(h, curr.y + Helpers.random(-2 * maxradius, 2 * maxradius))), 0));
                 }
             }
         }

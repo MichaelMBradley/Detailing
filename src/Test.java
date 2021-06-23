@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
 
-public class test {
+public class Test {
     public static void test1(PApplet s) {
         /*
         Attempts to smooth a series of circles.
@@ -75,7 +75,7 @@ public class test {
         s.strokeWeight(1);
         s.stroke(0);
         println();
-        for (Arc arc : smoothing.surroundingArcsTree(ns)) {
+        for (Arc arc : Smoothing.surroundingArcsTree(ns)) {
             arc.draw(s);
         }
     }
@@ -90,10 +90,10 @@ public class test {
         s.stroke(0);
         n1.draw(s);
         n2.draw(s);
-        for (Circle n : smoothing.getExterior(n1, n2)) {
+        for (Circle n : Smoothing.getExterior(n1, n2)) {
             s.stroke(255, 0, 0);
             n.draw(s);
-            for (Circle j : smoothing.triCircleAdjacent(n1, n2, n)) {
+            for (Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
                 s.stroke(0, 0, 255);
                 j.draw(s);
             }
@@ -111,7 +111,7 @@ public class test {
         s.strokeWeight(1);
         s.stroke(0);
         s.randomSeed(0L);
-        shapefunctions.arcLine(new PVector(100, 100), new PVector(s.mouseX, s.mouseY)).draw(s);
+        ShapeFunctions.arcLine(new PVector(100, 100), new PVector(s.mouseX, s.mouseY)).draw(s);
     }
 
     public static void test4(PApplet s) {
@@ -157,7 +157,7 @@ public class test {
         Circle n2 = new Circle(s.mouseX, s.mouseY, 100);
         n1.draw(s);
         n2.draw(s);
-        for (Circle n : smoothing.getInterior(n1, n2)) {
+        for (Circle n : Smoothing.getInterior(n1, n2)) {
             n.draw(s);
         }
         //noLoop();
@@ -190,13 +190,13 @@ public class test {
         n2.draw(s);
         n3.draw(s);
         n4.draw(s);
-        for (Circle n : smoothing.getExterior(n1, n2)) {
+        for (Circle n : Smoothing.getExterior(n1, n2)) {
             n.draw(s);
         }
-        for (Circle n : smoothing.getExterior(n2, n3)) {
+        for (Circle n : Smoothing.getExterior(n2, n3)) {
             n.draw(s);
         }
-        for (Circle n : smoothing.getExterior(n2, n4)) {
+        for (Circle n : Smoothing.getExterior(n2, n4)) {
             n.draw(s);
         }
     }
@@ -211,7 +211,7 @@ public class test {
         Circle n2 = new Circle(s.mouseX, s.mouseY, 25);
         n1.draw(s);
         n2.draw(s);
-        Circle[] ext = smoothing.getExterior(n1, n2);
+        Circle[] ext = Smoothing.getExterior(n1, n2);
         for (Circle n : ext) {
             n.draw(s);
         }

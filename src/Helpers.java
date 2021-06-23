@@ -4,12 +4,12 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class helpers {
+public class Helpers {
     public static PVector calcOffset(ArrayList<PVector> vertices, int w, int h, boolean noDraw) {
-        /**
-         Calculates the amount all geometry should be offset to center it.
-         */
-        PVector[] ends = shapefunctions.extremes(vertices);
+        /*
+        Calculates the amount all geometry should be offset to center it.
+        */
+        PVector[] ends = ShapeFunctions.extremes(vertices);
         if (noDraw) {
             return new PVector();
         } else {
@@ -22,9 +22,9 @@ public class helpers {
     }
 
     public static HashSet<HashSet<Node>> getMSTs(HashSet<Node> nodes) {
-        /**
-         Returns a HashSet of the minimum spanning trees.
-         */
+        /*
+        Returns a HashSet of the minimum spanning trees.
+        */
         HashSet<HashSet<Node>> MSTs = new HashSet<HashSet<Node>>();
         for (Node n : nodes) {
             MSTs.add(n.kruskal);

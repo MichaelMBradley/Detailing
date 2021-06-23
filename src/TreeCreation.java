@@ -7,15 +7,15 @@ import java.util.HashSet;
 
 import static processing.core.PApplet.sqrt;
 
-public class treecreation {
+public class TreeCreation {
     public static void kruskal(HashSet<Node> nodes) {
         kruskal(nodes, (int) sqrt(sqrt(nodes.size())));
     }
 
     public static void kruskal(HashSet<Node> nodes, int restrictSize) {
-        /**
-         Creates a minimum spanning tree of the nodes.
-         */
+        /*
+        Creates a minimum spanning tree of the nodes.
+        */
         ArrayList<Edge> edges = new ArrayList<Edge>();
         for (Node b : nodes) {
             for (Node t : b.delaunay) {
@@ -29,9 +29,9 @@ public class treecreation {
     }
 
     public static void kruskalWithin(HashSet<Node> nodes, int restrictSize) {
-        /**
-         Creates a minimum spanning tree of the nodes.
-         */
+        /*
+        Creates a minimum spanning tree of the nodes.
+        */
         ArrayList<Edge> edges = new ArrayList<Edge>();
         for (Node b : nodes) {
             for (Node t : b.delaunay) {
@@ -47,9 +47,9 @@ public class treecreation {
     }
 
     public static void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /**
-         Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
-         */
+        /*
+        Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
+        */
         HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
         HashSet<Node> valid;
         Node use;
@@ -69,7 +69,7 @@ public class treecreation {
                 }
                 if (valid.size() > 0) {
                     add = true;
-                    use = helpers.randomFromHashSet(valid);
+                    use = Helpers.randomFromHashSet(valid);
                     // Add random available node, if one is available
                     for (Node k : n.kruskal) {
                         if (k.delaunay.contains(use)) {
@@ -83,10 +83,10 @@ public class treecreation {
     }
 
     public static void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /**
-         Creates trees based on the closest node touching the polyline to each node available.
-         Uses a random weighting to create variability in the size of the trees.
-         */
+        /*
+        Creates trees based on the closest node touching the polyline to each node available.
+        Uses a random weighting to create variability in the size of the trees.
+        */
         HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
         HashMap<Node, Float> weights = new HashMap<Node, Float>();
         HashMap<Node, HashSet<Node>> groups = new HashMap<Node, HashSet<Node>>();
@@ -94,7 +94,7 @@ public class treecreation {
         boolean valid;
         Node close = new Node();
         for (Node t : touching) {
-            weights.put(t, helpers.random(1, 3));
+            weights.put(t, Helpers.random(1, 3));
             groups.put(t, new HashSet<Node>());
             groups.get(t).add(t);
         }
@@ -157,13 +157,13 @@ public class treecreation {
     }
 
     public static HashSet<Node> getNodesTouchingPolyline(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /**
-         Helper function that returns the set of nodes intersected by a segment of the given polyline.
-         */
+        /*
+        Helper function that returns the set of nodes intersected by a segment of the given polyline.
+        */
         HashSet<Node> touching = new HashSet<Node>();
         for (Node n : nodes) {
             for (int i = 0; i < vertices.size(); i++) {
-                if (shapefunctions.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {
+                if (ShapeFunctions.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {
                     touching.add(n);
                     n.kruskal.add(n);
                     //println(n.pv, distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv), vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1));

@@ -3,6 +3,7 @@ Things to do:
 - Implement smoothing for connections between delaunay arcs
 - Fix smoothing for arcs connecting touching circles
 - Add more space in between trees
+- Look into circle packing via Voronoi
 */
 
 import org.processing.wiki.triangulate.*;
@@ -20,13 +21,13 @@ public class Detailing extends PApplet {
     ArrayList<PVector> vertices;
     ArrayList<Node> traverse;
     HashSet<Node> circles, interior, exterior;
-    int w, h, p, q, mx, my, ogmx, ogmy, maxIter = 0;
+    int w, h, p, q, mx, my, og_mx, og_my, maxIter = 0;
     float zoom = 2f;
     PShape shape;
     PVector offset;
 
     final float minimise = 5;
-    final boolean noDraw = true;
+    final boolean noDraw = !true;
 
     HashMap<Character, String> conv;
     HashMap<String, Boolean> draw;
@@ -45,21 +46,21 @@ public class Detailing extends PApplet {
         q = 1;
         // Tilted Square:
         // float m = 0; // 0 for no tilt
-        // float[][] initvertices = {{0, m}, {100 - m, 0}, {100, 100 - m}, {m, 100}};
+        // float[][] initVertices = {{0, m}, {100 - m, 0}, {100, 100 - m}, {m, 100}};
         // Mouse input example:
-        //float[][] initvertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
+        // float[][] initVertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
         // More complex vertices:
-        float[][] initvertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
-        vertices = shapefunctions.toPVector(initvertices);
-        shapefunctions.scaleVertices((float) w / 30, vertices);
-        shape = shapefunctions.toShape(vertices, this);
-        offset = helpers.calcOffset(vertices, w, h, noDraw);
+        float[][] initVertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
+        vertices = ShapeFunctions.toPVector(initVertices);
+        ShapeFunctions.scaleVertices((float) w / 30, vertices);
+        shape = ShapeFunctions.toShape(vertices, this);
+        offset = Helpers.calcOffset(vertices, w, h, noDraw);
         calc();
     }
 
     public void draw() {
-        ogmx = mouseX;
-        ogmy = mouseY;
+        og_mx = mouseX;
+        og_my = mouseY;
         scale(draw.get("zoom") ? zoom : 1);
         translate(offset.x, offset.y);
         if (draw.get("zoom")) {
@@ -67,7 +68,7 @@ public class Detailing extends PApplet {
         }
         background(255);
         if (noDraw) {
-            test.test1(this);
+            Test.test1(this);
         }
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
@@ -124,10 +125,10 @@ public class Detailing extends PApplet {
                 } else {
                     stroke(255, 0, 0);
                 }
-                helpers.drawLine(traverse.get(i).pv, traverse.get(i + 1).pv, this);
+                Helpers.drawLine(traverse.get(i).pv, traverse.get(i + 1).pv, this);
             }
             stroke(0, 0, 255);
-            helpers.drawLine(traverse.get(traverse.size() - 1).pv, traverse.get(0).pv, this);
+            Helpers.drawLine(traverse.get(traverse.size() - 1).pv, traverse.get(0).pv, this);
         }
         if (draw.get("traversalArcs")) {
             strokeWeight(1);
@@ -145,21 +146,21 @@ public class Detailing extends PApplet {
             }
         }
         if (draw.get("iterate")) {
-            // codestuffs with p and q
+            // things can be done with p and q
             // keyPressed(); // ?
             maxIter = traverseArcs.size();
             stroke(0, 255, 0);
             traverseArcs.get(p).draw(this);
         }
-        mouseX = ogmx;
-        mouseY = ogmy;
+        mouseX = og_mx;
+        mouseY = og_my;
     }
 
     public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
-        /**
-         Nodes may be stored in multiple discrete sets.
-         This function draws relevant information for all nodes in a given set.
-         */
+        /*
+        Nodes may be stored in multiple discrete sets.
+        This function draws relevant information for all nodes in a given set.
+        */
         if (!noDraw) {
             for (Node n : circles) {
                 if (drawCircles) {
@@ -171,21 +172,21 @@ public class Detailing extends PApplet {
                     stroke(0, 0, 255);
                     strokeWeight(1);
                     for (Node t : n.touching) {
-                        helpers.drawLine(n.pv, t.pv, this);
+                        Helpers.drawLine(n.pv, t.pv, this);
                     }
                 }
                 if (draw.get("delaunay")) {
                     stroke(255, 0, 0);
                     strokeWeight(1);
                     for (Node t : n.delaunay) {
-                        helpers.drawLine(n.pv, t.pv, this);
+                        Helpers.drawLine(n.pv, t.pv, this);
                     }
                 }
                 if (draw.get("kruskal")) {
                     stroke(0, 255, 0);
                     strokeWeight(1);
                     for (Node t : n.kruskalAdjacent) {
-                        helpers.drawLine(n.pv, t.pv, this);
+                        Helpers.drawLine(n.pv, t.pv, this);
                     }
                 }
             }
@@ -200,55 +201,55 @@ public class Detailing extends PApplet {
     }
 
     public ArrayList<Circle> analyze(HashSet<Node> aCircles) {
-        /**
-         The Delaunay Triangulation and tree generation is done seperately for the interior and exterior circles.
-         This was made into a function to avoid repeating code.
-         */
-        ArrayList<Circle> circum;
+        /*
+        The Delaunay Triangulation and tree generation is done separately for the interior and exterior circles.
+        This was made into a function to avoid repeating code.
+        */
+        ArrayList<Circle> circumcircles;
         int start;
         start = millis();
         ArrayList<Triangle> triangles = delaunay.delaunayTriangulation(aCircles);
-        circum = shapefunctions.triangleToCircle(triangles);
+        circumcircles = ShapeFunctions.triangleToCircle(triangles);
         delaunay.updateDelaunay(aCircles, triangles);
         println(String.format("\tTriangulation: %.3f", (float) (millis() - start) / 1000));
         start = millis();
-        //kruskal(aCircles);
-        //altTreeCreate(aCircles, vertices);
-        treecreation.treeNearest(aCircles, vertices);
+        // kruskal(aCircles);
+        // altTreeCreate(aCircles, vertices);
+        TreeCreation.treeNearest(aCircles, vertices);
         println(String.format("\tKruskal: %.3f", (float) (millis() - start) / 1000));
-        return circum;
+        return circumcircles;
     }
 
     public void calc() {
-        /**
-         Completes all relevant calculations.
-         */
+        /*
+        Completes all relevant calculations.
+        */
         if (!noDraw) {
             int start;
             start = millis();
-            circles = circlepacking.randomFillAware(vertices, minimise);
+            circles = CirclePacking.randomFillAware(vertices, minimise);
             println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size() / ((float) (millis() - start) / 1000)));
             if (draw.get("condense")) {
                 start = millis();
-                touching.condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
+                Touching.condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
                 println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
             }
             if (draw.get("getTouching") && !draw.get("condense")) {
                 start = millis();
-                touching.createTouchingGraphs(circles);
+                Touching.createTouchingGraphs(circles);
                 println(String.format("Touching: %.3f", (float) (millis() - start) / 1000));
             }
             println("-Interior-");
-            interior = traversal.containing(vertices, circles, true);
+            interior = Traversal.containing(vertices, circles, true);
             interiorCircumcircles = analyze(interior);
             println("-Exterior-");
-            exterior = traversal.containing(vertices, circles, false);
+            exterior = Traversal.containing(vertices, circles, false);
             exteriorCircumcircles = analyze(exterior);
             start = millis();
-            traverse = treeselection.traverseTreesBase(circles, vertices, true);
+            traverse = TreeSelection.traverseTreesBase(circles, vertices, true);
             //traverseArcs = smoothing.delaunayTraversalToArcs(traverse, vertices);
             //traverse = treeselection.traverseTreesSkip(circles, vertices, true);
-            traverseArcs = smoothing.surroundingArcs(traverse);
+            traverseArcs = Smoothing.surroundingArcs(traverse);
             //traverse = new ArrayList<Node>();
             //traverseArcs = new ArrayList<Arc>();
             println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
@@ -266,11 +267,11 @@ public class Detailing extends PApplet {
     public void keyPressed() {
         String cmd;
         if (key == 'h') {
-            String out = "Draw:\n";
+            StringBuilder out = new StringBuilder("Draw:\n");
             for (char c : conv.keySet()) {
-                out += c + ": " + conv.get(c) + "\n";
+                out.append(c).append(": ").append(conv.get(c)).append("\n");
             }
-            print(out);
+            print(out.toString());
         } else if (conv.containsKey(key)) {
             cmd = conv.get(key);
             draw.replace(cmd, !draw.get(cmd));

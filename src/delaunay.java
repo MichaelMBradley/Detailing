@@ -69,9 +69,9 @@ public class delaunay {
          */
         ArrayList<Node> traverse = new ArrayList<Node>();
         float closest, angle, distance;
-        Node goal, next = new Node(), current = traversal.closestNode(nodes, vertices.get(vertices.size() - 1));
+        Node goal, next = new Node(), current = Traversal.closestNode(nodes, vertices.get(vertices.size() - 1));
         for (int i = 0; i < vertices.size(); i++) {
-            goal = traversal.closestNode(nodes, vertices.get(i));
+            goal = Traversal.closestNode(nodes, vertices.get(i));
             while (current != goal) {
                 if (current.delaunay.contains(goal)) {
                     next = goal;

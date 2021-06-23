@@ -4,23 +4,23 @@ import java.util.ArrayList;
 
 import static processing.core.PApplet.*;
 
-public class smoothing {
+public class Smoothing {
     public static Circle[] getAdjacent(Circle n1, Circle n2, float r0, boolean exterior) {
-        /**
-         Returns the two Circles touching the both the two given Circles.
-         if sign(x2-x1) != sign(y2-y1):  # +/-, -/+
-            [0] is (higher y than) line passing through centres
-         if sign(x2-x1) == sign(y2-y1):  # +/+, -/-
-            [0] is (lower y than) line passing through centres
-         if x1==x2:
-            [0] is to the right
-         if y1==y2:
-            [0] is the lower circle (higher y)
-         */
+        /*
+        Returns the two Circles touching the both the two given Circles.
+        if sign(x2-x1) != sign(y2-y1):  # +/-, -/+
+           [0] is (higher y than) line passing through centres
+        if sign(x2-x1) == sign(y2-y1):  # +/+, -/-
+           [0] is (lower y than) line passing through centres
+        if x1==x2:
+           [0] is to the right
+        if y1==y2:
+           [0] is the lower circle (higher y)
+        */
         float dist = PVector.dist(n1.pv,n2.pv);
-        if(dist + n2.r < n1.r || dist + n1.r < n2.r || dist > n1.r + n2.r + (r0*2)) {
+        if(dist + n2.r < n1.r || dist + n1.r < n2.r || dist > n1.r + n2.r + (r0 * 2)) {
             // Circle 1 contains Circle 2 || Circle 2 contains Circle 1 || circles are too far apart
-            return new Circle[]{new Circle(),new Circle()};
+            return new Circle[]{ new Circle(), new Circle() };
         }
         float ml, bl, aq, bq, cq, xa1, ya1, xa2, ya2;
         float x1 = n1.x;
@@ -30,7 +30,7 @@ public class smoothing {
         float y2 = n2.y;
         float r2 = n2.r;
         int inv = exterior ? 1 : -1;
-        if(abs(y1-y2)>1){
+        if(abs(y1 - y2) > 1){
             ml = - (x2 - x1) / (y2 - y1);
             bl = (-pow(x1, 2) + pow(x2, 2) - pow(y1, 2) + pow(y2, 2) + pow(r1, 2) - pow(r2, 2) + (2 * r0 * (r1 - r2)) * inv) / (2 * (y2 - y1));
             aq = 1 + pow(ml, 2);
@@ -103,7 +103,6 @@ public class smoothing {
         float y5 = B0 + B1 * r5;
         return new Circle[] { new Circle(x4, y4, r4), new Circle(x5, y5, r5) };
     }
-
 
     public static ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes) {
         ArrayList<ArrayList<Node>>trees = new ArrayList<ArrayList<Node>>();

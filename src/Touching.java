@@ -3,13 +3,13 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class touching {
+public class Touching {
     public static void condense(HashSet<Node> nodes) {
-        /**
-         Combine many graphs into one by moving the first graph
-         to be touching it's closest neighbour. Keeps doing this
-         until there is only one graph left.
-         */
+        /*
+        Combine many graphs into one by moving the first graph
+        to be touching it's closest neighbour. Keeps doing this
+        until there is only one graph left.
+        */
         ArrayList<HashSet<Node>> graphs = createTouchingGraphs(nodes);
         Node closeBase, closeNode;
         PVector moveVector;
@@ -43,9 +43,9 @@ public class touching {
     }
 
     public static ArrayList<HashSet<Node>> createTouchingGraphs(HashSet<Node> nodes) {
-        /**
-         Takes a list of nodes, returns the set of sets of touching nodes.
-         */
+        /*
+        Takes a list of nodes, returns the set of sets of touching nodes.
+        */
         ArrayList<HashSet<Node>> graphs = new ArrayList<HashSet<Node>>();
         HashSet<Node> used = new HashSet<Node>();
         for (Node n : nodes) {
