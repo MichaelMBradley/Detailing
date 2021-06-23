@@ -11,7 +11,7 @@ public class Test {
         /*
         Attempts to smooth a series of circles.
         */
-        ArrayList<Circle> ns = new ArrayList<Circle>();
+        ArrayList<Circle> ns = new ArrayList<>();
         /*
         iter = (int(mouseX)/5)*5 * PI / 180f;//+= 0.01f;
         Circle n1 = new Circle(400, 400, 50);
@@ -251,7 +251,7 @@ public class Test {
         println(".sub.magSq: " + (s.millis() - t));
         t = s.millis();
         for (int i = 0; i < num; i++) {
-            j = pow(p1.x - p2.x, 2) + pow(p2.y - p2.y, 2);
+            j = pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2);
         }
         println("custom: " + (s.millis() - t));
         s.exit();

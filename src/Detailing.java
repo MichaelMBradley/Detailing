@@ -27,7 +27,7 @@ public class Detailing extends PApplet {
     PVector offset;
 
     final float minimise = 5;
-    final boolean noDraw = false;
+    final boolean noDraw = true;
 
     HashMap<Character, String> conv;
     HashMap<String, Boolean> draw;
@@ -68,7 +68,7 @@ public class Detailing extends PApplet {
         }
         background(255);
         if (noDraw) {
-            Test.test1(this);
+            Test.test4(this);
         }
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
@@ -247,19 +247,19 @@ public class Detailing extends PApplet {
             exteriorCircumcircles = analyze(exterior);
             start = millis();
             traverse = TreeSelection.traverseTreesBase(circles, vertices, true);
-            //traverseArcs = smoothing.delaunayTraversalToArcs(traverse, vertices);
-            //traverse = treeselection.traverseTreesSkip(circles, vertices, true);
+            //traverseArcs = Smoothing.delaunayTraversalToArcs(traverse, vertices);
+            //traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
             traverseArcs = Smoothing.surroundingArcs(traverse);
             //traverse = new ArrayList<Node>();
             //traverseArcs = new ArrayList<Arc>();
             println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
             println("\n");
         } else {
-            circles = new HashSet<Node>();
-            interiorCircumcircles = new ArrayList<Circle>();
-            exteriorCircumcircles = new ArrayList<Circle>();
-            traverse = new ArrayList<Node>();
-            traverseArcs = new ArrayList<Arc>();
+            circles = new HashSet<>();
+            interiorCircumcircles = new ArrayList<>();
+            exteriorCircumcircles = new ArrayList<>();
+            traverse = new ArrayList<>();
+            traverseArcs = new ArrayList<>();
         }
     }
 
@@ -325,8 +325,8 @@ public class Detailing extends PApplet {
                 {'n', "snap", true},
                 {'z', "zoom", false},
         };
-        conv = new HashMap<Character, String>();
-        draw = new HashMap<String, Boolean>();
+        conv = new HashMap<>();
+        draw = new HashMap<>();
         for (Object[] arr : cmd) {
             conv.put((char) arr[0], (String) arr[1]);
             draw.put((String) arr[1], !noDraw && (boolean) arr[2]);

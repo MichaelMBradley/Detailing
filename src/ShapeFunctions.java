@@ -71,17 +71,17 @@ public class ShapeFunctions {
         [x, y, w, h, start, end]
         w = h
         */
-        Circle arcinfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
-        float ang1 = PVector.sub(n1.pv, arcinfo.pv).heading();
-        float ang2 = PVector.sub(n2.pv, arcinfo.pv).heading();
+        Circle arcInfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
+        float ang1 = PVector.sub(n1.pv, arcInfo.pv).heading();
+        float ang2 = PVector.sub(n2.pv, arcInfo.pv).heading();
         if (ang1 > ang2) {
             ang2 += TWO_PI;
         }
-        return new Arc(arcinfo, ang1, ang2);
+        return new Arc(arcInfo, ang1, ang2);
     }
 
     public static Arc[] getArcKruskal(Node n1, Node n2) {
-        ArrayList<Node> n3arr = new ArrayList<Node>();
+        ArrayList<Node> n3arr = new ArrayList<>();
         for (Node d : n1.delaunay) {
             if (d.delaunay.contains(n2)) {
                 n3arr.add(d);
@@ -104,7 +104,7 @@ public class ShapeFunctions {
         /*
         Return list of circumcircles for the triangles.
         */
-        ArrayList<Circle> info = new ArrayList<Circle>();
+        ArrayList<Circle> info = new ArrayList<>();
         for (Triangle tri : triangles) {
             info.add(triangleToCircle(tri.p1.x, tri.p1.y, tri.p2.x, tri.p2.y, tri.p3.x, tri.p3.y));
         }
@@ -124,7 +124,6 @@ public class ShapeFunctions {
             // Impossible to find circumcircle for points in a straight line
             x = Float.NaN;
             y = Float.NaN;
-            r = Float.NaN;
         } else if (y1 == y2) {
             // Preventing div/0 errors for when points
             // 1 and 2 have the same y value
@@ -165,9 +164,9 @@ public class ShapeFunctions {
         and turns it into a list of PVectors. Personally
         I just find it easier to enter vertices this way.
         */
-        ArrayList<PVector> proper = new ArrayList<PVector>();
-        for (int i = 0; i < vertices.length; i++) {
-            proper.add(new PVector(vertices[i][0], vertices[i][1]));
+        ArrayList<PVector> proper = new ArrayList<>();
+        for(float[] vertex : vertices) {
+            proper.add(new PVector(vertex[0], vertex[1]));
         }
         return proper;
     }

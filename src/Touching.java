@@ -46,8 +46,8 @@ public class Touching {
         /*
         Takes a list of nodes, returns the set of sets of touching nodes.
         */
-        ArrayList<HashSet<Node>> graphs = new ArrayList<HashSet<Node>>();
-        HashSet<Node> used = new HashSet<Node>();
+        ArrayList<HashSet<Node>> graphs = new ArrayList<>();
+        HashSet<Node> used = new HashSet<>();
         for (Node n : nodes) {
             n.resetGraph();
             n.findTouching(nodes);

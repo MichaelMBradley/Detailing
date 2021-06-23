@@ -7,9 +7,9 @@ public class Circle {
     public float x, y, r;
     public PVector pv;
 
-    public Circle(float xpos, float ypos, float rad) {
-        x = xpos;
-        y = ypos;
+    public Circle(float xPos, float yPos, float rad) {
+        x = xPos;
+        y = yPos;
         r = rad;
         pv = new PVector(x, y);
     }
@@ -34,8 +34,8 @@ public class Circle {
 
 
     // Distance from a point to the center of the node
-    public float distanceToCenter(float xpos, float ypos) {
-        return dist(x, y, xpos, ypos);
+    public float distanceToCenter(float xPos, float yPos) {
+        return dist(x, y, xPos, yPos);
     }
     public float distanceToCenter(PVector pos) {
         return PVector.dist(pv, pos);
@@ -45,8 +45,8 @@ public class Circle {
     }
 
     // Distance from a point to the perimeter of the node
-    public float distanceToRadius(float xpos, float ypos) {
-        return distanceToCenter(xpos, ypos) - r;
+    public float distanceToRadius(float xPos, float yPos) {
+        return distanceToCenter(xPos, yPos) - r;
     }
     public float distanceToRadius(PVector pos) {
         return distanceToCenter(pos) - r;
@@ -56,8 +56,8 @@ public class Circle {
     }
 
     // Distance between the closest points of each node
-    public float distanceToCircle(float xpos, float ypos, float r) {
-        return distanceToRadius(xpos, ypos) - r;
+    public float distanceToCircle(float xPos, float yPos, float r) {
+        return distanceToRadius(xPos, yPos) - r;
     }
     public float distanceToCircle(PVector pos, float r) {
         return distanceToRadius(pos) - r;

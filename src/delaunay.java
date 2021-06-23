@@ -12,10 +12,10 @@ import static processing.core.PConstants.QUARTER_PI;
 
 public class delaunay {
     public static ArrayList<Triangle> delaunayTriangulation(HashSet<Node> nodes) {
-        /**
-         Accepts a set of nodes, creates a triangulation of their centres.
-         */
-        ArrayList<PVector> vectors = new ArrayList<PVector>();
+        /*
+        Accepts a set of nodes, creates a triangulation of their centres.
+        */
+        ArrayList<PVector> vectors = new ArrayList<>();
         for (Node n : nodes) {
             vectors.add(n.pv);
         }
@@ -29,15 +29,15 @@ public class delaunay {
 
 
     public static void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
-        /**
-         Adds the delaunay triangulation information to the nodes.
-         */
-        HashMap<PVector, Node> conv = new HashMap<PVector, Node>();
-        HashMap<PVector, HashSet<PVector>> dict = new HashMap<PVector, HashSet<PVector>>();
+        /*
+        Adds the delaunay triangulation information to the nodes.
+        */
+        HashMap<PVector, Node> conv = new HashMap<>();
+        HashMap<PVector, HashSet<PVector>> dict = new HashMap<>();
         Node base, con;
         for (Node n : nodes) {
             conv.put(n.pv, n);
-            dict.put(n.pv, new HashSet<PVector>());
+            dict.put(n.pv, new HashSet<>());
         }
         for (Triangle tri : triangles) {
             dict.get(tri.p1).add(tri.p2);
@@ -64,14 +64,14 @@ public class delaunay {
     }
 
     public static ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
-        /**
-         Visits many nodes in order around the polyline, based on the delaunay triangulation.
-         */
-        ArrayList<Node> traverse = new ArrayList<Node>();
+        /*
+        Visits many nodes in order around the polyline, based on the delaunay triangulation.
+        */
+        ArrayList<Node> traverse = new ArrayList<>();
         float closest, angle, distance;
         Node goal, next = new Node(), current = Traversal.closestNode(nodes, vertices.get(vertices.size() - 1));
-        for (int i = 0; i < vertices.size(); i++) {
-            goal = Traversal.closestNode(nodes, vertices.get(i));
+        for (PVector vertex : vertices) {
+            goal = Traversal.closestNode(nodes, vertex);
             while (current != goal) {
                 if (current.delaunay.contains(goal)) {
                     next = goal;

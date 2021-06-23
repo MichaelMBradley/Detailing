@@ -22,42 +22,31 @@ public class Smoothing {
             // Circle 1 contains Circle 2 || Circle 2 contains Circle 1 || circles are too far apart
             return new Circle[]{ new Circle(), new Circle() };
         }
-        float ml, bl, aq, bq, cq, xa1, ya1, xa2, ya2;
-        float x1 = n1.x;
-        float y1 = n1.y;
-        float r1 = n1.r;
-        float x2 = n2.x;
-        float y2 = n2.y;
-        float r2 = n2.r;
-        int inv = exterior ? 1 : -1;
-        if(abs(y1 - y2) > 1){
-            ml = - (x2 - x1) / (y2 - y1);
-            bl = (-pow(x1, 2) + pow(x2, 2) - pow(y1, 2) + pow(y2, 2) + pow(r1, 2) - pow(r2, 2) + (2 * r0 * (r1 - r2)) * inv) / (2 * (y2 - y1));
-            aq = 1 + pow(ml, 2);
-            bq = 2 * (ml * (bl - y1) - x1);
-            cq = pow(x1, 2) + pow(bl - y1, 2) - pow(r1 + r0 * inv, 2);
-            if(pow(bq, 2) < 4 * aq * cq) {
-                return new Circle[] { new Circle(), new Circle() };
-            }
-            xa1 = (-bq + sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
-            ya1 = ml * xa1 + bl;
-            xa2 = (-bq - sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
-            ya2 = ml * xa2 + bl;
+        if(abs(n1.y - n2.y) > 1){
+            return getAdjacentCalc(n1.x, n1.y, n1.r, n2.x, n2.y, n2.r, r0, exterior);
         } else {
-            ml = - (y2 - y1) / (x2 - x1);
-            bl = (-pow(x1, 2) + pow(x2, 2) - pow(y1, 2) + pow(y2, 2) + pow(r1, 2) - pow(r2, 2) + (2 * r0 * (r1 - r2)) * inv) / (2 * (x2 - x1));
-            aq = 1 + pow(ml, 2);
-            bq = 2 * (ml * (bl - x1) - y1);
-            cq = pow(y1, 2) + pow(bl - x1, 2) - pow(r1 + r0 * inv, 2);
-            if(pow(bq, 2) < 4 * aq * cq){
-                return new Circle[] { new Circle(), new Circle() };
-            }
-            ya1 = (-bq + sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
-            xa1 = ml * ya1 + bl;
-            ya2 = (-bq - sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
-            xa2 = ml * ya2 + bl;
+            // Swapping x/y still returns valid circles and avoids div/0 errors
+            //noinspection SuspiciousNameCombination
+            return getAdjacentCalc(n1.y, n1.x, n1.r, n2.y, n2.x, n2.r, r0, exterior);
         }
-        return new Circle[]{new Circle(xa1,ya1,r0),new Circle(xa2,ya2,r0)};
+    }
+
+    private static Circle[] getAdjacentCalc(float x1, float y1, float r1, float x2, float y2, float r2, float r0, boolean exterior) {
+        float ml, bl, aq, bq, cq, xa1, ya1, xa2, ya2;
+        int inv = exterior ? 1 : -1;
+        ml = - (x2 - x1) / (y2 - y1);
+        bl = (-pow(x1, 2) + pow(x2, 2) - pow(y1, 2) + pow(y2, 2) + pow(r1, 2) - pow(r2, 2) + (2 * r0 * (r1 - r2)) * inv) / (2 * (y2 - y1));
+        aq = 1 + pow(ml, 2);
+        bq = 2 * (ml * (bl - y1) - x1);
+        cq = pow(x1, 2) + pow(bl - y1, 2) - pow(r1 + r0 * inv, 2);
+        if(pow(bq, 2) < 4 * aq * cq) {
+            return new Circle[] { new Circle(), new Circle() };
+        }
+        xa1 = (-bq + sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
+        ya1 = ml * xa1 + bl;
+        xa2 = (-bq - sqrt(pow(bq, 2) - 4 * aq * cq)) / (2 * aq);
+        ya2 = ml * xa2 + bl;
+        return new Circle[] { new Circle(xa1, ya1, r0), new Circle(xa2, ya2, r0) };
     }
 
     public static Circle[]getExterior(Circle n1, Circle n2) {
@@ -105,13 +94,13 @@ public class Smoothing {
     }
 
     public static ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes) {
-        ArrayList<ArrayList<Node>>trees = new ArrayList<ArrayList<Node>>();
-        ArrayList<Arc> arcs = new ArrayList<Arc>();
-        trees.add(new ArrayList<Node>());
+        ArrayList<ArrayList<Node>>trees = new ArrayList<>();
+        ArrayList<Arc> arcs = new ArrayList<>();
+        trees.add(new ArrayList<>());
         trees.get(0).add(new Node());
         for(Node n : nodes){
             if(!trees.get(trees.size() - 1).get(0).kruskal.contains(n)){
-                trees.add(new ArrayList<Node>());
+                trees.add(new ArrayList<>());
             }
             trees.get(trees.size() - 1).add(n);
         }
@@ -134,17 +123,17 @@ public class Smoothing {
 
     public static ArrayList<Arc> surroundingArcsTree(ArrayList<?extends Circle> nodes) {
         if(nodes.size()==0){
-            return new ArrayList<Arc>();
+            return new ArrayList<>();
         }
-        ArrayList<Arc> arcs = new ArrayList<Arc>();
-        ArrayList<Circle> arcCircles = new ArrayList<Circle>();
-        ArrayList<Integer> tri = new ArrayList<Integer>();
+        ArrayList<Arc> arcs = new ArrayList<>();
+        ArrayList<Circle> arcCircles = new ArrayList<>();
+        // ArrayList<Integer> tri = new ArrayList<>();
         Circle ni, nj, nc, n;
         float[] se;
         int choose;
         for(int i = 1; i < nodes.size() - 1; i++) {
-            ni=nodes.get(i);
-            nj=nodes.get(i == 0 ? nodes.size() - 1 : i - 1);
+            ni = nodes.get(i);
+            nj = nodes.get(i - 1);
             // Choosing which side of the circle to put the arc on based on the direction
             if(ni.x == nj.x){
                 choose = ni.y > nj.y ? 0 : 1;
@@ -159,8 +148,7 @@ public class Smoothing {
             arcCircles.add(nc);
             arcCircles.add(ni);
         }
-        /*
-        for(int i = 3; i <= arcCircles.size() - 3; i += 2) {
+        /*for(int i = 3; i <= arcCircles.size() - 3; i += 2) {
           //println(PVector.angleBetween(PVector.sub(arcCircles.get(i+2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i-2).pv, arcCircles.get(i).pv)) + "\t" +
           //(PVector.angleBetween(PVector.sub(arcCircles.get(i + 2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i - 2).pv, arcCircles.get(i).pv)) < HALF_PI * 1.25f && arcCircles.get(i + 2) != arcCircles.get(i - 2)));
           //println("\t" + arcCircles.get(i - 2).pv + "\t" + arcCircles.get(i).pv + "\t" + arcCircles.get(i+2).pv);
@@ -170,8 +158,7 @@ public class Smoothing {
             arcCircles.remove(i - 1);
             tri.add(i - 1);
           }
-        }
-        */
+        }*/
         if(arcCircles.size() > 2){
             for(int i = 0; i < arcCircles.size(); i++){
                 n = arcCircles.get(i);

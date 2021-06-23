@@ -15,10 +15,10 @@ public class TreeSelection {
         in order around the perimeter of the shape.
         */
         ArrayList<HashMap<PVector, Node>> options;
-        ArrayList<Node> traversal = new ArrayList<Node>();
-        HashSet<HashSet<Node>> MSTs = new HashSet<HashSet<Node>>();
+        ArrayList<Node> traversal = new ArrayList<>();
+        HashSet<HashSet<Node>> MSTs = new HashSet<>();
         HashMap<PVector, Node> current;
-        float distance, testdist;
+        float distance, testDist;
         PVector next = new PVector();
         for (Node n : nodes) {
             MSTs.add(n.kruskal);
@@ -30,9 +30,9 @@ public class TreeSelection {
             while (!current.isEmpty()) {
                 distance = 1e6f;
                 for (PVector pv : current.keySet()) {
-                    testdist = PVector.dist(pv, vertices.get(i));
-                    if (testdist < distance) {
-                        distance = testdist;
+                    testDist = PVector.dist(pv, vertices.get(i));
+                    if (testDist < distance) {
+                        distance = testDist;
                         next = pv;
                     }
                 }
@@ -49,14 +49,14 @@ public class TreeSelection {
         Returns a list of pairs of points, where each HashMap on the list corresponds to a line, and each entry in the hashmap
         represents the closest point on that line to a minimum spanning tree.
         */
-        ArrayList<HashMap<PVector, Node>> options = new ArrayList<HashMap<PVector, Node>>();
+        ArrayList<HashMap<PVector, Node>> options = new ArrayList<>();
         float close, test;
         int j, q;
-        PVector vi, vj, testpv;
+        PVector vi, vj, testPV;
         PVector touch = new PVector();
         Node closest = new Node();
         for (int m = 0; m < vertices.size(); m++) {
-            options.add(new HashMap<PVector, Node>());
+            options.add(new HashMap<>());
         }
         // Finding closest node to edge
         for (HashSet<Node> MST : MSTs) {
@@ -67,10 +67,10 @@ public class TreeSelection {
                     j = i + 1 == vertices.size() ? 0 : i + 1;
                     vi = vertices.get(i);
                     vj = vertices.get(j);
-                    testpv = Traversal.closestPoint2(vi, vj, n.pv);
+                    testPV = Traversal.closestPoint2(vi, vj, n.pv);
                     test = (float) Line2D.ptSegDist(vi.x, vi.y, vj.x, vj.y, n.x, n.y) - n.r;
                     if (test < close) {
-                        touch = testpv;
+                        touch = testPV;
                         close = test;
                         closest = n;
                         q = i;
@@ -89,9 +89,9 @@ public class TreeSelection {
         /*
         Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
         */
-        ArrayList<Node> traverse = new ArrayList<Node>();
+        ArrayList<Node> traverse = new ArrayList<>();
         ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);
-        Node edge = new Node();
+        Node edge;
         PVector j, k = new PVector(), l = new PVector();
         float dist;
         Polygon shape = ShapeFunctions.toPolygon(vertices);
@@ -116,8 +116,8 @@ public class TreeSelection {
         Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
         This method starts and stops on the closest nodes to the adjacent trees.
         */
-        ArrayList<Node> traverse = new ArrayList<Node>();
-        ArrayList<Node> order = new ArrayList<Node>();
+        ArrayList<Node> traverse = new ArrayList<>();
+        ArrayList<Node> order = new ArrayList<>();
         ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);//kruskalRecursive(nodes, vertices);//
         Node empty = new Node();
         Node next = new Node();
@@ -149,8 +149,8 @@ public class TreeSelection {
         /*
         Traverses the minimum spanning trees by traversing the minimum spanning tree of the minimum spanning trees.
         */
-        HashSet<Node> base = new HashSet<Node>();
-        HashMap<PVector, Node> conv = new HashMap<PVector, Node>();
+        HashSet<Node> base = new HashSet<>();
+        HashMap<PVector, Node> conv = new HashMap<>();
         HashSet<HashSet<Node>> MSTs = Helpers.getMSTs(nodes);
         ArrayList<Node> traverse;
         float t;

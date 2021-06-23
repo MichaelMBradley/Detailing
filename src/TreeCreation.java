@@ -16,7 +16,7 @@ public class TreeCreation {
         /*
         Creates a minimum spanning tree of the nodes.
         */
-        ArrayList<Edge> edges = new ArrayList<Edge>();
+        ArrayList<Edge> edges = new ArrayList<>();
         for (Node b : nodes) {
             for (Node t : b.delaunay) {
                 edges.add(new Edge(b, t));
@@ -32,7 +32,7 @@ public class TreeCreation {
         /*
         Creates a minimum spanning tree of the nodes.
         */
-        ArrayList<Edge> edges = new ArrayList<Edge>();
+        ArrayList<Edge> edges = new ArrayList<>();
         for (Node b : nodes) {
             for (Node t : b.delaunay) {
                 if (nodes.contains(t)) {
@@ -58,7 +58,7 @@ public class TreeCreation {
         while (add) {
             add = false;
             for (Node n : touching) {
-                valid = new HashSet<Node>();
+                valid = new HashSet<>();
                 for (Node k : n.kruskal) {
                     for (Node d : k.delaunay) {
                         if (d.kruskal.size() == 0 && !touching.contains(d)) {
@@ -88,23 +88,23 @@ public class TreeCreation {
         Uses a random weighting to create variability in the size of the trees.
         */
         HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
-        HashMap<Node, Float> weights = new HashMap<Node, Float>();
-        HashMap<Node, HashSet<Node>> groups = new HashMap<Node, HashSet<Node>>();
-        float dist, testdist;
+        HashMap<Node, Float> weights = new HashMap<>();
+        HashMap<Node, HashSet<Node>> groups = new HashMap<>();
+        float dist, testDist;
         boolean valid;
         Node close = new Node();
         for (Node t : touching) {
             weights.put(t, Helpers.random(1, 3));
-            groups.put(t, new HashSet<Node>());
+            groups.put(t, new HashSet<>());
             groups.get(t).add(t);
         }
         for (Node n : nodes) {
             if (!touching.contains(n)) {
                 dist = Float.MAX_VALUE;
                 for (Node t : touching) {
-                    testdist = n.distanceToCircle(t) * weights.get(t);
-                    if (testdist < dist) {
-                        dist = testdist;
+                    testDist = n.distanceToCircle(t) * weights.get(t);
+                    if (testDist < dist) {
+                        dist = testDist;
                         close = t;
                     }
                 }
@@ -115,10 +115,10 @@ public class TreeCreation {
             if (groups.get(g).size() == 1) {
                 dist = Float.MAX_VALUE;
                 for (Node t : touching) {
-                    testdist = g.distanceToCircle(t);
-                    if (testdist > 0 && testdist < dist && groups.keySet().contains(t)) {
+                    testDist = g.distanceToCircle(t);
+                    if (testDist > 0 && testDist < dist && groups.containsKey(t)) {
                         close = t;
-                        dist = testdist;
+                        dist = testDist;
                     }
                 }
                 groups.remove(g);
@@ -142,10 +142,10 @@ public class TreeCreation {
                 close = new Node();
                 for (Node d : n.delaunay) {
                     if (!n.kruskal.contains(d)) {
-                        testdist = n.distanceToCircle(d);
-                        if (testdist < dist) {
+                        testDist = n.distanceToCircle(d);
+                        if (testDist < dist) {
                             close = d;
-                            dist = testdist;
+                            dist = testDist;
                         }
                     }
                 }
@@ -160,7 +160,7 @@ public class TreeCreation {
         /*
         Helper function that returns the set of nodes intersected by a segment of the given polyline.
         */
-        HashSet<Node> touching = new HashSet<Node>();
+        HashSet<Node> touching = new HashSet<>();
         for (Node n : nodes) {
             for (int i = 0; i < vertices.size(); i++) {
                 if (ShapeFunctions.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {

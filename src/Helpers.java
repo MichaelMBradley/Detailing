@@ -10,7 +10,7 @@ public class Helpers {
         Calculates the amount all geometry should be offset to center it.
         */
         PVector[] ends = ShapeFunctions.extremes(vertices);
-        if (noDraw) {
+        if(noDraw) {
             return new PVector();
         } else {
             return new PVector((w - (ends[1].x - ends[0].x)) / 2, (h - (ends[1].y - ends[0].y)) / 2);
@@ -25,8 +25,8 @@ public class Helpers {
         /*
         Returns a HashSet of the minimum spanning trees.
         */
-        HashSet<HashSet<Node>> MSTs = new HashSet<HashSet<Node>>();
-        for (Node n : nodes) {
+        HashSet<HashSet<Node>> MSTs = new HashSet<>();
+        for(Node n : nodes) {
             MSTs.add(n.kruskal);
         }
         return MSTs;

@@ -7,12 +7,12 @@ import java.util.HashSet;
 public class Traversal {
     public static Node closestNode(HashSet<Node> nodes, PVector vertex) {
         Node close = new Node();
-        float tempdist;
+        float tempDist;
         float distance = 1e6f;
         for (Node n : nodes) {
-            tempdist = PVector.dist(vertex, n.pv);
-            if (tempdist < distance) {
-                distance = tempdist;
+            tempDist = PVector.dist(vertex, n.pv);
+            if (tempDist < distance) {
+                distance = tempDist;
                 close = n;
             }
         }
@@ -53,7 +53,7 @@ public class Traversal {
         Accepts a set of nodes, returns the subset
         that is either inside or outside the shape.
         */
-        HashSet<Node> side = new HashSet<Node>();
+        HashSet<Node> side = new HashSet<>();
         Polygon shape = ShapeFunctions.toPolygon(vertices);
         for (Node n : nodes) {
             if (shape.contains(n.x, n.y) == inside) {
@@ -73,7 +73,7 @@ public class Traversal {
     }
 
     public static ArrayList<Arc> delaunayTraversalToArcs(ArrayList<Node> traversal) {
-        ArrayList<Arc> arcs = new ArrayList<Arc>();
+        ArrayList<Arc> arcs = new ArrayList<>();
         for (int i = 0; i < traversal.size() - 1; i++) {
             if (traversal.get(i).kruskalAdjacent.contains(traversal.get(i + 1))) {
                 arcs.add(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);
