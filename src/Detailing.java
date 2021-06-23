@@ -27,7 +27,7 @@ public class Detailing extends PApplet {
     PVector offset;
 
     final float minimise = 5;
-    final boolean noDraw = !true;
+    final boolean noDraw = false;
 
     HashMap<Character, String> conv;
     HashMap<String, Boolean> draw;
