@@ -1,3 +1,8 @@
+import processing.core.PApplet;
+import processing.core.PVector;
+
+import static processing.core.PApplet.dist;
+
 public class Circle {
   public float x, y, r;
   public PVector pv;
@@ -75,8 +80,8 @@ public class Circle {
     y += direction.y;
   }
   
-  public void draw() {
-    circle(x, y, r * 2);  // p5 accepts diameter, not radius
+  public void draw(PApplet sketch) {
+    sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius
   }
   
   public String toString() {

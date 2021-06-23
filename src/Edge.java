@@ -1,3 +1,5 @@
+import processing.core.PVector;
+
 // Just for Kruskal's MST algorithm
 public class Edge implements Comparable<Edge> {
   public Node n1, n2;

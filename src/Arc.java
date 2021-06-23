@@ -1,3 +1,9 @@
+import processing.core.PApplet;
+import processing.core.PVector;
+
+import static processing.core.PApplet.abs;
+import static processing.core.PConstants.TWO_PI;
+
 // I want to see if using a specialised class can help clean up the code
 public class Arc extends Circle {
   public float start, end;
@@ -43,7 +49,7 @@ public class Arc extends Circle {
   }
   
   @Override
-  public void draw() {
-    arc(pv.x, pv.y, r * 2, r * 2, start, end);
+  public void draw(PApplet sketch) {
+    sketch.arc(pv.x, pv.y, r * 2, r * 2, start, end);
   }
 }

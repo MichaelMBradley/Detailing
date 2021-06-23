@@ -1,3 +1,12 @@
+import processing.core.PVector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import static processing.core.PConstants.TWO_PI;
+
 public class Node extends Circle {
   public HashSet<Node> delaunay, graph, touching, kruskal, kruskalAdjacent;
   
@@ -113,7 +122,7 @@ public class Node extends Circle {
     if(kruskalAdjacent.size() == 0) {
       return below;
     } else if(kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
-      float small = (float) mouseX / w;//0.5f;
+      float small = 0.5f;
       r *= small;
       move(PVector.sub(call.pv, pv).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
       return below;
