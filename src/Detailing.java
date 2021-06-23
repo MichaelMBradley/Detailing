@@ -27,7 +27,7 @@ public class Detailing extends PApplet {
     PVector offset;
 
     final float minimise = 5;
-    final boolean noDraw = true;
+    final boolean noDraw = false;
 
     HashMap<Character, String> conv;
     HashMap<String, Boolean> draw;
@@ -68,7 +68,7 @@ public class Detailing extends PApplet {
         }
         background(255);
         if (noDraw) {
-            Test.test4(this);
+            Test.test1(this);
         }
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
