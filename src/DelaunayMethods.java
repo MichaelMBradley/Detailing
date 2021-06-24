@@ -1,5 +1,8 @@
+import megamu.mesh.Delaunay;
+import megamu.mesh.Voronoi;
 import org.processing.wiki.triangulate.*;
 
+import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -10,23 +13,17 @@ import static processing.core.PApplet.abs;
 import static processing.core.PApplet.println;
 import static processing.core.PConstants.QUARTER_PI;
 
-public class delaunay {
+public class DelaunayMethods {
     public static ArrayList<Triangle> delaunayTriangulation(HashSet<Node> nodes) {
         /*
         Accepts a set of nodes, creates a triangulation of their centres.
         */
-        ArrayList<PVector> vectors = new ArrayList<>();
-        for (Node n : nodes) {
-            vectors.add(n.pv);
-        }
-        return Triangulate.triangulate(vectors);
+        return Triangulate.triangulate(ShapeFunctions.getPVectors(nodes));
     }
-
 
     public static void updateDelaunay(HashSet<Node> nodes) {
         updateDelaunay(nodes, delaunayTriangulation(nodes));
     }
-
 
     public static void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
         /*
@@ -58,6 +55,14 @@ public class delaunay {
         }
     }
 
+    public static Delaunay delaunayMesh(HashSet<Node> nodes) {
+        ArrayList<PVector> pv = new ArrayList<>();
+        for(Node n : nodes) {
+            pv.add(n.pv);
+        }
+        return new Delaunay(ShapeFunctions.toFloatArray(pv));
+    }
+
     public static ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
         return delaunayTraverse(nodes, vertices, 1f);
         //return delaunayTraverse(nodes, vertices, (float) mouseX * 20f / w);
@@ -67,8 +72,9 @@ public class delaunay {
         /*
         Visits many nodes in order around the polyline, based on the delaunay triangulation.
         */
-        ArrayList<Node> traverse = new ArrayList<>();
+        ArrayList<Node> comb, traverse = new ArrayList<>();
         float closest, angle, distance;
+        int i;
         Node goal, next = new Node(), current = Traversal.closestNode(nodes, vertices.get(vertices.size() - 1));
         for (PVector vertex : vertices) {
             goal = Traversal.closestNode(nodes, vertex);
@@ -77,23 +83,20 @@ public class delaunay {
                     next = goal;
                 } else {
                     closest = Float.MAX_VALUE;
-                    for (Node d : current.kruskal) {
-                        angle = abs(PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
-                        distance = PVector.dist(d.pv, goal.pv);
-                        if (angle + distance / ((goal.r + d.r) / 2) * distanceWeight < closest && !traverse.contains(d)) {
-                            closest = angle + distance / ((goal.r + d.r) / 2) * distanceWeight;
-                            next = d;
+                    comb = new ArrayList<Node>(current.kruskal);
+                    comb.addAll(current.delaunay);
+                    i = 0;
+                    for (Node k : comb) {
+                        if(i == current.kruskal.size() && closest != Float.MAX_VALUE) {
+                            break;
                         }
-                    }
-                    if (closest == Float.MAX_VALUE) {
-                        for (Node d : current.delaunay) {
-                            angle = abs(PVector.angleBetween(PVector.sub(d.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
-                            distance = PVector.dist(d.pv, goal.pv);
-                            if (angle + distance / ((goal.r + d.r) / 2) * distanceWeight < closest && !traverse.contains(d)) {
-                                closest = angle + distance / ((goal.r + d.r) / 2) * distanceWeight;
-                                next = d;
-                            }
+                        angle = abs(PVector.angleBetween(PVector.sub(k.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
+                        distance = PVector.dist(k.pv, goal.pv);
+                        if (angle + distance / ((goal.r + k.r) / 2) * distanceWeight < closest && !traverse.contains(k)) {
+                            closest = angle + distance / ((goal.r + k.r) / 2) * distanceWeight;
+                            next = k;
                         }
+                        i++;
                     }
                     if (closest == Float.MAX_VALUE) {
                         println("skip");
@@ -105,5 +108,20 @@ public class delaunay {
             }
         }
         return traverse;
+    }
+
+    public Voronoi getVoronoi(HashSet<Node> nodes) {
+        return new Voronoi(ShapeFunctions.toFloatArray(ShapeFunctions.getPVectors(nodes)));
+    }
+
+    public static void compareDelaunaySpeeds(HashSet<Node> nodes, PApplet sketch) {
+        ArrayList<PVector> pv = ShapeFunctions.getPVectors(nodes);
+        float[][] po = ShapeFunctions.toFloatArray(pv);
+        int t = sketch.millis();
+        Delaunay test = new Delaunay(po);
+        println(String.format("Mesh: %dms", sketch.millis() - t));
+        t = sketch.millis();
+        Triangulate.triangulate(pv);
+        println(String.format("Triangulate: %dms", sketch.millis() - t));
     }
 }

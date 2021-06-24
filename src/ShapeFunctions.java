@@ -6,6 +6,7 @@ import processing.core.PVector;
 import java.awt.geom.Line2D;
 import java.awt.Polygon;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.PI;
@@ -94,6 +95,14 @@ public class ShapeFunctions {
         return arcs;
     }
 
+    public static ArrayList<PVector> getPVectors(HashSet<Node> nodes) {
+        ArrayList<PVector> vectors = new ArrayList<>();
+        for (Node n : nodes) {
+            vectors.add(n.pv);
+        }
+        return vectors;
+    }
+
     public static void scaleVertices(float scalingFactor, ArrayList<PVector> vertices) {
         for (PVector pv : vertices) {
             pv.mult(scalingFactor);
@@ -169,6 +178,18 @@ public class ShapeFunctions {
             proper.add(new PVector(vertex[0], vertex[1]));
         }
         return proper;
+    }
+
+    public static float[][] toFloatArray(ArrayList<PVector> vertices) {
+        float[][] proper = new float[vertices.size()][2];
+        for(int i = 0; i < vertices.size(); i++) {
+            proper[i] = PVectorToFloat(vertices.get(i));
+        }
+        return proper;
+    }
+
+    public static float[] PVectorToFloat(PVector pv) {
+        return new float[] {pv.x, pv.y};
     }
 
     public static PShape toShape(ArrayList<PVector> vertices, PApplet sketch) {
