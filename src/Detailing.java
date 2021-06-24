@@ -1,9 +1,10 @@
 /*
-Things to do:
-- Implement smoothing for connections between delaunay arcs
-- Fix smoothing for arcs connecting touching circles
-- Add more space in between trees
-- Look into circle packing via Voronoi
+TODO: Implement smoothing for connections between delaunay arcs
+TODO: Fix smoothing for arcs connecting touching circles
+TODO: Add more space in between trees
+TODO: Look into circle packing via Voronoi
+TODO: Finish swapping to Mesh library
+TODO: Swap most ArrayList/HashSet functions to Iterable
 */
 
 import org.processing.wiki.triangulate.*;
@@ -20,7 +21,7 @@ public class Detailing extends PApplet {
     ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
     ArrayList<PVector> vertices;
     ArrayList<Node> traverse;
-    HashSet<Node> circles, interior, exterior;
+    HashSet<Node> nodes, interior, exterior;
     int w, h, p, q, mx, my, og_mx, og_my, maxIter = 0;
     float zoom = 2f;
     PShape shape;
@@ -73,7 +74,7 @@ public class Detailing extends PApplet {
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
             my = mouseY - (int) offset.y;
-            for (Node n : circles) {
+            for (Node n : nodes) {
                 if (n.distanceToCenter(mx, my) < n.r) {
                     mouseX = (int) (n.x + offset.x);
                     mouseY = (int) (n.y + offset.y);
@@ -103,7 +104,7 @@ public class Detailing extends PApplet {
         }
         if (draw.get("numCircles")) {
             fill(0);
-            text(String.format("Circles: %d", circles.size()), 30 - offset.x, 30 - offset.y);
+            text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
             if (draw.get("zoom")) {
                 text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
             }
@@ -208,9 +209,9 @@ public class Detailing extends PApplet {
         ArrayList<Circle> circumcircles;
         int start;
         start = millis();
-        ArrayList<Triangle> triangles = delaunay.delaunayTriangulation(aCircles);
+        ArrayList<Triangle> triangles = DelaunayMethods.delaunayTriangulation(aCircles);
         circumcircles = ShapeFunctions.triangleToCircle(triangles);
-        delaunay.updateDelaunay(aCircles, triangles);
+        DelaunayMethods.updateDelaunay(aCircles, triangles);
         println(String.format("\tTriangulation: %.3f", (float) (millis() - start) / 1000));
         start = millis();
         // kruskal(aCircles);
@@ -227,35 +228,33 @@ public class Detailing extends PApplet {
         if (!noDraw) {
             int start;
             start = millis();
-            circles = CirclePacking.randomFillAware(vertices, minimise);
-            println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, circles.size(), circles.size() / ((float) (millis() - start) / 1000)));
+            nodes = CirclePacking.randomFillAware(vertices, minimise);
+            println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, nodes.size(), nodes.size() / ((float) (millis() - start) / 1000)));
             if (draw.get("condense")) {
                 start = millis();
-                Touching.condense(circles);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
+                Touching.condense(nodes);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
                 println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
             }
             if (draw.get("getTouching") && !draw.get("condense")) {
                 start = millis();
-                Touching.createTouchingGraphs(circles);
+                Touching.createTouchingGraphs(nodes);
                 println(String.format("Touching: %.3f", (float) (millis() - start) / 1000));
             }
             println("-Interior-");
-            interior = Traversal.containing(vertices, circles, true);
+            interior = Traversal.containing(vertices, nodes, true);
             interiorCircumcircles = analyze(interior);
             println("-Exterior-");
-            exterior = Traversal.containing(vertices, circles, false);
+            exterior = Traversal.containing(vertices, nodes, false);
             exteriorCircumcircles = analyze(exterior);
             start = millis();
-            traverse = TreeSelection.traverseTreesBase(circles, vertices, true);
+            traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
             //traverseArcs = Smoothing.delaunayTraversalToArcs(traverse, vertices);
             //traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
             traverseArcs = Smoothing.surroundingArcs(traverse);
-            //traverse = new ArrayList<Node>();
-            //traverseArcs = new ArrayList<Arc>();
             println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
             println("\n");
         } else {
-            circles = new HashSet<>();
+            nodes = new HashSet<>();
             interiorCircumcircles = new ArrayList<>();
             exteriorCircumcircles = new ArrayList<>();
             traverse = new ArrayList<>();

@@ -169,7 +169,7 @@ public class TreeSelection {
             conv.put(temp.pv, temp);
             base.add(new Node(temp.x, temp.y, temp.r));
         }
-        delaunay.updateDelaunay(base);
+        DelaunayMethods.updateDelaunay(base);
         TreeCreation.kruskal(base);
         traverse = traverseTreesBase(base, vertices, true);
         for (i = 0; i < traverse.size(); i++) {
