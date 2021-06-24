@@ -3,10 +3,9 @@ TODO: Implement smoothing for connections between delaunay arcs
 TODO: Fix smoothing for arcs connecting touching circles
 TODO: Add more space in between trees
 TODO: Look into circle packing via Voronoi
-TODO: Finish swapping to Mesh library
-TODO: Swap most ArrayList/HashSet functions to Iterable
 */
 
+import megamu.mesh.Delaunay;
 import org.processing.wiki.triangulate.*;
 
 import java.util.*;
@@ -69,7 +68,7 @@ public class Detailing extends PApplet {
         }
         background(255);
         if (noDraw) {
-            Test.test1(this);
+            Test.test9(this);
         }
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
@@ -209,9 +208,8 @@ public class Detailing extends PApplet {
         ArrayList<Circle> circumcircles;
         int start;
         start = millis();
-        ArrayList<Triangle> triangles = DelaunayMethods.delaunayTriangulation(aCircles);
-        circumcircles = ShapeFunctions.triangleToCircle(triangles);
-        DelaunayMethods.updateDelaunay(aCircles, triangles);
+        Delaunay d = DelaunayMethods.delaunayMesh(aCircles);
+        circumcircles = ShapeFunctions.delaunayMeshToCircle(d, aCircles);
         println(String.format("\tTriangulation: %.3f", (float) (millis() - start) / 1000));
         start = millis();
         // kruskal(aCircles);
