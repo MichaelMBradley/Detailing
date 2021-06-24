@@ -44,6 +44,31 @@ public class DelaunayMethods {
             dict.get(tri.p3).add(tri.p1);
             dict.get(tri.p3).add(tri.p2);
         }
+        addDelaunay(conv, dict);
+    }
+
+    public static Delaunay delaunayMesh(HashSet<Node> nodes) {
+        PVector p1, p2;
+        Node base, con;
+        HashMap<PVector, Node> conv = new HashMap<>();
+        HashMap<PVector, HashSet<PVector>> dict = new HashMap<>();
+        for(Node n : nodes) {
+            conv.put(n.pv, n);
+            dict.put(n.pv, new HashSet<>());
+        }
+        Delaunay d = new Delaunay(ShapeFunctions.toFloatArray(new ArrayList<>(conv.keySet())));
+        for(float[] p : d.getEdges()) {
+            p1 = new PVector(p[0], p[1]);
+            p2 = new PVector(p[2], p[3]);
+            dict.get(p1).add(p2);
+            dict.get(p2).add(p1);
+        }
+        addDelaunay(conv, dict);
+        return d;
+    }
+
+    private static void addDelaunay(HashMap<PVector, Node> conv, HashMap<PVector, HashSet<PVector>> dict) {
+        Node base, con;
         for (PVector pv : dict.keySet()) {
             base = conv.get(pv);
             for (PVector connect : dict.get(pv)) {
@@ -53,14 +78,6 @@ public class DelaunayMethods {
                 }
             }
         }
-    }
-
-    public static Delaunay delaunayMesh(HashSet<Node> nodes) {
-        ArrayList<PVector> pv = new ArrayList<>();
-        for(Node n : nodes) {
-            pv.add(n.pv);
-        }
-        return new Delaunay(ShapeFunctions.toFloatArray(pv));
     }
 
     public static ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
@@ -83,7 +100,7 @@ public class DelaunayMethods {
                     next = goal;
                 } else {
                     closest = Float.MAX_VALUE;
-                    comb = new ArrayList<Node>(current.kruskal);
+                    comb = new ArrayList<>(current.kruskal);
                     comb.addAll(current.delaunay);
                     i = 0;
                     for (Node k : comb) {
@@ -123,5 +140,8 @@ public class DelaunayMethods {
         t = sketch.millis();
         Triangulate.triangulate(pv);
         println(String.format("Triangulate: %dms", sketch.millis() - t));
+        sketch.millis();
+        Voronoi testV = new Voronoi(po);
+        println(String.format("Voronoi: %dms", sketch.millis() - t));
     }
 }

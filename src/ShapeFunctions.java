@@ -1,3 +1,4 @@
+import megamu.mesh.Delaunay;
 import org.processing.wiki.triangulate.Triangle;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -6,6 +7,8 @@ import processing.core.PVector;
 import java.awt.geom.Line2D;
 import java.awt.Polygon;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static processing.core.PApplet.*;
@@ -109,6 +112,34 @@ public class ShapeFunctions {
         }
     }
 
+    public static ArrayList<Circle> delaunayMeshToCircle(Delaunay d, HashSet<Node> nodes) {
+        ArrayList<Circle> info = new ArrayList<>();
+        HashMap<PVector, HashSet<PVector>> link = new HashMap<>();
+        HashSet<HashSet<PVector>> tris = new HashSet<>();
+        ArrayList<PVector> triInfo;
+        for(Node n : nodes) {
+            link.put(n.pv, new HashSet<>());
+        }
+        for(float[] line : d.getEdges()) {
+            link.get(new PVector(line[0], line[1])).add(new PVector(line[2], line[3]));
+            link.get(new PVector(line[2], line[3])).add(new PVector(line[0], line[1]));
+        }
+        for(PVector pv : link.keySet()) {
+            for(PVector con : link.get(pv)) {
+                for(PVector con2 : link.get(con)) {
+                    if (link.get(con2).contains(pv)) {
+                        tris.add(new HashSet<>(Arrays.asList(pv, con, con2)));
+                    }
+                }
+            }
+        }
+        for(HashSet<PVector> tri : tris) {
+            triInfo = new ArrayList<>(tri);
+            info.add(triangleToCircle(triInfo.get(0).x, triInfo.get(0).y, triInfo.get(1).x, triInfo.get(1).y, triInfo.get(2).x, triInfo.get(2).y));
+        }
+        return info;
+    }
+
     public static ArrayList<Circle> triangleToCircle(ArrayList<Triangle> triangles) {
         /*
         Return list of circumcircles for the triangles.
@@ -138,13 +169,14 @@ public class ShapeFunctions {
             // 1 and 2 have the same y value
             x = (x1 + x2) / 2;
             y = -((x3 - x2) / (y3 - y2)) * (x - ((x2 + x3) / 2)) + ((y2 + y3) / 2);
-        } else if (y2 == y3) {
-            // Preventing div/0 errors for when points
-            // 2 and 3 have the same y value
-            x = (x2 + x3) / 2;
-            y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
         } else {
-            x = (((x2 * x2 - x1 * x1) / (y2 - y1)) - ((x3 * x3 - x2 * x2) / (y3 - y2)) + (y1 - y3)) / (2 * (((x2 - x1) / (y2 - y1)) - ((x3 - x2) / (y3 - y2))));
+            if (y2 == y3) {
+                // Preventing div/0 errors for when points
+                // 2 and 3 have the same y value
+                x = (x2 + x3) / 2;
+            } else {
+                x = (((x2 * x2 - x1 * x1) / (y2 - y1)) - ((x3 * x3 - x2 * x2) / (y3 - y2)) + (y1 - y3)) / (2 * (((x2 - x1) / (y2 - y1)) - ((x3 - x2) / (y3 - y2))));
+            }
             y = -((x2 - x1) / (y2 - y1)) * (x - ((x1 + x2) / 2)) + ((y1 + y2) / 2);
         }
         r = dist(x, y, x1, y1);
@@ -175,9 +207,13 @@ public class ShapeFunctions {
         */
         ArrayList<PVector> proper = new ArrayList<>();
         for(float[] vertex : vertices) {
-            proper.add(new PVector(vertex[0], vertex[1]));
+            proper.add(toPVector(vertex));
         }
         return proper;
+    }
+
+    public static PVector toPVector(float[] vertices) {
+        return new PVector(vertices[0], vertices[1]);
     }
 
     public static float[][] toFloatArray(ArrayList<PVector> vertices) {

@@ -1,7 +1,10 @@
+import megamu.mesh.Delaunay;
+import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
@@ -11,7 +14,6 @@ public class Test {
         /*
         Attempts to smooth a series of circles.
         */
-        ArrayList<Circle> ns = new ArrayList<>();
         /*
         iter = (int(mouseX)/5)*5 * PI / 180f;//+= 0.01f;
         Circle n1 = new Circle(400, 400, 50);
@@ -42,23 +44,7 @@ public class Test {
         text(9 + "\n" + n9.x + " " + n9.y, n9.x, n9.y);
         noFill();
         */
-        ns.add(n1);
-        ns.add(n2);
-        ns.add(n7);
-        ns.add(n8);
-        ns.add(n7);
-        ns.add(n9);
-        ns.add(n7);
-        ns.add(n2);
-        ns.add(n5);
-        ns.add(n6);
-        ns.add(n5);
-        ns.add(n2);
-        ns.add(n3);
-        ns.add(n4);
-        ns.add(n3);
-        ns.add(n2);
-        ns.add(n1);
+        ArrayList<Circle> ns = new ArrayList<>(Arrays.asList(n1, n2, n7, n8, n7, n9, n7, n2, n5, n6, n5, n2, n3, n4, n3, n2, n1));
         s.strokeWeight(1);
         s.stroke(0, 255, 0);
         /*
@@ -255,5 +241,35 @@ public class Test {
         }
         println("custom: " + (s.millis() - t));
         s.exit();
+    }
+
+    public static void test9(PApplet s) {
+        s.randomSeed(0l);
+        int max = 500;
+        int h = s.pixelHeight;
+        int w = s.pixelWidth;
+        float[][] points = new float[max + 1][2];
+        for(int i = 0; i < max; i++) {
+            points[i][0] = s.random(w);
+            points[i][1] = s.random(h);
+        }
+        points[max][0] = s.mouseX;
+        points[max][1] = s.mouseY;
+        Delaunay d = new Delaunay(points);
+        Voronoi v = new Voronoi(points);
+        s.stroke(255, 0, 0);
+        for(float[] edge : d.getEdges()) {
+            s.line(edge[0], edge[1], edge[2], edge[3]);
+        }
+        s.stroke(0, 0, 255);
+        for(float[] edge : v.getEdges()) {
+            s.line(edge[0], edge[1], edge[2], edge[3]);
+        }
+        s.strokeWeight(5);
+        s.stroke(0, 255, 0);
+        for(float[] point : points) {
+            s.point(point[0], point[1]);
+        }
+        s.strokeWeight(1);
     }
 }
