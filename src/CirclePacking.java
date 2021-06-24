@@ -1,6 +1,9 @@
+import megamu.mesh.MPolygon;
+import megamu.mesh.Voronoi;
 import processing.core.PVector;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Stack;
 
@@ -128,5 +131,36 @@ public class CirclePacking {
             }
         }
         return new HashSet<>(nodes);
+    }
+
+    public static void voronoiPacking(Collection<Node> nodes) {
+        voronoiPacking(nodes, -1f, -1f);
+    }
+    public static void voronoiPacking(Collection<Node> nodes, ArrayList<PVector> vertices, float minimise) {
+        PVector max = ShapeFunctions.extremes(vertices)[1];
+        float maxRadius = max(max.x, max.y) / (60 * minimise) * 4;
+        float minRadius = maxRadius / 2;
+        voronoiPacking(nodes, -1f, maxRadius);
+    }
+    public static void voronoiPacking(Collection<Node> nodes, float minR, float maxR) {
+        ArrayList<PVector> pvs = new ArrayList<>();
+        float close;
+        for(Node n : nodes) {
+            pvs.add(n.pv);
+        }
+        Voronoi v = new Voronoi(ShapeFunctions.toFloatArray(pvs));
+        for(MPolygon m : v.getRegions()) {
+            for(float[] co : m.getCoords()) {
+                if(min(co) > -100 && max(co) < 1100) {
+                    close = Float.MAX_VALUE;
+                    for (Circle c : nodes) {
+                        close = min(close, c.distanceToRadius(co[0], co[1]));
+                    }
+                    if (close > 0 && close != Float.MAX_VALUE && (minR == -1f || close > minR) && (maxR == -1f || close < maxR)) {
+                        nodes.add(new Node(co[0], co[1], close));
+                    }
+                }
+            }
+        }
     }
 }

@@ -6,7 +6,6 @@ TODO: Look into circle packing via Voronoi
 */
 
 import megamu.mesh.Delaunay;
-import org.processing.wiki.triangulate.*;
 
 import java.util.*;
 
@@ -27,7 +26,7 @@ public class Detailing extends PApplet {
     PVector offset;
 
     final float minimise = 5;
-    final boolean noDraw = false;
+    final boolean doTests = false;
 
     HashMap<Character, String> conv;
     HashMap<String, Boolean> draw;
@@ -54,7 +53,7 @@ public class Detailing extends PApplet {
         vertices = ShapeFunctions.toPVector(initVertices);
         ShapeFunctions.scaleVertices((float) w / 30, vertices);
         shape = ShapeFunctions.toShape(vertices, this);
-        offset = Helpers.calcOffset(vertices, w, h, noDraw);
+        offset = Helpers.calcOffset(vertices, w, h, doTests);
         calc();
     }
 
@@ -67,8 +66,8 @@ public class Detailing extends PApplet {
             translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
         }
         background(255);
-        if (noDraw) {
-            Test.test9(this);
+        if (doTests) {
+            Test.test10(this);
         }
         if (draw.get("snap") && draw.get("grid")) {
             mx = mouseX - (int) offset.x;
@@ -161,7 +160,7 @@ public class Detailing extends PApplet {
         Nodes may be stored in multiple discrete sets.
         This function draws relevant information for all nodes in a given set.
         */
-        if (!noDraw) {
+        if (!doTests) {
             for (Node n : circles) {
                 if (drawCircles) {
                     stroke(0);
@@ -223,7 +222,7 @@ public class Detailing extends PApplet {
         /*
         Completes all relevant calculations.
         */
-        if (!noDraw) {
+        if (!doTests) {
             int start;
             start = millis();
             nodes = CirclePacking.randomFillAware(vertices, minimise);
@@ -326,7 +325,7 @@ public class Detailing extends PApplet {
         draw = new HashMap<>();
         for (Object[] arr : cmd) {
             conv.put((char) arr[0], (String) arr[1]);
-            draw.put((String) arr[1], !noDraw && (boolean) arr[2]);
+            draw.put((String) arr[1], !doTests && (boolean) arr[2]);
         }
     }
 

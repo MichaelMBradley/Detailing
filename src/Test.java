@@ -1,10 +1,12 @@
 import megamu.mesh.Delaunay;
+import megamu.mesh.MPolygon;
 import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
@@ -244,7 +246,7 @@ public class Test {
     }
 
     public static void test9(PApplet s) {
-        s.randomSeed(0l);
+        s.randomSeed(0L);
         int max = 500;
         int h = s.pixelHeight;
         int w = s.pixelWidth;
@@ -271,5 +273,27 @@ public class Test {
             s.point(point[0], point[1]);
         }
         s.strokeWeight(1);
+    }
+
+    public static void test10(PApplet s) {
+        s.randomSeed(10L);
+        Node c1 = new Node(200, 200, 100);
+        Node c2 = new Node(700, 200, 100);
+        Node c3 = new Node(200, 700, 100);
+        Node c4 = new Node(700, 700, 100);
+        Node c5 = new Node(400, 400, 100);
+        Node c6 = new Node(s.mouseX, s.mouseY, 50);
+        int max = 10;
+        ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
+        nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
+        for(int i = 0; i < max; i++) {
+            nodes.add((ArrayList<Node>) nodes.get(nodes.size()-1).clone());
+            CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
+            s.strokeWeight(1);//2 * (max - i));
+            s.stroke(s.random(255), s.random(255), s.random(255));
+            for(Node n : nodes.get(nodes.size()-1)) {
+                n.draw(s);
+            }
+        }
     }
 }
