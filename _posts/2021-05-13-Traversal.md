@@ -23,14 +23,14 @@ One strategy for drawing a curve around the circles in order is to do something 
 {: style="text-align:center"}
 ![A drawing of a circle packing is turned int a line.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/GraphToLine.jpeg)
 
-In this image I swap from tree to tree, just drawing a line around the perimeter of the tree. I am also looking into a strategy of using the circumcircle connecting any two nodes (and an unkown thrd node), but it's still unclear to me how to deal with leaves in this strategy.
+In this image I swap from tree to tree, just drawing a line around the perimeter of the tree. I am also looking into a strategy of using the circumcircle connecting any two nodes (and an unknown third node), but it's still unclear to me how to deal with leaves in this strategy.
 
 The tree traversal strategy in this image is roughly this:
 
 {: style="text-align:center"}
 ![Several tree traversal strategies.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/GraphTraversal.jpeg)
 
-In the first two trees, I traverse to a leaf, and then traverse across leaves in order until there are none left, and then return to the root. In the third strategy, I visit every node while swapping bewteen leaves. This is the strategy I have implemented as a beginning.
+In the first two trees, I traverse to a leaf, and then traverse across leaves in order until there are none left, and then return to the root. In the third strategy, I visit every node while swapping between leaves. This is the strategy I have implemented as a beginning.
 
 Going clockwise around the polyline, here is the order in which my first algorithm plans to visit the nodes:
 
