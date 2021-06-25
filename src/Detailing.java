@@ -1,8 +1,6 @@
 /*
 TODO: Implement smoothing for connections between delaunay arcs
 TODO: Fix smoothing for arcs connecting touching circles
-TODO: Add more space in between trees
-TODO: Look into circle packing via Voronoi
 */
 
 import megamu.mesh.Delaunay;
@@ -20,7 +18,7 @@ public class Detailing extends PApplet {
 	ArrayList<PVector> vertices;
 	ArrayList<Node> traverse;
 	HashSet<Node> nodes, interior, exterior;
-	int w, h, p, q, mx, my, og_mx, og_my, maxIter = 0;
+	int w, h, p, q, maxIter = 0;
 	float zoom = 2f;
 	PShape shape;
 	PVector offset;
@@ -58,48 +56,11 @@ public class Detailing extends PApplet {
 	}
 	
 	public void draw() {
-		og_mx = mouseX;
-		og_my = mouseY;
-		scale(draw.get("zoom") ? zoom : 1);
-		translate(offset.x, offset.y);
-		if (draw.get("zoom")) {
-			translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
-		}
 		background(255);
 		if (doTests) {
-			Test.test10(this);
+			Test.runTest(this);
 		}
-		if (draw.get("snap") && draw.get("grid")) {
-			mx = mouseX - (int) offset.x;
-			my = mouseY - (int) offset.y;
-			for (Node n : nodes) {
-				if (n.distanceToCenter(mx, my) < n.r) {
-					mouseX = (int) (n.x + offset.x);
-					mouseY = (int) (n.y + offset.y);
-					break;
-				}
-			}
-		}
-		if (draw.get("grid")) {
-			fill(127);
-			stroke(127);
-			strokeWeight(1);
-			int freq = 25;
-			for (int i = ((int) offset.x / freq) * -freq; i < w - offset.x; i += freq) {
-				line(i, -offset.y, i, h - offset.y);
-				text("" + i, i + 2, 10 - offset.y);
-			}
-			for (int i = ((int) offset.y / freq) * -freq; i < h - offset.y; i += freq) {
-				line(-offset.x, i, w - offset.x, i);
-				text("" + i, -offset.x, i + 12);
-			}
-			fill(0);
-			stroke(0);
-			text("(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
-			line(mouseX - offset.x, -offset.y, mouseX - offset.x, h - offset.y);
-			line(-offset.x, mouseY - offset.y, w - offset.x, mouseY - offset.y);
-			noFill();
-		}
+		gridZoom();
 		if (draw.get("numCircles")) {
 			fill(0);
 			text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
@@ -151,8 +112,6 @@ public class Detailing extends PApplet {
 			stroke(0, 255, 0);
 			traverseArcs.get(p).draw(this);
 		}
-		mouseX = og_mx;
-		mouseY = og_my;
 	}
 	
 	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
@@ -199,10 +158,54 @@ public class Detailing extends PApplet {
 		}
 	}
 	
+	public void gridZoom() {
+		/*
+		Manages drawing the debug grid and the zoom/pan.
+		*/
+		int mx, my, og_mx = mouseX, og_my = mouseY;
+		scale(draw.get("zoom") ? zoom : 1);
+		translate(offset.x, offset.y);
+		if (draw.get("zoom")) {
+			translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
+		}
+		if (draw.get("snap") && draw.get("grid")) {
+			mx = mouseX - (int) offset.x;
+			my = mouseY - (int) offset.y;
+			for (Node n : nodes) {
+				if (n.distanceToCenter(mx, my) < n.r) {
+					mouseX = (int) (n.x + offset.x);
+					mouseY = (int) (n.y + offset.y);
+					break;
+				}
+			}
+		}
+		if (draw.get("grid")) {
+			fill(127);
+			stroke(127);
+			strokeWeight(1);
+			int freq = 25;
+			for (int i = ((int) offset.x / freq) * -freq; i < w - offset.x; i += freq) {
+				line(i, -offset.y, i, h - offset.y);
+				text("" + i, i + 2, 10 - offset.y);
+			}
+			for (int i = ((int) offset.y / freq) * -freq; i < h - offset.y; i += freq) {
+				line(-offset.x, i, w - offset.x, i);
+				text("" + i, -offset.x, i + 12);
+			}
+			fill(0);
+			stroke(0);
+			text("(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
+			line(mouseX - offset.x, -offset.y, mouseX - offset.x, h - offset.y);
+			line(-offset.x, mouseY - offset.y, w - offset.x, mouseY - offset.y);
+			noFill();
+		}
+		mouseX = og_mx;
+		mouseY = og_my;
+	}
+	
 	public ArrayList<Circle> analyze(HashSet<Node> aCircles) {
         /*
         The Delaunay Triangulation and tree generation is done separately for the interior and exterior circles.
-        This was made into a function to avoid repeating code.
         */
 		ArrayList<Circle> circumcircles;
 		int start;
@@ -245,9 +248,9 @@ public class Detailing extends PApplet {
 			exteriorCircumcircles = analyze(exterior);
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
-			//traverseArcs = Smoothing.delaunayTraversalToArcs(traverse, vertices);
+			traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
 			//traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
-			traverseArcs = Smoothing.surroundingArcs(traverse);
+			//traverseArcs = Smoothing.surroundingArcs(traverse);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 			println("\n");
 		} else {

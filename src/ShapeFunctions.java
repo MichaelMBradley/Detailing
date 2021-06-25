@@ -21,7 +21,7 @@ public class ShapeFunctions {
 		float minY = min(p1.y, p2.y) * (2f / 3f) + max(p1.y, p2.y) * (1f / 3f);
 		float maxX = min(p1.x, p2.x) * (1f / 3f) + max(p1.x, p2.x) * (2f / 3f);
 		float maxY = min(p1.y, p2.y) * (1f / 3f) + max(p1.y, p2.y) * (2f / 3f);
-		Circle circ = triangleToCircle(p1.x, p1.y, p2.x, p2.y, Helpers.random(minX, maxX), Helpers.random(minY, maxY));
+		Circle circ = triangleToCircle(p1, p2, new PVector(Helpers.random(minX, maxX), Helpers.random(minY, maxY)));
 		float[] se = Smoothing.order(p1, circ.pv, p2, true);
 		if (se[1] - se[0] > PI) {
 			return new Arc(circ, se[1] - TWO_PI, se[0]);
@@ -66,16 +66,14 @@ public class ShapeFunctions {
 				ends[1][1] = pv.y;
 			}
 		}
-		return new PVector[]{new PVector(ends[0][0], ends[0][1]), new PVector(ends[1][0], ends[1][1])};
+		return new PVector[]{ new PVector(ends[0][0], ends[0][1]), new PVector(ends[1][0], ends[1][1]) };
 	}
 	
 	public static Arc getArc(Circle n1, Circle n2, Circle n3) {
         /*
-        Returns data about the arc between n1 and n2, passing through n3.
-        [x, y, w, h, start, end]
-        w = h
+        Returns the arc between n1 and n2, passing through n3.
         */
-		Circle arcInfo = triangleToCircle(n1.x, n1.y, n2.x, n2.y, n3.x, n3.y);
+		Circle arcInfo = triangleToCircle(n1.pv, n2.pv, n3.pv);
 		float ang1 = PVector.sub(n1.pv, arcInfo.pv).heading();
 		float ang2 = PVector.sub(n2.pv, arcInfo.pv).heading();
 		if (ang1 > ang2) {
@@ -93,7 +91,7 @@ public class ShapeFunctions {
 		}
 		Arc[] arcs = new Arc[n3arr.size()];
 		for (int i = 0; i < n3arr.size(); i++) {
-			arcs[i] = getArc(n1, n2, n3arr.get(i));
+			arcs[i] = new Arc(n1.pv, n2.pv, n3arr.get(i).pv);
 		}
 		return arcs;
 	}
@@ -135,7 +133,7 @@ public class ShapeFunctions {
 		}
 		for(HashSet<PVector> tri : tris) {
 			triInfo = new ArrayList<>(tri);
-			info.add(triangleToCircle(triInfo.get(0).x, triInfo.get(0).y, triInfo.get(1).x, triInfo.get(1).y, triInfo.get(2).x, triInfo.get(2).y));
+			info.add(triangleToCircle(triInfo.get(0), triInfo.get(1), triInfo.get(2)));
 		}
 		return info;
 	}
@@ -146,7 +144,7 @@ public class ShapeFunctions {
         */
 		ArrayList<Circle> info = new ArrayList<>();
 		for (Triangle tri : triangles) {
-			info.add(triangleToCircle(tri.p1.x, tri.p1.y, tri.p2.x, tri.p2.y, tri.p3.x, tri.p3.y));
+			info.add(triangleToCircle(tri.p1, tri.p2, tri.p3));
 		}
 		return info;
 	}
@@ -181,6 +179,10 @@ public class ShapeFunctions {
 		}
 		r = dist(x, y, x1, y1);
 		return new Circle(x, y, r);
+	}
+	
+	public static Circle triangleToCircle(PVector pv1, PVector pv2, PVector pv3) {
+		return triangleToCircle(pv1.x, pv1.y, pv2.x, pv2.y, pv3.x, pv3.y);
 	}
 	
 	public static Polygon toPolygon(ArrayList<PVector> vertices) {

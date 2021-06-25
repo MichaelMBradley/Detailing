@@ -12,6 +12,10 @@ import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
 
 public class Test {
+	public static void runTest(PApplet s) {
+		test1(s);
+	}
+	
 	public static void test1(PApplet s) {
         /*
         Attempts to smooth a series of circles.

@@ -26,9 +26,12 @@ public class Arc extends Circle {
 		end = e;
 	}
 	
-	public Arc(PVector loc, Node prev, Node next, boolean connect) {
-		pv = loc;
-		r = PVector.dist(loc, prev.pv) - prev.r;
+	public Arc(PVector start, PVector end, PVector through) {
+		this(ShapeFunctions.triangleToCircle(start, end, through).pv, new Circle(start), new Circle(end), false);
+	}
+	
+	public Arc(PVector loc, Circle prev, Circle next, boolean connect) {
+		super(loc, PVector.dist(loc, prev.pv) - prev.r);
 		start = PVector.sub(prev.pv, loc).heading();
 		end = PVector.sub(next.pv, loc).heading();
 		float temp;
@@ -53,5 +56,9 @@ public class Arc extends Circle {
 	@Override
 	public void draw(PApplet sketch) {
 		sketch.arc(pv.x, pv.y, r * 2, r * 2, start, end);
+	}
+	@Override
+	public String toString() {
+		return String.format("(x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f)", x, y, r, start, end);
 	}
 }

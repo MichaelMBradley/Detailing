@@ -127,7 +127,7 @@ public class DelaunayMethods {
 		return traverse;
 	}
 	
-	public Voronoi getVoronoi(HashSet<Node> nodes) {
+	public static Voronoi getVoronoi(HashSet<Node> nodes) {
 		return new Voronoi(ShapeFunctions.toFloatArray(ShapeFunctions.getPVectors(nodes)));
 	}
 	

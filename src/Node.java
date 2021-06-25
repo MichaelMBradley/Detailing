@@ -123,8 +123,8 @@ public class Node extends Circle {
 		if (kruskalAdjacent.size() == 0) {
 			return below;
 		} else if (kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
-			float small = 0.5f;
-			r *= small;
+			//float small = 0.5f;
+			r *= 0.5f;//small;
 			move(PVector.sub(call.pv, pv).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
 			return below;
 		}

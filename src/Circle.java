@@ -20,16 +20,10 @@ public class Circle {
 		pv = PVec;
 	}
 	public Circle(PVector PVec) {
-		x = PVec.x;
-		y = PVec.y;
-		r = 0;
-		pv = PVec;
+		this(PVec, 0f);
 	}
 	public Circle() {
-		x = 0;
-		y = 0;
-		r = 0;
-		pv = new PVector(x, y);
+		this(0, 0, 0);
 	}
 	
 	

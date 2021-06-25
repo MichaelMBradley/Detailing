@@ -20,7 +20,11 @@ public class Helpers {
 	public static void drawLine(PVector p1, PVector p2, PApplet sketch) {
 		sketch.line(p1.x, p1.y, p2.x, p2.y);
 	}
-
+	
+	public static void drawLine(float[] arr, PApplet sketch) {
+		sketch.line(arr[0], arr[1], arr[2], arr[3]);
+	}
+	
 	public static HashSet<HashSet<Node>> getMSTs(HashSet<Node> nodes) {
 		/*
 		Returns a HashSet of the minimum spanning trees.
