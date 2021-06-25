@@ -12,7 +12,7 @@ import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
 
 public class Test {
-    public static void test1(PApplet s) {
+	public static void test1(PApplet s) {
         /*
         Attempts to smooth a series of circles.
         */
@@ -23,15 +23,15 @@ public class Test {
         Circle n3 = new Circle(n2.x + 100 * cos(1.5 * iter), n2.y + 100 * sin(1.5 * iter), 50);
         Circle n4 = new Circle(n2.x + 100 * cos(1.5 * iter + HALF_PI), n2.y + 100 * sin(1.5 * iter + HALF_PI), 50);
         */
-        Circle n1 = new Circle(300, 200, 50);
-        Circle n2 = new Circle(300, 300, 50);
-        Circle n3 = new Circle(200, 300, 50);
-        Circle n4 = new Circle(115, 355, 50);
-        Circle n5 = new Circle(300, 400, 50);
-        Circle n6 = new Circle(300, 480, 30);
-        Circle n7 = new Circle(400, 300, 50);
-        Circle n8 = new Circle(470, 230, 50);
-        Circle n9 = new Circle(s.mouseX, s.mouseY, s.mouseX / 10f);//470, 370, 50);
+		Circle n1 = new Circle(300, 200, 50);
+		Circle n2 = new Circle(300, 300, 50);
+		Circle n3 = new Circle(200, 300, 50);
+		Circle n4 = new Circle(115, 355, 50);
+		Circle n5 = new Circle(300, 400, 50);
+		Circle n6 = new Circle(300, 480, 30);
+		Circle n7 = new Circle(400, 300, 50);
+		Circle n8 = new Circle(470, 230, 50);
+		Circle n9 = new Circle(s.mouseX, s.mouseY, s.mouseX / 10f);//470, 370, 50);
         /*
         mouseX, mouseY, mouseX/10);//
         fill(0);
@@ -46,9 +46,9 @@ public class Test {
         text(9 + "\n" + n9.x + " " + n9.y, n9.x, n9.y);
         noFill();
         */
-        ArrayList<Circle> ns = new ArrayList<>(Arrays.asList(n1, n2, n7, n8, n7, n9, n7, n2, n5, n6, n5, n2, n3, n4, n3, n2, n1));
-        s.strokeWeight(1);
-        s.stroke(0, 255, 0);
+		ArrayList<Circle> ns = new ArrayList<>(Arrays.asList(n1, n2, n7, n8, n7, n9, n7, n2, n5, n6, n5, n2, n3, n4, n3, n2, n1));
+		s.strokeWeight(1);
+		s.stroke(0, 255, 0);
         /*
         n1.draw();
         n2.draw();
@@ -60,54 +60,54 @@ public class Test {
         n8.draw();
         n9.draw();
         */
-        s.strokeWeight(1);
-        s.stroke(0);
-        println();
-        for (Arc arc : Smoothing.surroundingArcsTree(ns)) {
-            arc.draw(s);
-        }
-    }
-
-    public static void test2(PApplet s) {
+		s.strokeWeight(1);
+		s.stroke(0);
+		println();
+		for (Arc arc : Smoothing.surroundingArcsTree(ns)) {
+			arc.draw(s);
+		}
+	}
+	
+	public static void test2(PApplet s) {
         /*
         Attempts to create a safe (non-overlapping) intermediate circle.
         */
-        Circle n1 = new Circle(s.mouseX, s.mouseY, 50);
-        Circle n2 = new Circle(300, 300, 50);
-        s.strokeWeight(1);
-        s.stroke(0);
-        n1.draw(s);
-        n2.draw(s);
-        for (Circle n : Smoothing.getExterior(n1, n2)) {
-            s.stroke(255, 0, 0);
-            n.draw(s);
-            for (Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
-                s.stroke(0, 0, 255);
-                j.draw(s);
-            }
-        }
-    }
-
-    public static void test3(PApplet s) {
+		Circle n1 = new Circle(s.mouseX, s.mouseY, 50);
+		Circle n2 = new Circle(300, 300, 50);
+		s.strokeWeight(1);
+		s.stroke(0);
+		n1.draw(s);
+		n2.draw(s);
+		for (Circle n : Smoothing.getExterior(n1, n2)) {
+			s.stroke(255, 0, 0);
+			n.draw(s);
+			for (Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
+				s.stroke(0, 0, 255);
+				j.draw(s);
+			}
+		}
+	}
+	
+	public static void test3(PApplet s) {
         /*
         Creates a slight curve.
         */
-        s.strokeWeight(5);
-        s.stroke(255, 0, 0);
-        s.point(100, 100);
-        s.point(s.mouseX, s.mouseY);
-        s.strokeWeight(1);
-        s.stroke(0);
-        s.randomSeed(0L);
-        ShapeFunctions.arcLine(new PVector(100, 100), new PVector(s.mouseX, s.mouseY)).draw(s);
-    }
-
-    public static void test4(PApplet s) {
+		s.strokeWeight(5);
+		s.stroke(255, 0, 0);
+		s.point(100, 100);
+		s.point(s.mouseX, s.mouseY);
+		s.strokeWeight(1);
+		s.stroke(0);
+		s.randomSeed(0L);
+		ShapeFunctions.arcLine(new PVector(100, 100), new PVector(s.mouseX, s.mouseY)).draw(s);
+	}
+	
+	public static void test4(PApplet s) {
         /*
         Creates a circle in the overlapping area two existing circles.
         */
-        s.strokeWeight(1);
-        s.stroke(0);
+		s.strokeWeight(1);
+		s.stroke(0);
         /*
         Circle n1 = new Circle(w / 2, h / 2, (w + h) / 4);//new Circle(mouseY, mouseX, (w + h) / 4);//
         loadPixels();
@@ -141,71 +141,71 @@ public class Test {
         }
         updatePixels();
         */
-        Circle n1 = new Circle(400, 400, 100);
-        Circle n2 = new Circle(s.mouseX, s.mouseY, 100);
-        n1.draw(s);
-        n2.draw(s);
-        for (Circle n : Smoothing.getInterior(n1, n2)) {
-            n.draw(s);
-        }
-        //noLoop();
-    }
-
-    public static void test5(PApplet s) {
+		Circle n1 = new Circle(400, 400, 100);
+		Circle n2 = new Circle(s.mouseX, s.mouseY, 100);
+		n1.draw(s);
+		n2.draw(s);
+		for (Circle n : Smoothing.getInterior(n1, n2)) {
+			n.draw(s);
+		}
+		//noLoop();
+	}
+	
+	public static void test5(PApplet s) {
         /*
         Tests out the Arc class.
         */
-        int w = s.pixelWidth;
-        int h = s.pixelHeight;
-        float t_s = (s.mouseX - w / 2f) / 20f;
-        float arc = (float) (s.mouseY * 1.25 * TWO_PI / h);
-        new Arc(new PVector(w / 2f, h / 2f), 50, t_s, t_s + arc).draw(s);
-        s.fill(0);
-        s.text(String.format("Start: %.2f\nLength: %.2f\nEnd: %.2f\n", t_s, arc, t_s + arc), s.mouseX, s.mouseY);
-        s.noFill();
-    }
-
-    public static void test6(PApplet s) {
+		int w = s.pixelWidth;
+		int h = s.pixelHeight;
+		float t_s = (s.mouseX - w / 2f) / 20f;
+		float arc = (float) (s.mouseY * 1.25 * TWO_PI / h);
+		new Arc(new PVector(w / 2f, h / 2f), 50, t_s, t_s + arc).draw(s);
+		s.fill(0);
+		s.text(String.format("Start: %.2f\nLength: %.2f\nEnd: %.2f\n", t_s, arc, t_s + arc), s.mouseX, s.mouseY);
+		s.noFill();
+	}
+	
+	public static void test6(PApplet s) {
         /*
         Tests out safe exteriors.
         */
-        Circle n1 = new Circle(400, 400, 50);
-        Circle n2 = new Circle(400, 500, 50);
-        float r = s.mouseX / 20f;
-        Circle n3 = new Circle(n2.x + (r + n2.r) * cos(s.mouseX / 100f), n2.y + (r + n2.r) * sin(s.mouseX / 100f), r);
-        Circle n4 = new Circle(n2.x + (r + n2.r) * cos(s.mouseY / 100f), n2.y + (r + n2.r) * sin(s.mouseY / 100f), r);
-        n1.draw(s);
-        n2.draw(s);
-        n3.draw(s);
-        n4.draw(s);
-        for (Circle n : Smoothing.getExterior(n1, n2)) {
-            n.draw(s);
-        }
-        for (Circle n : Smoothing.getExterior(n2, n3)) {
-            n.draw(s);
-        }
-        for (Circle n : Smoothing.getExterior(n2, n4)) {
-            n.draw(s);
-        }
-    }
-
-    public static void test7(PApplet s) {
+		Circle n1 = new Circle(400, 400, 50);
+		Circle n2 = new Circle(400, 500, 50);
+		float r = s.mouseX / 20f;
+		Circle n3 = new Circle(n2.x + (r + n2.r) * cos(s.mouseX / 100f), n2.y + (r + n2.r) * sin(s.mouseX / 100f), r);
+		Circle n4 = new Circle(n2.x + (r + n2.r) * cos(s.mouseY / 100f), n2.y + (r + n2.r) * sin(s.mouseY / 100f), r);
+		n1.draw(s);
+		n2.draw(s);
+		n3.draw(s);
+		n4.draw(s);
+		for (Circle n : Smoothing.getExterior(n1, n2)) {
+			n.draw(s);
+		}
+		for (Circle n : Smoothing.getExterior(n2, n3)) {
+			n.draw(s);
+		}
+		for (Circle n : Smoothing.getExterior(n2, n4)) {
+			n.draw(s);
+		}
+	}
+	
+	public static void test7(PApplet s) {
         /*
         Mixing safe connections with good looking ones.
         */
-        int w = s.pixelWidth;
-        int h = s.pixelHeight;
-        Circle n1 = new Circle(w / 2f, h / 2f, 50);
-        Circle n2 = new Circle(s.mouseX, s.mouseY, 25);
-        n1.draw(s);
-        n2.draw(s);
-        Circle[] ext = Smoothing.getExterior(n1, n2);
-        for (Circle n : ext) {
-            n.draw(s);
-        }
-        s.fill(0);
-        s.text("" + ext[0].overlaps(ext[1]), s.mouseX, s.mouseY);
-        s.noFill();
+		int w = s.pixelWidth;
+		int h = s.pixelHeight;
+		Circle n1 = new Circle(w / 2f, h / 2f, 50);
+		Circle n2 = new Circle(s.mouseX, s.mouseY, 25);
+		n1.draw(s);
+		n2.draw(s);
+		Circle[] ext = Smoothing.getExterior(n1, n2);
+		for (Circle n : ext) {
+			n.draw(s);
+		}
+		s.fill(0);
+		s.text("" + ext[0].overlaps(ext[1]), s.mouseX, s.mouseY);
+		s.noFill();
         /*
         color f;
         s.loadPixels();
@@ -221,79 +221,79 @@ public class Test {
         }
         s.updatePixels();
         */
-    }
-
-    public static void test8(PApplet s) {
-        PVector p1 = new PVector(0, 1), p2 = new PVector(1, 2);
-        float j;
-        float num = 1e9f;
-        int t = s.millis();
-        for (int i = 0; i < num; i++) {
-            j = PVector.dist(p1, p2);
-        }
-        println(".dist: " + (s.millis() - t));
-        t = s.millis();
-        for (int i = 0; i < num; i++) {
-            j = PVector.sub(p1, p2).magSq();
-        }
-        println(".sub.magSq: " + (s.millis() - t));
-        t = s.millis();
-        for (int i = 0; i < num; i++) {
-            j = pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2);
-        }
-        println("custom: " + (s.millis() - t));
-        s.exit();
-    }
-
-    public static void test9(PApplet s) {
-        s.randomSeed(0L);
-        int max = 500;
-        int h = s.pixelHeight;
-        int w = s.pixelWidth;
-        float[][] points = new float[max + 1][2];
-        for(int i = 0; i < max; i++) {
-            points[i][0] = s.random(w);
-            points[i][1] = s.random(h);
-        }
-        points[max][0] = s.mouseX;
-        points[max][1] = s.mouseY;
-        Delaunay d = new Delaunay(points);
-        Voronoi v = new Voronoi(points);
-        s.stroke(255, 0, 0);
-        for(float[] edge : d.getEdges()) {
-            s.line(edge[0], edge[1], edge[2], edge[3]);
-        }
-        s.stroke(0, 0, 255);
-        for(float[] edge : v.getEdges()) {
-            s.line(edge[0], edge[1], edge[2], edge[3]);
-        }
-        s.strokeWeight(5);
-        s.stroke(0, 255, 0);
-        for(float[] point : points) {
-            s.point(point[0], point[1]);
-        }
-        s.strokeWeight(1);
-    }
-
-    public static void test10(PApplet s) {
-        s.randomSeed(10L);
-        Node c1 = new Node(200, 200, 100);
-        Node c2 = new Node(700, 200, 100);
-        Node c3 = new Node(200, 700, 100);
-        Node c4 = new Node(700, 700, 100);
-        Node c5 = new Node(400, 400, 100);
-        Node c6 = new Node(s.mouseX, s.mouseY, 50);
-        int max = 10;
-        ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
-        nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
-        for(int i = 0; i < max; i++) {
-            nodes.add((ArrayList<Node>) nodes.get(nodes.size()-1).clone());
-            CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
-            s.strokeWeight(1);//2 * (max - i));
-            s.stroke(s.random(255), s.random(255), s.random(255));
-            for(Node n : nodes.get(nodes.size()-1)) {
-                n.draw(s);
-            }
-        }
-    }
+	}
+	
+	public static void test8(PApplet s) {
+		PVector p1 = new PVector(0, 1), p2 = new PVector(1, 2);
+		float j;
+		float num = 1e9f;
+		int t = s.millis();
+		for (int i = 0; i < num; i++) {
+			j = PVector.dist(p1, p2);
+		}
+		println(".dist: " + (s.millis() - t));
+		t = s.millis();
+		for (int i = 0; i < num; i++) {
+			j = PVector.sub(p1, p2).magSq();
+		}
+		println(".sub.magSq: " + (s.millis() - t));
+		t = s.millis();
+		for (int i = 0; i < num; i++) {
+			j = pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2);
+		}
+		println("custom: " + (s.millis() - t));
+		s.exit();
+	}
+	
+	public static void test9(PApplet s) {
+		s.randomSeed(0L);
+		int max = 500;
+		int h = s.pixelHeight;
+		int w = s.pixelWidth;
+		float[][] points = new float[max + 1][2];
+		for(int i = 0; i < max; i++) {
+			points[i][0] = s.random(w);
+			points[i][1] = s.random(h);
+		}
+		points[max][0] = s.mouseX;
+		points[max][1] = s.mouseY;
+		Delaunay d = new Delaunay(points);
+		Voronoi v = new Voronoi(points);
+		s.stroke(255, 0, 0);
+		for(float[] edge : d.getEdges()) {
+			s.line(edge[0], edge[1], edge[2], edge[3]);
+		}
+		s.stroke(0, 0, 255);
+		for(float[] edge : v.getEdges()) {
+			s.line(edge[0], edge[1], edge[2], edge[3]);
+		}
+		s.strokeWeight(5);
+		s.stroke(0, 255, 0);
+		for(float[] point : points) {
+			s.point(point[0], point[1]);
+		}
+		s.strokeWeight(1);
+	}
+	
+	public static void test10(PApplet s) {
+		s.randomSeed(10L);
+		Node c1 = new Node(200, 200, 100);
+		Node c2 = new Node(700, 200, 100);
+		Node c3 = new Node(200, 700, 100);
+		Node c4 = new Node(700, 700, 100);
+		Node c5 = new Node(400, 400, 100);
+		Node c6 = new Node(s.mouseX, s.mouseY, 50);
+		int max = 10;
+		ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
+		nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
+		for(int i = 0; i < max; i++) {
+			nodes.add((ArrayList<Node>) nodes.get(nodes.size()-1).clone());
+			CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
+			s.strokeWeight(1);//2 * (max - i));
+			s.stroke(s.random(255), s.random(255), s.random(255));
+			for(Node n : nodes.get(nodes.size()-1)) {
+				n.draw(s);
+			}
+		}
+	}
 }
