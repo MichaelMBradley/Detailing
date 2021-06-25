@@ -2,3 +2,5 @@
 *.class
 *.py
 *.pyde
+Detailing.iml
+.idea/*
