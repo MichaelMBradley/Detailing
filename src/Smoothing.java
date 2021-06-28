@@ -7,7 +7,7 @@ import static processing.core.PApplet.*;
 public class Smoothing {
 	public static Circle[] getAdjacent(Circle n1, Circle n2, float r0, boolean exterior) {
         /*
-        Returns the two Circles touching the both the two given Circles.
+        Returns the two Circles touching both of the two given Circles.
         if sign(x2-x1) != sign(y2-y1):  # +/-, -/+
            [0] is (higher y than) line passing through centres
         if sign(x2-x1) == sign(y2-y1):  # +/+, -/-
@@ -26,8 +26,10 @@ public class Smoothing {
 			return getAdjacentCalc(n1.x, n1.y, n1.r, n2.x, n2.y, n2.r, r0, exterior);
 		} else {
 			// Swapping x/y still returns valid circles and avoids div/0 errors
-			//noinspection SuspiciousNameCombination
-			return getAdjacentCalc(n1.y, n1.x, n1.r, n2.y, n2.x, n2.r, r0, exterior);
+			Circle[] circles = getAdjacentCalc(n1.y, n1.x, n1.r, n2.y, n2.x, n2.r, r0, exterior);
+			circles[0].setLocation(circles[0].y, circles[0].x);
+			circles[1].setLocation(circles[1].y, circles[1].x);
+			return circles;
 		}
 	}
 	
@@ -49,13 +51,22 @@ public class Smoothing {
 		return new Circle[] { new Circle(xa1, ya1, r0), new Circle(xa2, ya2, r0) };
 	}
 	
-	public static Circle[]getExterior(Circle n1, Circle n2) {
+	public static Circle[] getExterior(Circle n1, Circle n2) {
+		// Returns two a
+		// Safe
 		Circle[] adj = getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.r,n2.r), true)[0])[1].r * 0.9), true);
 		if(adj[0].distanceToCircle(adj[1]) > adj[0].r && n1.distanceToCircle(n2) < min(n1.r, n2.r) / 2) {
 			return adj;
 		}
 		float angle = PVector.sub(n2.pv, n1.pv).heading() + 0.01f;
-		return getAdjacent(n1, n2, triCircleAdjacent(n1, n2, new Circle((n1.x + n1.r * cos(angle) + n2.x + n2.r * cos(PI + angle)) / 2f,(n1.y + n1.r * sin(angle) + n2.y + n2.r * sin(PI + angle)) / 2f, (n1.r + n2.r) / 8))[0].r, true);
+		float dist = n1.distanceToCenter(n2) / 2f;
+		// Discrete
+		return getAdjacent(n1, n2,
+				triCircleAdjacent(n1, n2,
+						new Circle(n1.x + dist * cos(angle),
+								n1.y + dist * sin(angle),
+								(n1.r + n2.r) / 8)
+				)[0].r, true);
 	}
 	
 	public static Circle[] getInterior(Circle n1, Circle n2) {
@@ -90,6 +101,7 @@ public class Smoothing {
 		float y4 = B0 + B1 * r4;
 		float x5 = A0 + A1 * r5;
 		float y5 = B0 + B1 * r5;
+		// println(Ka + " " + Kb + " " + D + " " + A0 + " " + B0 + " " + A1 + " " + B1 + " " + C0 + " " + C1 + " " + C2);
 		return new Circle[] { new Circle(x4, y4, r4), new Circle(x5, y5, r5) };
 	}
 	

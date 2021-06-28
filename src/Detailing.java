@@ -24,7 +24,7 @@ public class Detailing extends PApplet {
 	PVector offset;
 	
 	final float minimise = 5;
-	final boolean doTests = false;
+	final boolean doTest = false;
 	
 	HashMap<Character, String> conv;
 	HashMap<String, Boolean> draw;
@@ -51,16 +51,16 @@ public class Detailing extends PApplet {
 		vertices = ShapeFunctions.toPVector(initVertices);
 		ShapeFunctions.scaleVertices((float) w / 30, vertices);
 		shape = ShapeFunctions.toShape(vertices, this);
-		offset = Helpers.calcOffset(vertices, w, h, doTests);
+		offset = Helpers.calcOffset(vertices, w, h, doTest);
 		calc();
 	}
 	
 	public void draw() {
 		background(255);
-		if (doTests) {
+		gridZoom();
+		if (doTest) {
 			Test.runTest(this);
 		}
-		gridZoom();
 		if (draw.get("numCircles")) {
 			fill(0);
 			text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
@@ -119,7 +119,7 @@ public class Detailing extends PApplet {
         Nodes may be stored in multiple discrete sets.
         This function draws relevant information for all nodes in a given set.
         */
-		if (!doTests) {
+		if (!doTest) {
 			for (Node n : circles) {
 				if (drawCircles) {
 					stroke(0);
@@ -225,7 +225,7 @@ public class Detailing extends PApplet {
         /*
         Completes all relevant calculations.
         */
-		if (!doTests) {
+		if (!doTest) {
 			int start;
 			start = millis();
 			nodes = CirclePacking.randomFillAware(vertices, minimise);
@@ -248,9 +248,9 @@ public class Detailing extends PApplet {
 			exteriorCircumcircles = analyze(exterior);
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
-			traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
+			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
 			//traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
-			//traverseArcs = Smoothing.surroundingArcs(traverse);
+			traverseArcs = Smoothing.surroundingArcs(traverse);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 			println("\n");
 		} else {
@@ -328,7 +328,7 @@ public class Detailing extends PApplet {
 		draw = new HashMap<>();
 		for (Object[] arr : cmd) {
 			conv.put((char) arr[0], (String) arr[1]);
-			draw.put((String) arr[1], !doTests && (boolean) arr[2]);
+			draw.put((String) arr[1], !doTest && (boolean) arr[2]);
 		}
 	}
 	

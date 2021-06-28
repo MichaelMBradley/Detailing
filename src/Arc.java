@@ -13,13 +13,11 @@ public class Arc extends Circle {
 		start = 0f;
 		start = 0f;
 	}
-	
 	public Arc(Circle c, float s, float e) {
 		super(c.pv, c.r);
 		start = s;
 		end = e;
 	}
-	
 	public Arc(PVector location, float radius, float s, float e) {
 		super(location, radius);
 		start = s;
@@ -27,16 +25,16 @@ public class Arc extends Circle {
 	}
 	
 	public Arc(PVector start, PVector end, PVector through) {
-		this(ShapeFunctions.triangleToCircle(start, end, through).pv, new Circle(start), new Circle(end), false);
+		this(ShapeFunctions.triangleToCircle(start, end, through), new Circle(start), new Circle(end), false);
 	}
 	
-	public Arc(PVector loc, Circle prev, Circle next, boolean connect) {
-		super(loc, PVector.dist(loc, prev.pv) - prev.r);
-		start = PVector.sub(prev.pv, loc).heading();
-		end = PVector.sub(next.pv, loc).heading();
+	public Arc(Circle base, Circle prev, Circle next, boolean connect) {
+		super(base.pv, base.r);
+		start = PVector.sub(prev.pv, base.pv).heading();
+		end = PVector.sub(next.pv, base.pv).heading();
 		float temp;
 		// Allow for rounding error on cross?
-		boolean cross = abs(end - start) != PVector.angleBetween(PVector.sub(prev.pv, loc), PVector.sub(next.pv, loc)) == connect;
+		boolean cross = (abs(abs(end - start) - PVector.angleBetween(PVector.sub(prev.pv, base.pv), PVector.sub(next.pv, base.pv))) < 0.01f) == connect;
 		if (start > end) {  // Out of order
 			if (cross) {
 				temp = start;

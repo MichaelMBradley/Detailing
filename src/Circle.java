@@ -64,16 +64,24 @@ public class Circle {
 		return distanceToCircle(c) < 0;
 	}
 	
-	
 	public void move(PVector direction) {
 		pv.add(direction);
 		x += direction.x;
 		y += direction.y;
 	}
+	public void setLocation(PVector location) {
+		pv = location;
+		x = location.x;
+		y = location.y;
+	}
+	public void setLocation(float newX, float newY) {
+		x = newX;
+		y = newY;
+		pv = new PVector(x, y);
+	}
 	public void draw(PApplet sketch) {
 		sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius
 	}
-	
 	
 	public String toString() {
 		return String.format("(x: %.2f, y: %.2f, r: %.2f)", x, y, r);

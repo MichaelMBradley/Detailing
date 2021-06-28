@@ -13,7 +13,7 @@ import static processing.core.PConstants.TWO_PI;
 
 public class Test {
 	public static void runTest(PApplet s) {
-		test1(s);
+		test2(s);
 	}
 	
 	public static void test1(PApplet s) {
@@ -78,18 +78,28 @@ public class Test {
         */
 		Circle n1 = new Circle(s.mouseX, s.mouseY, 50);
 		Circle n2 = new Circle(300, 300, 50);
-		s.strokeWeight(1);
-		s.stroke(0);
-		n1.draw(s);
-		n2.draw(s);
-		for (Circle n : Smoothing.getExterior(n1, n2)) {
+		s.strokeWeight(1);s.stroke(127);
+		n1.draw(s);n2.draw(s);
+		/*for (Circle n : Smoothing.getExterior(n1, n2)) {
 			s.stroke(255, 0, 0);
 			n.draw(s);
 			for (Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
 				s.stroke(0, 0, 255);
 				j.draw(s);
 			}
-		}
+		}*/
+		Circle first = Smoothing.getExterior(n1, n2)[0];
+		Circle second = Smoothing.getExterior(n2, n1)[1];
+		first.draw(s);second.draw(s);
+		Arc a1 = new Arc(n1, second, first, false);
+		Arc a2 = new Arc(n2, first, second, false);
+		Arc aFirst = new Arc(first, n1, n2, true);
+		Arc aSecond = new Arc(second, n2, n1, true);
+		s.strokeWeight(3);s.stroke(0);
+		a1.draw(s);a2.draw(s);aFirst.draw(s);aSecond.draw(s);
+		s.fill(0);
+		s.text("a1: "+a1,a1.x,a1.y);s.text("a2: "+a2,a2.x,a2.y);s.text("aFirst: "+aFirst,aFirst.x,aFirst.y);s.text("aSecond: "+aSecond,aSecond.x,aSecond.y);
+		s.noFill();
 	}
 	
 	public static void test3(PApplet s) {
@@ -299,5 +309,18 @@ public class Test {
 				n.draw(s);
 			}
 		}
+	}
+	
+	public static void test11(PApplet s) {
+		s.stroke(0);
+		s.strokeWeight(1);
+		Circle c1 = new Circle(200, 100, 50);
+		Circle c2 = new Circle(300, 300, 40);
+		Circle c3 = new Circle(s.mouseX, s.mouseY, 30);
+		c1.draw(s);c2.draw(s);c3.draw(s);
+		for(Circle c : Smoothing.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
+		for(Circle c : Smoothing.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Smoothing.getAdjacent(c1, c3, (c1.r + c3.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Smoothing.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
 	}
 }
