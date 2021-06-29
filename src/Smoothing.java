@@ -133,7 +133,7 @@ public class Smoothing {
 		return surroundingArcsTree(n);
 	}
 	
-	public static ArrayList<Arc> surroundingArcsTree(ArrayList<?extends Circle> nodes) {
+	public static ArrayList<Arc> surroundingArcsTree(ArrayList<? extends Circle> nodes) {
 		if(nodes.size()==0){
 			return new ArrayList<>();
 		}
@@ -160,6 +160,7 @@ public class Smoothing {
 			arcCircles.add(nc);
 			arcCircles.add(ni);
 		}
+		// TODO: Add in three-circle smoothing, maybe when smoothing circles overlap (even if no issue is caused)?
         /*for(int i = 3; i <= arcCircles.size() - 3; i += 2) {
           //println(PVector.angleBetween(PVector.sub(arcCircles.get(i+2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i-2).pv, arcCircles.get(i).pv)) + "\t" +
           //(PVector.angleBetween(PVector.sub(arcCircles.get(i + 2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i - 2).pv, arcCircles.get(i).pv)) < HALF_PI * 1.25f && arcCircles.get(i + 2) != arcCircles.get(i - 2)));
@@ -171,13 +172,14 @@ public class Smoothing {
             tri.add(i - 1);
           }
         }*/
-		if(arcCircles.size() > 2){
-			for(int i = 0; i < arcCircles.size(); i++){
+		if(arcCircles.size() > 2) {
+			for(int i = 0; i < arcCircles.size(); i++) {
 				n = arcCircles.get(i);
 				ni = arcCircles.get(i == 0 ? arcCircles.size() - 2 : i - 1);
 				nj = arcCircles.get(i >= arcCircles.size() - 2 ? arcCircles.size() - i : i + 1);
-				se = order(ni.pv, n.pv, nj.pv, (i % 2 == 0));
-				arcs.add(new Arc(n, se[0], se[1]));
+				arcs.add(new Arc(n, ni, nj, i % 2 == 0));
+				//se = order(ni.pv, n.pv, nj.pv, (i % 2 == 0));
+				//arcs.add(new Arc(n, se[0], se[1]));
 			}
 		}
 		return arcs;

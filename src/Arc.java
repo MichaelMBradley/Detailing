@@ -32,28 +32,35 @@ public class Arc extends Circle {
 		super(base.pv, base.r);
 		start = PVector.sub(prev.pv, base.pv).heading();
 		end = PVector.sub(next.pv, base.pv).heading();
-		float temp;
 		// Allow for rounding error on cross?
-		boolean cross = (abs(abs(end - start) - PVector.angleBetween(PVector.sub(prev.pv, base.pv), PVector.sub(next.pv, base.pv))) < 0.01f) == connect;
+		boolean cross = (abs(abs(end - start) - PVector.angleBetween(PVector.sub(prev.pv, base.pv), PVector.sub(next.pv, base.pv))) < 0.01f) != connect;
 		if (start > end) {  // Out of order
 			if (cross) {
-				temp = start;
-				start = end;
-				end = temp;
+				e2PI();
+				//swapSE();
 			} else {
-				end += TWO_PI;
+				//e2PI();
+				swapSE();
 			}
 		} else if (cross) {
-			temp = start;
-			start = end;
-			end = temp;
-			end += TWO_PI;
+			swapSE();
+			e2PI();
 		}
+	}
+	private void swapSE() {
+		float temp;
+		temp = start;
+		start = end;
+		end = temp;
+	}
+	private void e2PI() {
+		end += TWO_PI;
 	}
 	
 	@Override
 	public void draw(PApplet sketch) {
 		sketch.arc(pv.x, pv.y, r * 2, r * 2, start, end);
+		//sketch.circle(x,y,r*2);
 	}
 	@Override
 	public String toString() {

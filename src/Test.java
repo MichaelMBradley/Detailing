@@ -13,7 +13,7 @@ import static processing.core.PConstants.TWO_PI;
 
 public class Test {
 	public static void runTest(PApplet s) {
-		test2(s);
+		test1(s);
 	}
 	
 	public static void test1(PApplet s) {
@@ -66,7 +66,7 @@ public class Test {
         */
 		s.strokeWeight(1);
 		s.stroke(0);
-		println();
+		//println();
 		for (Arc arc : Smoothing.surroundingArcsTree(ns)) {
 			arc.draw(s);
 		}
@@ -76,10 +76,11 @@ public class Test {
         /*
         Attempts to create a safe (non-overlapping) intermediate circle.
         */
-		Circle n1 = new Circle(s.mouseX, s.mouseY, 50);
-		Circle n2 = new Circle(300, 300, 50);
+		Circle n1 = new Circle(s.pixelWidth / 2f, s.pixelHeight / 2f, 50);
+		Circle n2 = new Circle(s.mouseX, s.mouseY, n1.r);
+		Circle n3 = new Circle(n2.x + cos(TWO_PI * ((float) s.mouseX / s.pixelWidth)) * (n2.r * 2), n2.y + sin(TWO_PI * ((float) s.mouseX / s.pixelWidth)) * (n2.r * 2), n2.r);
 		s.strokeWeight(1);s.stroke(127);
-		n1.draw(s);n2.draw(s);
+		n1.draw(s);n2.draw(s);n3.draw(s);
 		/*for (Circle n : Smoothing.getExterior(n1, n2)) {
 			s.stroke(255, 0, 0);
 			n.draw(s);
@@ -90,15 +91,24 @@ public class Test {
 		}*/
 		Circle first = Smoothing.getExterior(n1, n2)[0];
 		Circle second = Smoothing.getExterior(n2, n1)[1];
-		first.draw(s);second.draw(s);
+		Circle first2 = Smoothing.getExterior(n2, n3)[0];
+		Circle second2 = Smoothing.getExterior(n3, n2)[1];
+		first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
+		// a1 -> aFirst -> a2 -> aFirst2 -> a3 -> aSecond2 -> a2 -> aSecond -> a1
 		Arc a1 = new Arc(n1, second, first, false);
-		Arc a2 = new Arc(n2, first, second, false);
 		Arc aFirst = new Arc(first, n1, n2, true);
+		Arc a2 = new Arc(n2, first, first2, false);
+		Arc aFirst2 = new Arc(first2, n2, n3, true);
+		Arc a3 = new Arc(n3, first2, second2, false);
+		Arc aSecond2 = new Arc(second2, n3, n2, true);
+		Arc a22 = new Arc(n2, second2, second, false);
 		Arc aSecond = new Arc(second, n2, n1, true);
 		s.strokeWeight(3);s.stroke(0);
-		a1.draw(s);a2.draw(s);aFirst.draw(s);aSecond.draw(s);
+		a1.draw(s);a2.draw(s);a3.draw(s);a22.draw(s);aFirst.draw(s);aSecond.draw(s);aFirst2.draw(s);aSecond2.draw(s);
 		s.fill(0);
-		s.text("a1: "+a1,a1.x,a1.y);s.text("a2: "+a2,a2.x,a2.y);s.text("aFirst: "+aFirst,aFirst.x,aFirst.y);s.text("aSecond: "+aSecond,aSecond.x,aSecond.y);
+		s.text("a22: "+a22,a22.x,a22.y);
+		//s.text("a1: "+a1,a1.x,a1.y);s.text("a2: "+a2,a2.x,a2.y);s.text("a3: "+a3,a3.x,a3.y);
+		//s.text("aFirst: "+aFirst,aFirst.x,aFirst.y);s.text("aSecond: "+aSecond,aSecond.x,aSecond.y);s.text("aFirst2: "+aFirst2,aFirst2.x,aFirst2.y);s.text("aSecond2: "+aSecond2,aSecond2.x,aSecond2.y);
 		s.noFill();
 	}
 	
@@ -322,5 +332,19 @@ public class Test {
 		for(Circle c : Smoothing.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
 		for(Circle c : Smoothing.getAdjacent(c1, c3, (c1.r + c3.r) / 2, true)) { c.draw(s); }
 		for(Circle c : Smoothing.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
+	}
+	
+	public static void test12(PApplet s) {
+		int h = s.pixelHeight;
+		int w = s.pixelWidth;
+		float angle = new PVector(s.mouseX - w / 2f, s.mouseY - h / 2f).heading();
+		Circle c1 = new Circle(w / 2f + cos(angle) * w / 2, h / 2f + sin(angle) * h / 2, 5);
+		angle += HALF_PI;
+		Circle c2 = new Circle(w / 2f + cos(angle) * w / 2, h / 2f + sin(angle) * h / 2, 5);
+		c1.draw(s);c2.draw(s);
+		s.stroke(0);
+		s.strokeWeight(1);
+		new Arc(new Circle(new PVector(w / 2f, h / 2f), 50), c1, c2, false).draw(s);
+		new Arc(new Circle(new PVector(w / 2f, h / 2f), 40), c2, c1, true).draw(s);
 	}
 }
