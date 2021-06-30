@@ -1,5 +1,5 @@
 # Detailing
 
-A tool to add complexity to a set of points outlining a regular polygon.
+Adding complexity to Polygons.
 
 Read more on the [blog](https://michaelmbradley.github.io/Detailing/).
