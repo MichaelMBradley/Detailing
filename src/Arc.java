@@ -25,16 +25,22 @@ public class Arc extends Circle {
 	}
 	
 	public Arc(PVector start, PVector end, PVector through) {
+		// Creates an Arc from "start" to "end" intersecting "through"
 		this(ShapeFunctions.triangleToCircle(start, end, through), new Circle(start), new Circle(end), false);
 	}
 	
 	public Arc(Circle base, Circle prev, Circle next, boolean connect) {
 		super(base.pv, base.r);
-		start = PVector.sub(prev.pv, base.pv).heading();
-		end = PVector.sub(next.pv, base.pv).heading();
-		// Allow for rounding error on cross?
-		boolean cross = (abs(abs(end - start) - PVector.angleBetween(PVector.sub(prev.pv, base.pv), PVector.sub(next.pv, base.pv))) < 0.01f) != connect;
-		if (start > end) {  // Out of order
+		PVector relPrevPV = PVector.sub(prev.pv, base.pv);
+		PVector relNextPV = PVector.sub(next.pv, base.pv);
+		start = relPrevPV.heading();
+		end = relNextPV.heading();
+		// Allow for rounding error
+		boolean cross = (abs(abs(end - start) - PVector.angleBetween(relPrevPV, relNextPV)) < 0.01f) != connect;
+		// Changing the start and end angles such that
+		// * end > start
+		// * end - start < 2Pi
+		if (start > end) {
 			if (cross) {
 				e2PI();
 				//swapSE();
@@ -60,7 +66,7 @@ public class Arc extends Circle {
 	@Override
 	public void draw(PApplet sketch) {
 		sketch.arc(pv.x, pv.y, r * 2, r * 2, start, end);
-		//sketch.circle(x,y,r*2);
+		// sketch.circle(x,y,r*2);
 	}
 	@Override
 	public String toString() {

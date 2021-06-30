@@ -25,6 +25,7 @@ public class Detailing extends PApplet {
 	
 	final float minimise = 5;
 	final boolean doTest = false;
+	final String commands = "acsmn";
 	
 	HashMap<Character, String> conv;
 	HashMap<String, Boolean> draw;
@@ -250,7 +251,7 @@ public class Detailing extends PApplet {
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
 			//traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
-			traverseArcs = Smoothing.surroundingArcs(traverse);
+			traverseArcs = Smoothing.surroundingArcsTree(traverse);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 			println("\n");
 		} else {
@@ -306,29 +307,29 @@ public class Detailing extends PApplet {
 	public void initializeKeys() {
 		// key, name, value
 		Object[][] cmd = new Object[][]{
-				{'g', "grid", false},
-				{'c', "numCircles", true},
-				{'s', "shape", true},
-				{'i', "interior", true},
-				{'e', "exterior", true},
-				{'t', "touching", false},
-				{'d', "delaunay", false},
-				{'u', "circumcircles", false},
-				{'r', "traversal", true},
-				{'a', "traversalArcs", false},
-				{'k', "kruskal", false},
-				{'m', "gradient", true},
-				{'q', "getTouching", false},
-				{'o', "condense", false},
-				{'p', "iterate", false},
-				{'n', "snap", true},
-				{'z', "zoom", false},
+				{'a', "traversalArcs"},
+				{'c', "numCircles"},
+				{'d', "delaunay"},
+				{'e', "exterior"},
+				{'g', "grid"},
+				{'i', "interior"},
+				{'k', "kruskal"},
+				{'m', "gradient"},
+				{'n', "snap"},
+				{'o', "condense"},
+				{'p', "iterate"},
+				{'q', "getTouching"},
+				{'r', "traversal"},
+				{'s', "shape"},
+				{'t', "touching"},
+				{'u', "circumcircles"},
+				{'z', "zoom"},
 		};
 		conv = new HashMap<>();
 		draw = new HashMap<>();
 		for (Object[] arr : cmd) {
 			conv.put((char) arr[0], (String) arr[1]);
-			draw.put((String) arr[1], !doTest && (boolean) arr[2]);
+			draw.put((String) arr[1], !doTest && (commands.indexOf((char) arr[0]) != -1));
 		}
 	}
 	

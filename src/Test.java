@@ -1,12 +1,10 @@
 import megamu.mesh.Delaunay;
-import megamu.mesh.MPolygon;
 import megamu.mesh.Voronoi;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
@@ -35,7 +33,7 @@ public class Test {
 		Circle n6 = new Circle(300, 480, 30);
 		Circle n7 = new Circle(400, 300, 50);
 		Circle n8 = new Circle(470, 230, 50);
-		Circle n9 = new Circle(s.mouseX, s.mouseY, s.mouseX / 10f);//470, 370, 50);
+		Circle n9 = new Circle(s.mouseX, s.mouseY, s.mouseX / 10f);//470, 370, 50);//
         /*
         mouseX, mouseY, mouseX/10);//
         fill(0);
@@ -67,8 +65,9 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0);
 		//println();
-		for (Arc arc : Smoothing.surroundingArcsTree(ns)) {
-			arc.draw(s);
+		ArrayList<Arc> arcs = Smoothing.surroundingArcsTree(ns);
+		for (int i = 0; i < arcs.size()/* * ((float) s.mouseX / (float) s.pixelWidth)*/; i++) {
+			arcs.get(i).draw(s);
 		}
 	}
 	

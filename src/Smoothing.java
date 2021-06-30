@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import static processing.core.PApplet.*;
 
 public class Smoothing {
+	@SuppressWarnings("SuspiciousNameCombination")
 	public static Circle[] getAdjacent(Circle n1, Circle n2, float r0, boolean exterior) {
         /*
         Returns the two Circles touching both of the two given Circles.
@@ -52,21 +53,18 @@ public class Smoothing {
 	}
 	
 	public static Circle[] getExterior(Circle n1, Circle n2) {
-		// Returns two a
-		// Safe
-		Circle[] adj = getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.r,n2.r), true)[0])[1].r * 0.9), true);
-		if(adj[0].distanceToCircle(adj[1]) > adj[0].r && n1.distanceToCircle(n2) < min(n1.r, n2.r) / 2) {
-			return adj;
-		}
 		float angle = PVector.sub(n2.pv, n1.pv).heading() + 0.01f;
 		float dist = n1.distanceToCenter(n2) / 2f;
-		// Discrete
 		return getAdjacent(n1, n2,
 				triCircleAdjacent(n1, n2,
 						new Circle(n1.x + dist * cos(angle),
 								n1.y + dist * sin(angle),
-								(n1.r + n2.r) / 8)
+								(n1.r + n2.r) / 3)//8)
 				)[0].r, true);
+	}
+	
+	public static Circle[] getExteriorSafe(Circle n1, Circle n2) {
+		return getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.r,n2.r), true)[0])[1].r * 0.9), true);
 	}
 	
 	public static Circle[] getInterior(Circle n1, Circle n2) {
@@ -101,7 +99,9 @@ public class Smoothing {
 		float y4 = B0 + B1 * r4;
 		float x5 = A0 + A1 * r5;
 		float y5 = B0 + B1 * r5;
+		// println(String.format("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", Ka, Kb, D, A0, B0, A1, B1, C0, C1, C2));
 		// println(Ka + " " + Kb + " " + D + " " + A0 + " " + B0 + " " + A1 + " " + B1 + " " + C0 + " " + C1 + " " + C2);
+		// println(String.format("%s %s %s (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)", n1, n2, n3, x4, y4, r4, x5, y5, r5));
 		return new Circle[] { new Circle(x4, y4, r4), new Circle(x5, y5, r5) };
 	}
 	
@@ -128,7 +128,7 @@ public class Smoothing {
 	}
 	
 	public static ArrayList<Arc> surroundingArcsTree(ArrayList<? extends Circle> nodes, Circle next) {
-		ArrayList<Circle> n = (ArrayList<Circle>) nodes.clone();
+		ArrayList<Circle> n = new ArrayList<>(nodes);
 		n.add(next);
 		return surroundingArcsTree(n);
 	}
@@ -139,7 +139,6 @@ public class Smoothing {
 		}
 		ArrayList<Arc> arcs = new ArrayList<>();
 		ArrayList<Circle> arcCircles = new ArrayList<>();
-		// ArrayList<Integer> tri = new ArrayList<>();
 		Circle ni, nj, nc, n;
 		float[] se;
 		int choose;
@@ -160,26 +159,26 @@ public class Smoothing {
 			arcCircles.add(nc);
 			arcCircles.add(ni);
 		}
-		// TODO: Add in three-circle smoothing, maybe when smoothing circles overlap (even if no issue is caused)?
-        /*for(int i = 3; i <= arcCircles.size() - 3; i += 2) {
-          //println(PVector.angleBetween(PVector.sub(arcCircles.get(i+2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i-2).pv, arcCircles.get(i).pv)) + "\t" +
-          //(PVector.angleBetween(PVector.sub(arcCircles.get(i + 2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i - 2).pv, arcCircles.get(i).pv)) < HALF_PI * 1.25f && arcCircles.get(i + 2) != arcCircles.get(i - 2)));
-          //println("\t" + arcCircles.get(i - 2).pv + "\t" + arcCircles.get(i).pv + "\t" + arcCircles.get(i+2).pv);
-          if(PVector.angleBetween(PVector.sub(arcCircles.get(i + 2).pv, arcCircles.get(i).pv), PVector.sub(arcCircles.get(i - 2).pv, arcCircles.get(i).pv)) < HALF_PI * 1.25f && arcCircles.get(i + 2) != arcCircles.get(i - 2)) {
-            arcCircles.set(i, triCircleAdjacent(arcCircles.get(i - 2), arcCircles.get(i + 2), arcCircles.get(i))[1]);
-            arcCircles.remove(i + 1);
-            arcCircles.remove(i - 1);
-            tri.add(i - 1);
-          }
-        }*/
 		if(arcCircles.size() > 2) {
-			for(int i = 0; i < arcCircles.size(); i++) {
-				n = arcCircles.get(i);
-				ni = arcCircles.get(i == 0 ? arcCircles.size() - 2 : i - 1);
-				nj = arcCircles.get(i >= arcCircles.size() - 2 ? arcCircles.size() - i : i + 1);
-				arcs.add(new Arc(n, ni, nj, i % 2 == 0));
-				//se = order(ni.pv, n.pv, nj.pv, (i % 2 == 0));
-				//arcs.add(new Arc(n, se[0], se[1]));
+			boolean overlap = true;
+			int j = 0;
+			while(overlap) {
+				j++;
+				overlap = false;
+				for (int i = 3; i < arcCircles.size() - 3; i += 2) {
+					if (arcCircles.get(i - 1).overlaps(arcCircles.get(i + 1))) {
+						arcCircles.set(i, triCircleAdjacent(arcCircles.get(i - 2), arcCircles.get(i), arcCircles.get(i + 2))[1]);
+						arcCircles.remove(i + 1);
+						arcCircles.remove(i - 1);
+						i -= 2;
+						overlap = true;
+					}
+				}
+			}
+			println(j);
+			for(int i = 1; i < arcCircles.size() - 1; i++) {
+				se = order(arcCircles.get(i - 1).pv, arcCircles.get(i).pv, arcCircles.get(i + 1).pv, (i % 2 == 0));
+				arcs.add(new Arc(arcCircles.get(i), se[0], se[1]));
 			}
 		}
 		return arcs;
