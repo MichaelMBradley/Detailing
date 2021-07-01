@@ -1,16 +1,18 @@
 /*
 TODO: Implement smoothing for connections between delaunay arcs
 TODO: Fix smoothing for arcs connecting touching circles
+TODO: Make inside/outside clearer (maybe two adjacent perimeters coloured separately?)
 */
 
 import megamu.mesh.Delaunay;
-
-import java.util.*;
-
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
 import processing.event.MouseEvent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class Detailing extends PApplet {
 	ArrayList<Arc> traverseArcs;
@@ -23,9 +25,9 @@ public class Detailing extends PApplet {
 	PShape shape;
 	PVector offset;
 	
-	final float minimise = 5;
+	final float minimise = 4;
 	final boolean doTest = false;
-	final String commands = "acsmn";
+	final String commands = "acmn";
 	
 	HashMap<Character, String> conv;
 	HashMap<String, Boolean> draw;
@@ -97,13 +99,20 @@ public class Detailing extends PApplet {
 			float r = 255;
 			float b = 0;
 			float chn = 255.0f / (float) traverseArcs.size();
-			for (Arc a : traverseArcs) {
+			/*for (Arc a : traverseArcs) {
 				if (draw.get("gradient")) {
 					stroke(r, 0, b);
 					r -= chn;
 					b += chn;
 				}
 				a.draw(this);
+			}*/
+			stroke(255, 0, 0);
+			for(int i = traverseArcs.size() - 1; i >= 0; i--) {
+				if(i <= traverseArcs.size() / 2) {
+					stroke(0, 0, 0);
+				}
+				traverseArcs.get(i).draw(this);
 			}
 		}
 		if (draw.get("iterate")) {
@@ -250,8 +259,8 @@ public class Detailing extends PApplet {
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
-			//traverse = TreeSelection.traverseTreesSkip(circles, vertices, true);
-			traverseArcs = Smoothing.surroundingArcsTree(traverse);
+			//traverse = TreeSelection.traverseTreesSkip(nodes, vertices, true);
+			traverseArcs = Smoothing.fixedSurroundingArcs(traverse, exterior);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 			println("\n");
 		} else {

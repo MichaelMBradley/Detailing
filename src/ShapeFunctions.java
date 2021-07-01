@@ -30,6 +30,10 @@ public class ShapeFunctions {
 		}
 	}
 	
+	public static Arc connectArcs(Arc a1, Arc a2) {
+		return arcLine(new PVector(a1.x + a1.r * cos(a1.end), a1.y + a1.r * sin(a1.end)), new PVector(a2.x + a2.r * cos(a2.start), a2.y + a2.r * sin(a2.start)));
+	}
+	
 	public static boolean circleNearLine(float cutoff, Node c, ArrayList<PVector> vertices) {
         /*
         Returns if a given node is suitably close (cutoff) to any

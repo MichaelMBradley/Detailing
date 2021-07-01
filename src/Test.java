@@ -33,7 +33,7 @@ public class Test {
 		Circle n6 = new Circle(300, 480, 30);
 		Circle n7 = new Circle(400, 300, 50);
 		Circle n8 = new Circle(470, 230, 50);
-		Circle n9 = new Circle(s.mouseX, s.mouseY, s.mouseX / 10f);//470, 370, 50);//
+		Circle n9 = new Circle(470, 370, 50);//s.mouseX, s.mouseY, s.mouseX / 10f);//
         /*
         mouseX, mouseY, mouseX/10);//
         fill(0);
@@ -65,8 +65,8 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0);
 		//println();
-		ArrayList<Arc> arcs = Smoothing.surroundingArcsTree(ns);
-		for (int i = 0; i < arcs.size()/* * ((float) s.mouseX / (float) s.pixelWidth)*/; i++) {
+		ArrayList<Arc> arcs = Smoothing.fixedSurroundingArcsTree(ns, true);
+		for (int i = 0; i < arcs.size() * ((float) s.mouseX / (float) s.pixelWidth); i++) {
 			arcs.get(i).draw(s);
 		}
 	}
@@ -89,9 +89,9 @@ public class Test {
 			}
 		}*/
 		Circle first = Smoothing.getExterior(n1, n2)[0];
-		Circle second = Smoothing.getExterior(n2, n1)[1];
+		Circle second = Smoothing.getExterior(n2, n1)[0];
 		Circle first2 = Smoothing.getExterior(n2, n3)[0];
-		Circle second2 = Smoothing.getExterior(n3, n2)[1];
+		Circle second2 = Smoothing.getExterior(n3, n2)[0];
 		first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
 		// a1 -> aFirst -> a2 -> aFirst2 -> a3 -> aSecond2 -> a2 -> aSecond -> a1
 		Arc a1 = new Arc(n1, second, first, false);
