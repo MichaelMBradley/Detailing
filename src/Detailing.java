@@ -1,7 +1,6 @@
 /*
 TODO: Implement smoothing for connections between delaunay arcs
 TODO: Fix smoothing for arcs connecting touching circles
-TODO: Make inside/outside clearer (maybe two adjacent perimeters coloured separately?)
 */
 
 import megamu.mesh.Delaunay;

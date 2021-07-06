@@ -11,7 +11,7 @@ import static processing.core.PConstants.TWO_PI;
 
 public class Test {
 	public static void runTest(PApplet s) {
-		test1(s);
+		test13(s);
 	}
 	
 	public static void test1(PApplet s) {
@@ -345,5 +345,19 @@ public class Test {
 		s.strokeWeight(1);
 		new Arc(new Circle(new PVector(w / 2f, h / 2f), 50), c1, c2, false).draw(s);
 		new Arc(new Circle(new PVector(w / 2f, h / 2f), 40), c2, c1, true).draw(s);
+	}
+	
+	public static void test13(PApplet s) {
+		// Testing Arc collision
+		Arc a1 = new Arc(new PVector((float) s.pixelWidth / 2 - 25, (float) s.pixelHeight / 2), 50,
+				(float) s.mouseX / s.pixelWidth * TWO_PI * 2,
+				(float) s.mouseX / s.pixelWidth * TWO_PI * 2 + HALF_PI);
+		Arc a2 = new Arc(new PVector((float) s.pixelWidth / 2 + 25, (float) s.pixelHeight / 2), 50,
+				(float) s.mouseY / s.pixelHeight * TWO_PI * 2,
+				(float) s.mouseY / s.pixelHeight * TWO_PI * 2 + HALF_PI);
+		s.strokeWeight(1f);
+		s.stroke(a1.overlaps(a2) ? 255: 0, 0, 0);
+		a1.draw(s);
+		a2.draw(s);
 	}
 }
