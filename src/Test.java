@@ -11,7 +11,7 @@ import static processing.core.PConstants.TWO_PI;
 
 public class Test {
 	public static void runTest(PApplet s) {
-		test13(s);
+		test14(s);
 	}
 	
 	public static void test1(PApplet s) {
@@ -359,5 +359,11 @@ public class Test {
 		s.stroke(a1.overlaps(a2) ? 255: 0, 0, 0);
 		a1.draw(s);
 		a2.draw(s);
+	}
+	
+	public static void test14(PApplet s) {
+		PVector p1 = new PVector(200, 200);
+		PVector p2 = new PVector(700, 700);
+		new Clothoid(-16 * PI* (float) s.mouseX / s.pixelWidth, 16 * PI* (float) s.mouseY / s.pixelHeight, p1, p2).draw(s);
 	}
 }

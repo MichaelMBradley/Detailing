@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Detailing extends PApplet {
-	ArrayList<Arc> traverseArcs;
+	ArrayList<Curve> traverseArcs;
 	ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 	ArrayList<PVector> vertices;
 	ArrayList<Node> traverse;
@@ -25,7 +25,7 @@ public class Detailing extends PApplet {
 	PVector offset;
 	
 	final float minimise = 4;
-	final boolean doTest = false;
+	final boolean doTest = true;
 	final String commands = "acmn";
 	
 	HashMap<Character, String> conv;

@@ -1,17 +1,11 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.awt.geom.Line2D;
-
-import static processing.core.PApplet.*;
-import static processing.core.PConstants.HALF_PI;
 import static processing.core.PConstants.TWO_PI;
 
-// I want to see if using a specialised class can help clean up the code
-public class Arc extends Circle {
-	public float start, end, drawStart, drawEnd;
-	boolean bezier = false, circle = false;
-	float[] bezierInfo;
+public class Arc extends Circle implements Curve {
+	float start, end, drawStart, drawEnd;
+	boolean circle = false;
 	
 	public Arc() {
 		super();
@@ -35,29 +29,6 @@ public class Arc extends Circle {
 	public Arc(PVector start, PVector end, PVector through) {
 		// Creates an Arc from "start" to "end" intersecting "through"
 		this(ShapeFunctions.triangleToCircle(start, end, through), new Circle(start), new Circle(end), false);
-	}
-	public Arc(Arc from, Arc to) {
-		// Bezier connect
-		this();
-		float angle, m = 2f, r = min(from.r, to.r);
-		boolean invalid = true;
-		bezierInfo = new float[8];
-		bezierInfo[0] = from.x + from.r * cos(from.end);
-		bezierInfo[1] = from.y + from.r * sin(from.end);
-		bezierInfo[6] = to.x + to.r * cos(to.start);
-		bezierInfo[7] = to.y + to.r * sin(to.start);
-		while(invalid && m > 0.01f) {
-			angle = (from.start == from.drawStart) ? HALF_PI : -HALF_PI;
-			bezierInfo[2] = bezierInfo[0] + m * r * cos(from.end + angle);
-			bezierInfo[3] = bezierInfo[1] + m * r * sin(from.end + angle);
-			angle = (to.end == to.drawEnd) ? -HALF_PI : HALF_PI;
-			bezierInfo[4] = bezierInfo[6] + m * r * cos(to.start + angle);
-			bezierInfo[5] = bezierInfo[7] + m * r * sin(to.start + angle);
-			invalid = Line2D.linesIntersect(bezierInfo[0], bezierInfo[1], bezierInfo[2], bezierInfo[3],
-					bezierInfo[4], bezierInfo[5], bezierInfo[6], bezierInfo[7]);
-			m /= 2;
-		}
-		bezier = true;
 	}
 	public Arc(Circle base, Circle prev, Circle next, boolean clockwise) {
 		super(base.pv, base.r);
@@ -106,16 +77,12 @@ public class Arc extends Circle {
 		arc.end = end;
 		arc.drawStart = drawStart;
 		arc.drawEnd = drawEnd;
-		arc.bezier = bezier;
 		arc.circle = circle;
-		arc.bezierInfo = bezierInfo.clone();
 		return arc;
 	}
 	@Override
 	public void draw(PApplet sketch) {
-		if(bezier) {
-			sketch.bezier(bezierInfo[0], bezierInfo[1], bezierInfo[2], bezierInfo[3], bezierInfo[4], bezierInfo[5], bezierInfo[6], bezierInfo[7]);
-		} else if (r >= 0) {
+		if (r >= 0) {
 			sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
 			if (circle) {
 				sketch.circle(x, y, r * 2);
