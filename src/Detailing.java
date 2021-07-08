@@ -21,6 +21,7 @@ public class Detailing extends PApplet {
 	HashSet<Node> nodes, interior, exterior;
 	int w, h, p, q, maxIter = 0;
 	float zoom = 2f;
+	Test test;
 	PShape shape;
 	PVector offset;
 	
@@ -39,6 +40,7 @@ public class Detailing extends PApplet {
 		noFill();
 		surface.setTitle("Detailing");
 		initializeKeys();
+		test = new Test(this);
 		w = pixelWidth;
 		h = pixelHeight;
 		p = 0;
@@ -61,7 +63,7 @@ public class Detailing extends PApplet {
 		background(255);
 		gridZoom();
 		if (doTest) {
-			Test.runTest(this);
+			test.run();
 		}
 		if (draw.get("numCircles")) {
 			fill(0);
@@ -273,33 +275,40 @@ public class Detailing extends PApplet {
 	
 	// Input
 	public void keyPressed() {
-		String cmd;
-		if (key == 'h') {
-			StringBuilder out = new StringBuilder("Draw:\n");
-			for (char c : conv.keySet()) {
-				out.append(c).append(": ").append(conv.get(c)).append("\n");
-			}
-			print(out.toString());
-		} else if (conv.containsKey(key)) {
-			cmd = conv.get(key);
-			draw.replace(cmd, !draw.get(cmd));
-			println(cmd + ": " + draw.get(cmd));
-			loop();
-		} else if (draw.get("iterate")) {
-			p = p + 1 >= maxIter ? 0 : p + 1;
-			q = q + 1 >= maxIter ? 0 : q + 1;
+		if(doTest) {
+			test.keyPressed(key);
 		} else {
-			mouseClicked();
+			String cmd;
+			if (key == 'h') {
+				StringBuilder out = new StringBuilder("Draw:\n");
+				for (char c : conv.keySet()) {
+					out.append(c).append(": ").append(conv.get(c)).append("\n");
+				}
+				print(out.toString());
+			} else if (conv.containsKey(key)) {
+				cmd = conv.get(key);
+				draw.replace(cmd, !draw.get(cmd));
+				println(cmd + ": " + draw.get(cmd));
+				loop();
+			} else if (draw.get("iterate")) {
+				p = p + 1 >= maxIter ? 0 : p + 1;
+				q = q + 1 >= maxIter ? 0 : q + 1;
+			} else {
+				mouseClicked();
+			}
 		}
-		
 	}
 	
 	public void mouseClicked() {
-		calc();
-		loop();
-		p = 0;
-		q = 1;
-		//altTreeCreate(circles, vertices);
+		if(doTest) {
+			test.mouseClicked(mouseButton);
+		} else {
+			calc();
+			loop();
+			p = 0;
+			q = 1;
+			//altTreeCreate(circles, vertices);
+		}
 	}
 	
 	public void mouseMoved() {
@@ -310,6 +319,9 @@ public class Detailing extends PApplet {
 	
 	public void mouseWheel(MouseEvent event) {
 		zoom *= pow(0.9f, event.getCount());
+		if (doTest) {
+			test.mouseWheel(event.getCount());
+		}
 	}
 	
 	public void initializeKeys() {

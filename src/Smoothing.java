@@ -159,8 +159,8 @@ public class Smoothing {
 			}
 		}
 		for(int i = 0; i < arcs.size(); i++) {
-			if(arcs.get(i).r == 0f) {
-				if(arcs.get(i == arcs.size() - 1 ? 0 : i + 1).r == 0f) {
+			if (arcs.get(i).isEmpty()) {
+				if (arcs.get(i == arcs.size() - 1 ? 0 : i + 1).isEmpty()) {
 					arcs.remove(i);
 					arcInside.remove(i);
 					i--;
@@ -175,7 +175,7 @@ public class Smoothing {
 					}
 					
 				}
-			}
+				}
 		}
 		arcs.addAll(arcInside);
 		return arcs;
@@ -236,14 +236,14 @@ public class Smoothing {
 		for(int i = 1; i < ev.size() - 1; i++) {
 			arcs.add(new Arc(ev.get(i), ev.get(i - 1), ev.get(i + 1), clockwise == (i % 2 == 0)));
 		}
-		for(int i = 1; i < arcs.size() - 1; i += 2) {
+		/*for(int i = 1; i < arcs.size() - 1; i += 2) {
 			for(int j = i + 2; j < arcs.size() - 1; j += 2) {
 				if(arcs.get(i).overlaps(arcs.get(j))) {
 					rel = arcs.get(i).range() > arcs.get(j).range() ? i : j;
 					arcs.set(rel, new Arc(arcs.get(rel - 1), arcs.get(rel + 1)));
 				}
 			}
-		}
+		}*/
 		return arcs;
 	}
 	

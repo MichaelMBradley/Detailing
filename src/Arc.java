@@ -1,11 +1,14 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import static processing.core.PApplet.cos;
+import static processing.core.PApplet.sin;
+import static processing.core.PConstants.HALF_PI;
 import static processing.core.PConstants.TWO_PI;
 
 public class Arc extends Circle implements Curve {
 	float start, end, drawStart, drawEnd;
-	boolean circle = false;
+	boolean connect, circle = false;
 	
 	public Arc() {
 		super();
@@ -64,6 +67,31 @@ public class Arc extends Circle implements Curve {
 	}
 	public float range() {
 		return drawEnd - drawStart;
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return r == 0f || range() == 0f;
+	}
+	@Override
+	public boolean isConnecting() {
+		return connect;
+	}
+	@Override
+	public float getStartAngle() {
+		return start == drawStart ? start + HALF_PI : start - HALF_PI;
+	}
+	@Override
+	public float getEndAngle() {
+		return start == drawStart ? end + HALF_PI : end - HALF_PI;
+	}
+	@Override
+	public PVector getStartPVector() {
+		return new PVector(x + cos(start) * r, y + sin(start) * r);
+	}
+	@Override
+	public PVector getEndPVector() {
+		return new PVector(x + cos(end) * r, y + sin(end) * r);
 	}
 	
 	@Override
