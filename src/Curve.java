@@ -8,6 +8,7 @@ public interface Curve {
 	float getEndAngle();
 	PVector getStartPVector();
 	PVector getEndPVector();
+	float getSize();
 	
 	void draw(PApplet sketch);
 }

@@ -1,8 +1,3 @@
-/*
-TODO: Implement smoothing for connections between delaunay arcs
-TODO: Fix smoothing for arcs connecting touching circles
-*/
-
 import megamu.mesh.Delaunay;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -14,28 +9,29 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Detailing extends PApplet {
-	ArrayList<Curve> traverseArcs;
-	ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
-	ArrayList<PVector> vertices;
-	ArrayList<Node> traverse;
-	HashSet<Node> nodes, interior, exterior;
-	int w, h, p, q, maxIter = 0;
-	float zoom = 2f;
-	Test test;
-	PShape shape;
-	PVector offset;
+	private ArrayList<Curve> traverseArcs;
+	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
+	private ArrayList<PVector> vertices;
+	private ArrayList<Node> traverse;
+	private HashSet<Node> nodes, interior, exterior;
+	private int w, h, p, q, maxIter = 0;
+	private float zoom = 2f;
+	private Test test;
+	private PShape shape;
+	private PVector offset;
 	
-	final float minimise = 4;
-	final boolean doTest = true;
-	final String commands = "acmn";
+	private final boolean doTest = false;
+	private final String commands = "acmn";
+	private final float minimise = 4;
 	
-	HashMap<Character, String> conv;
-	HashMap<String, Boolean> draw;
+	private HashMap<Character, String> conv;
+	private HashMap<String, Boolean> draw;
 	
+	@Override
 	public void settings() {
 		size(900, 900);
 	}
-	
+	@Override
 	public void setup() {
 		noFill();
 		surface.setTitle("Detailing");
@@ -57,8 +53,14 @@ public class Detailing extends PApplet {
 		shape = ShapeFunctions.toShape(vertices, this);
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
 		calc();
+		StringBuilder init = new StringBuilder();
+		for(char c : commands.toCharArray()) {
+			init.append(conv.get(c)).append(", ");
+		}
+		println(String.format("\nComplexity: %.1f\nInitial settings (press 'h' for full list):\n%s\n", minimise, init));
 	}
 	
+	@Override
 	public void draw() {
 		background(255);
 		gridZoom();
@@ -124,7 +126,6 @@ public class Detailing extends PApplet {
 			traverseArcs.get(p).draw(this);
 		}
 	}
-	
 	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
         /*
         Nodes may be stored in multiple discrete sets.
@@ -168,7 +169,6 @@ public class Detailing extends PApplet {
 			}
 		}
 	}
-	
 	public void gridZoom() {
 		/*
 		Manages drawing the debug grid and the zoom/pan.
@@ -231,7 +231,6 @@ public class Detailing extends PApplet {
 		println(String.format("\tKruskal: %.3f", (float) (millis() - start) / 1000));
 		return circumcircles;
 	}
-	
 	public void calc() {
         /*
         Completes all relevant calculations.
@@ -263,7 +262,6 @@ public class Detailing extends PApplet {
 			//traverse = TreeSelection.traverseTreesSkip(nodes, vertices, true);
 			traverseArcs = Smoothing.fixedSurroundingArcs(traverse, exterior);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
-			println("\n");
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
@@ -274,6 +272,7 @@ public class Detailing extends PApplet {
 	}
 	
 	// Input
+	@Override
 	public void keyPressed() {
 		if(doTest) {
 			test.keyPressed(key);
@@ -298,7 +297,7 @@ public class Detailing extends PApplet {
 			}
 		}
 	}
-	
+	@Override
 	public void mouseClicked() {
 		if(doTest) {
 			test.mouseClicked(mouseButton);
@@ -310,13 +309,13 @@ public class Detailing extends PApplet {
 			//altTreeCreate(circles, vertices);
 		}
 	}
-	
+	@Override
 	public void mouseMoved() {
 		//traverse = traverseKruskalTrees2(circles, vertices, false);
 		//traverseArcs = delaunayTraversalToArcs(traverse);
 		//loop();
 	}
-	
+	@Override
 	public void mouseWheel(MouseEvent event) {
 		zoom *= pow(0.9f, event.getCount());
 		if (doTest) {
@@ -352,7 +351,6 @@ public class Detailing extends PApplet {
 			draw.put((String) arr[1], !doTest && (commands.indexOf((char) arr[0]) != -1));
 		}
 	}
-	
 	public static void main(String[] args) {
 		PApplet.runSketch(new String[] {"Detailing"}, new Detailing());
 	}

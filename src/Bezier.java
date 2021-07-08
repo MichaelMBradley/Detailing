@@ -22,7 +22,7 @@ public class Bezier implements Curve {
 	public Bezier(Curve from, Curve to) {
 		// Bezier connect
 		this();
-		float angle, m = 2f, r = min(from.getStartPVector().dist(from.getEndPVector()), to.getStartPVector().dist(to.getEndPVector())) / 2;
+		float angle, m = 2f, r = min(from.getSize(), to.getSize());
 		boolean invalid = true;
 		info = new float[8];
 		info[0] = from.getEndPVector().x;
@@ -66,6 +66,10 @@ public class Bezier implements Curve {
 	@Override
 	public PVector getEndPVector() {
 		return new PVector(info[6], info[7]);
+	}
+	@Override
+	public float getSize() {
+		return new PVector(info[0], info[1]).dist(new PVector(info[6], info[7]));
 	}
 	
 	public void draw(PApplet sketch) {

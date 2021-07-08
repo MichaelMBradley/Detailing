@@ -7,9 +7,17 @@ import static processing.core.PApplet.*;
 
 public class Clothoid implements Curve {
 	// Code from Joe (https://math.stackexchange.com/users/221133/joe), Get points in the plane of an Euler spiral given by curvature, URL (version: 2019-04-22): https://math.stackexchange.com/q/3196882
-	ArrayList<PVector> points;
-	float start, end;
+	public ArrayList<PVector> points;
+	public float start, end;
+	public PVector first, last;
 	
+	public Clothoid() {
+		points = new ArrayList<>();
+		start = Float.NaN;
+		end = Float.NaN;
+		first = new PVector();
+		last = new PVector();
+	}
 	public Clothoid(Curve c1, Curve c2) {
 		this(c1.getEndAngle(), c2.getStartAngle(), c1.getEndPVector(), c2.getStartPVector());
 	}
@@ -20,6 +28,8 @@ public class Clothoid implements Curve {
 		}
 		start = k1;
 		end = k2;
+		first = points.get(0);
+		last = points.get(points.size() - 1);
 	}
 	
 	public PVector quadrature(float t, float k1, float k2) {
@@ -55,7 +65,7 @@ public class Clothoid implements Curve {
 	
 	@Override
 	public boolean isEmpty() {
-		return start == end || points.get(0).equals(points.get(points.size() - 1));
+		return start == end || first.equals(last);
 	}
 	@Override
 	public boolean isConnecting() {
@@ -71,12 +81,17 @@ public class Clothoid implements Curve {
 	}
 	@Override
 	public PVector getStartPVector() {
-		return points.get(0);
+		return first;
 	}
 	@Override
 	public PVector getEndPVector() {
-		return points.get(points.size() - 1);
+		return last;
 	}
+	@Override
+	public float getSize() {
+		return first.dist(last);
+	}
+	
 	@Override
 	public void draw(PApplet sketch) {
 		for(int i = 0; i < points.size() - 1; i++) {

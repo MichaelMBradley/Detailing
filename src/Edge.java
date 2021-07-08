@@ -15,13 +15,20 @@ public class Edge implements Comparable<Edge> {
 	public int compareTo(Edge edge) {
 		return Float.compare(len, edge.len);
 	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Edge) {
 			Edge edge = (Edge) obj;
-			return (n1.pv.equals(edge.n1.pv) && n2.pv.equals(edge.n2.pv)) || (n1.pv.equals(edge.n2.pv) && n2.pv.equals(edge.n1.pv));
+			return (n1.pv.equals(edge.n1.pv) && n2.pv.equals(edge.n2.pv)) ||
+					(n1.pv.equals(edge.n2.pv) && n2.pv.equals(edge.n1.pv));
 		}
 		return false;
+	}
+	@Override
+	public int hashCode() {
+		int hash = 13;
+		hash = 37 * hash + n1.hashCode();
+		hash = 37 * hash * n2.hashCode();
+		return hash;
 	}
 }

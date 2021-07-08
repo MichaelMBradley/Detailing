@@ -9,15 +9,16 @@ import java.util.Arrays;
 import static processing.core.PApplet.*;
 
 public class Test {
-	float mouseX, mouseY, width, height, percentX, percentY;
-	boolean clicked, pressed, scrolled;
-	char key;
-	int mouseButton, mouseCount, iter;
-	PApplet s;
+	private float mouseX, mouseY, width, height, percentX, percentY;
+	private boolean clicked, pressed, scrolled;
+	private char key;
+	private int mouseButton, mouseCount, iter, iterNext;
+	private final PApplet s;
 	
 	public Test(PApplet sketch) {
 		s = sketch;
 		iter = 0;
+		iterNext = 1;
 		mouseCount = 0;
 		update();
 	}
@@ -33,12 +34,17 @@ public class Test {
 		height = (float) s.pixelHeight;
 		percentX = mouseX / width;
 		percentY = mouseY / width;
-		key = Character.UNASSIGNED;
-		mouseButton = -1;
+		key = s.key;
+		mouseButton = s.mouseButton;
 		pressed = false;
 		clicked = false;
 		scrolled = false;
 	}
+	private void iterate(int max) {
+		iter = iter == max - 1 ? 0 : iter + 1;
+		iterNext = iter == max - 1 ? 0 : iter + 1;
+	}
+	
 	public void keyPressed(char keyDown) {
 		key = keyDown;
 		pressed = true;
@@ -327,7 +333,7 @@ public class Test {
 		ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
 		nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
 		for(int i = 0; i < max; i++) {
-			nodes.add((ArrayList<Node>) nodes.get(nodes.size()-1).clone());
+			nodes.add(new ArrayList<>(nodes.get(nodes.size()-1)));
 			CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
 			s.strokeWeight(1);//2 * (max - i));
 			s.stroke(s.random(255), s.random(255), s.random(255));

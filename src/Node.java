@@ -14,28 +14,24 @@ public class Node extends Circle {
 		super(xPos, yPos, rad);
 		init();
 	}
-
 	public Node(PVector PVec, float rad) {
 		super(PVec, rad);
 		init();
 	}
-
 	public Node(PVector PVec) {
 		super(PVec);
 		init();
 	}
-
 	public Node() {
 		super();
 		init();
 	}
-
+	
 	public void init() {
 		kruskal = new HashSet<>();
 		kruskalAdjacent = new HashSet<>();
 		resetGraph();
 	}
-
 	public void resetGraph() {
 		/*
 		Attempts to simply update the existing graph fail,
@@ -47,8 +43,7 @@ public class Node extends Circle {
 		graph = new HashSet<>();
 		graph.add(this);
 	}
-
-
+	
 	public void findTouching(HashSet<Node> nodes) {
 		for (Node n : nodes) {
 			if (this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors
@@ -56,7 +51,6 @@ public class Node extends Circle {
 			}
 		}
 	}
-
 	public void graphing(Node n) {
 		/*
 		Tells every node it's touching to recursively run this code,
@@ -70,11 +64,10 @@ public class Node extends Circle {
 			}
 		}
 	}
-
+	
 	public void addKruskal(Node n) {
 		addKruskal(n, -1);
 	}
-
 	public void addKruskal(Node n, int restrictSize) {
 		/*
 		If the spanning tree that this node is a part of doesn't
@@ -91,7 +84,6 @@ public class Node extends Circle {
 			n.makeAddKruskal(this);
 		}
 	}
-
 	private void makeAddKruskal(Node n) {
 		/*
 		The maximum size limit of a tree in the above code can cause an issue
@@ -106,11 +98,10 @@ public class Node extends Circle {
 		kruskalAdjacent.add(n);
 	}
 
-	ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents) {
+	public ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents) {
 		return kruskalTreeTraverse(call, clockwise, includeParents, null);
 	}
-
-	ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents, Node exit) {
+	public ArrayList<Node> kruskalTreeTraverse(Node call, boolean clockwise, boolean includeParents, Node exit) {
 		/*
 		Recursive function that returns a list of all nodes below it
 		in it's kruskal (ish) tree, in cw or ccw order.
@@ -142,7 +133,6 @@ public class Node extends Circle {
 		}
 		return below;
 	}
-
 	private ArrayList<Node> sortRelativeHeadings(ArrayList<Node> children, Node call, boolean clockwise) {
 		/*
 		Returns a mapping of children->heading, offset such that the parent

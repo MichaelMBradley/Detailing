@@ -7,14 +7,22 @@ import static processing.core.PConstants.HALF_PI;
 import static processing.core.PConstants.TWO_PI;
 
 public class Arc extends Circle implements Curve {
-	float start, end, drawStart, drawEnd;
-	boolean connect, circle = false;
+	public float start, end, drawStart, drawEnd;
+	public boolean connect;
 	
 	public Arc() {
 		super();
 		start = 0f;
 		start = 0f;
 		setDraw(false, false);
+	}
+	public Arc(Arc a) {
+		super(a.x, a.y, a.r);
+		start = a.start;
+		end = a.end;
+		drawStart = a.drawStart;
+		drawEnd = a.drawEnd;
+		connect = a.connect;
 	}
 	public Arc(Circle c, float s, float e) {
 		super(c.pv, c.r);
@@ -93,29 +101,17 @@ public class Arc extends Circle implements Curve {
 	public PVector getEndPVector() {
 		return new PVector(x + cos(end) * r, y + sin(end) * r);
 	}
+	@Override
+	public float getSize() {
+		return r;
+	}
 	
 	@Override
-	public Object clone() {
-		Arc arc = new Arc();
-		arc.pv = pv;
-		arc.x = x;
-		arc.y = y;
-		arc.r = r;
-		arc.start = start;
-		arc.end = end;
-		arc.drawStart = drawStart;
-		arc.drawEnd = drawEnd;
-		arc.circle = circle;
-		return arc;
-	}
-	@Override
 	public void draw(PApplet sketch) {
-		if (r >= 0) {
-			sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
-			if (circle) {
-				sketch.circle(x, y, r * 2);
-			}
-		}
+		sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
+	}
+	public void drawCircle(PApplet sketch) {
+		sketch.circle(x, y, r * 2);
 	}
 	public boolean overlaps(Arc a) {
 		Circle[] circles = Smoothing.getAdjacent(this, a, 0f, true);

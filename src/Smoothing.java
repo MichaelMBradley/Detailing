@@ -169,7 +169,7 @@ public class Smoothing {
 					arcs.set(i, new Bezier(arcs.get(i == 0 ? arcs.size() - 1 : i - 1), arcs.get(i == arcs.size() - 1 ? 0 : i + 1)));
 					//println(arcs.get(i) + "\t" + arcs.get(i == 0 ? arcs.size() - 1 : i - 1) + "\t" + arcs.get(i == arcs.size() - 1 ? 0 : i + 1));
 					if(arcs.get(i) instanceof Arc) {
-						newArc = (Arc) ((Arc) arcs.get(i)).clone();
+						newArc = new Arc((Arc) arcs.get(i));
 						newArc.r -= 0.5f;
 						arcInside.set(i, newArc);
 					}
