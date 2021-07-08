@@ -24,7 +24,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test15();
+		test14();
 		update();
 	}
 	public void update() {
@@ -98,7 +98,7 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0);
 		ArrayList<Arc> arcs = Smoothing.fixedSurroundingArcsTree(ns, true);
-		for (int i = 0; i < arcs.size() * ((float) s.mouseX / (float) s.pixelWidth); i++) {
+		for (int i = 0; i < arcs.size() * percentX; i++) {
 			arcs.get(i).draw(s);
 		}
 	}
@@ -106,9 +106,9 @@ public class Test {
 		/*
 		Attempts to create a safe (non-overlapping) intermediate circle.
 		*/
-		Circle n1 = new Circle(s.pixelWidth / 2f, s.pixelHeight / 2f, 50);
-		Circle n2 = new Circle(s.mouseX, s.mouseY, n1.r);
-		Circle n3 = new Circle(n2.x + cos(TWO_PI * ((float) s.mouseX / s.pixelWidth)) * (n2.r * 2), n2.y + sin(TWO_PI * ((float) s.mouseX / s.pixelWidth)) * (n2.r * 2), n2.r);
+		Circle n1 = new Circle(width / 2, height / 2, 50);
+		Circle n2 = new Circle(mouseX, mouseY, n1.r);
+		Circle n3 = new Circle(n2.x + cos(TWO_PI * mouseX / width) * (n2.r * 2), n2.y + sin(TWO_PI * mouseX / width) * (n2.r * 2), n2.r);
 		s.strokeWeight(1);s.stroke(127);
 		n1.draw(s);n2.draw(s);n3.draw(s);
 		/*for (Circle n : Smoothing.getExterior(n1, n2)) {
@@ -148,11 +148,11 @@ public class Test {
 		s.strokeWeight(5);
 		s.stroke(255, 0, 0);
 		s.point(100, 100);
-		s.point(s.mouseX, s.mouseY);
+		s.point(mouseX, mouseY);
 		s.strokeWeight(1);
 		s.stroke(0);
 		s.randomSeed(0L);
-		ShapeFunctions.arcLine(new PVector(100, 100), new PVector(s.mouseX, s.mouseY)).draw(s);
+		ShapeFunctions.arcLine(new PVector(100, 100), new PVector(mouseX, mouseY)).draw(s);
 	}
 	public void test4() {
 		/*
@@ -162,15 +162,15 @@ public class Test {
 		s.stroke(0);
 		/*
 		Circle n1 = new Circle(w / 2, h / 2, (w + h) / 4);//new Circle(mouseY, mouseX, (w + h) / 4);//
-		loadPixels();
+		s.loadPixels();
 		float r0, ml, bl, aq, bq, cq;
-		float r1 = (w + h) / 4;
-		float r2 = (w + h) / 4;
-		float x1 = w / 2;
-		float y1 = h / 2;
+		float r1 = (width + height) / 4;
+		float r2 = (width + height) / 4;
+		float x1 = width / 2;
+		float y1 = height / 2;
 		float t;
-		for(int x = 0; x < w; x++) {
-		  for(int y = 0; y < h; y++) {
+		for(int x = 0; x < width; x++) {
+		  for(int y = 0; y < height; y++) {
 			r0 = r1 + r2 - dist(x1, y1, x, y);;
 			if(abs(y1 - y) > 1) {
 			  ml = - (x - x1) / (y - y1);
@@ -186,15 +186,15 @@ public class Test {
 			  cq = pow(y1, 2) + pow(bl - x1, 2) - pow(r1 - r0, 2);
 			}
 			t = pow(bq, 2) - 4 * aq * cq;
-			pixels[x * w + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Circle(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
+			s.pixels[x * width + y] = color(constrain((log(abs(t)) * t / abs(t)) * 150 + 127, 0, 255));//getInterior(n1, new Circle(x, y, (w + h) / 4))[0].x == 0f ? color(0) : color(255);
 			//println(getInterior(n1, new Circle(x, y, 100))[0].x);
 			//println((log(abs(t)) * t / abs(t)) * 5 + 127);
 		  }
 		}
-		updatePixels();
+		s.updatePixels();
 		*/
 		Circle n1 = new Circle(400, 400, 100);
-		Circle n2 = new Circle(s.mouseX, s.mouseY, 100);
+		Circle n2 = new Circle(mouseX, mouseY, 100);
 		n1.draw(s);
 		n2.draw(s);
 		for (Circle n : Smoothing.getInterior(n1, n2)) {
@@ -206,11 +206,9 @@ public class Test {
 		/*
 		Tests out the Arc class.
 		*/
-		int w = s.pixelWidth;
-		int h = s.pixelHeight;
-		float t_s = (s.mouseX - w / 2f) / 20f;
-		float arc = (float) (s.mouseY * 1.25 * TWO_PI / h);
-		new Arc(new PVector(w / 2f, h / 2f), 50, t_s, t_s + arc).draw(s);
+		float t_s = (mouseX - width / 2) / 20;
+		float arc = mouseY * 1.25f * TWO_PI / height;
+		new Arc(new PVector(width / 2, height / 2), 50, t_s, t_s + arc).draw(s);
 		s.fill(0);
 		s.text(String.format("Start: %.2f\nLength: %.2f\nEnd: %.2f\n", t_s, arc, t_s + arc), s.mouseX, s.mouseY);
 		s.noFill();
@@ -221,9 +219,9 @@ public class Test {
 		*/
 		Circle n1 = new Circle(400, 400, 50);
 		Circle n2 = new Circle(400, 500, 50);
-		float r = s.mouseX / 20f;
-		Circle n3 = new Circle(n2.x + (r + n2.r) * cos(s.mouseX / 100f), n2.y + (r + n2.r) * sin(s.mouseX / 100f), r);
-		Circle n4 = new Circle(n2.x + (r + n2.r) * cos(s.mouseY / 100f), n2.y + (r + n2.r) * sin(s.mouseY / 100f), r);
+		float r = mouseX / 20;
+		Circle n3 = new Circle(n2.x + (r + n2.r) * cos(mouseX / 100), n2.y + (r + n2.r) * sin(mouseX / 100), r);
+		Circle n4 = new Circle(n2.x + (r + n2.r) * cos(mouseY / 100), n2.y + (r + n2.r) * sin(mouseY / 100), r);
 		n1.draw(s);
 		n2.draw(s);
 		n3.draw(s);
@@ -242,10 +240,8 @@ public class Test {
 		/*
 		Mixing safe connections with good looking ones.
 		*/
-		int w = s.pixelWidth;
-		int h = s.pixelHeight;
-		Circle n1 = new Circle(w / 2f, h / 2f, 50);
-		Circle n2 = new Circle(s.mouseX, s.mouseY, 25);
+		Circle n1 = new Circle(width / 2, height / 2, 50);
+		Circle n2 = new Circle(mouseX, mouseY, 25);
 		n1.draw(s);
 		n2.draw(s);
 		Circle[] ext = Smoothing.getExterior(n1, n2);
@@ -253,19 +249,19 @@ public class Test {
 			n.draw(s);
 		}
 		s.fill(0);
-		s.text("" + ext[0].overlaps(ext[1]), s.mouseX, s.mouseY);
+		s.text("" + ext[0].overlaps(ext[1]), mouseX, mouseY);
 		s.noFill();
 		/*
 		color f;
 		s.loadPixels();
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				if (smoothing.getExterior(n1, new Circle(x, y, 100f * s.mouseX / w))[0].x > Float.MIN_VALUE) {
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (smoothing.getExterior(n1, new Circle(x, y, 100 * mouseX / width))[0].x > Float.MIN_VALUE) {
 					f = color(0, 255, 0);
 				} else {
 					f = color(255, 0, 0);
 				}
-				s.pixels[x * w + y] = f;
+				s.pixels[x * width + y] = f;
 			}
 		}
 		s.updatePixels();
@@ -273,7 +269,7 @@ public class Test {
 	}
 	public void test8() {
 		PVector p1 = new PVector(0, 1), p2 = new PVector(1, 2);
-		float j;
+		float j = 0f;
 		float num = 1e9f;
 		int t = s.millis();
 		for (int i = 0; i < num; i++) {
@@ -290,20 +286,19 @@ public class Test {
 			j = pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2);
 		}
 		println("custom: " + (s.millis() - t));
+		println(j);
 		s.exit();
 	}
 	public void test9() {
 		s.randomSeed(0L);
 		int max = 500;
-		int h = s.pixelHeight;
-		int w = s.pixelWidth;
 		float[][] points = new float[max + 1][2];
 		for(int i = 0; i < max; i++) {
-			points[i][0] = s.random(w);
-			points[i][1] = s.random(h);
+			points[i][0] = s.random(width);
+			points[i][1] = s.random(height);
 		}
-		points[max][0] = s.mouseX;
-		points[max][1] = s.mouseY;
+		points[max][0] = mouseX;
+		points[max][1] = mouseY;
 		Delaunay d = new Delaunay(points);
 		Voronoi v = new Voronoi(points);
 		s.stroke(255, 0, 0);
@@ -328,7 +323,7 @@ public class Test {
 		Node c3 = new Node(200, 700, 100);
 		Node c4 = new Node(700, 700, 100);
 		Node c5 = new Node(400, 400, 100);
-		Node c6 = new Node(s.mouseX, s.mouseY, 50);
+		Node c6 = new Node(mouseX, mouseY, 50);
 		int max = 10;
 		ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
 		nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
@@ -347,7 +342,7 @@ public class Test {
 		s.strokeWeight(1);
 		Circle c1 = new Circle(200, 100, 50);
 		Circle c2 = new Circle(300, 300, 40);
-		Circle c3 = new Circle(s.mouseX, s.mouseY, 30);
+		Circle c3 = new Circle(mouseX, mouseY, 30);
 		c1.draw(s);c2.draw(s);c3.draw(s);
 		for(Circle c : Smoothing.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
 		for(Circle c : Smoothing.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
@@ -355,38 +350,36 @@ public class Test {
 		for(Circle c : Smoothing.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
 	}
 	public void test12() {
-		int h = s.pixelHeight;
-		int w = s.pixelWidth;
-		float angle = new PVector(s.mouseX - w / 2f, s.mouseY - h / 2f).heading();
-		Circle c1 = new Circle(w / 2f + cos(angle) * w / 2, h / 2f + sin(angle) * h / 2, 5);
+		float angle = new PVector(mouseX - width / 2f, mouseY - height / 2f).heading();
+		Circle c1 = new Circle(width / 2 + cos(angle) * width / 2, height / 2 + sin(angle) * height / 2, 5);
 		angle += HALF_PI;
-		Circle c2 = new Circle(w / 2f + cos(angle) * w / 2, h / 2f + sin(angle) * h / 2, 5);
+		Circle c2 = new Circle(width / 2 + cos(angle) * width / 2, height / 2 + sin(angle) * height / 2, 5);
 		c1.draw(s);c2.draw(s);
 		s.stroke(0);
 		s.strokeWeight(1);
-		new Arc(new Circle(new PVector(w / 2f, h / 2f), 50), c1, c2, false).draw(s);
-		new Arc(new Circle(new PVector(w / 2f, h / 2f), 40), c2, c1, true).draw(s);
+		new Arc(new Circle(new PVector(width / 2, height / 2), 50), c1, c2, false).draw(s);
+		new Arc(new Circle(new PVector(width / 2, height / 2), 40), c2, c1, true).draw(s);
 	}
 	public void test13() {
 		// Testing Arc collision
-		Arc a1 = new Arc(new PVector((float) s.pixelWidth / 2 - 25, (float) s.pixelHeight / 2), 50,
-				(float) s.mouseX / s.pixelWidth * TWO_PI * 2,
-				(float) s.mouseX / s.pixelWidth * TWO_PI * 2 + HALF_PI);
-		Arc a2 = new Arc(new PVector((float) s.pixelWidth / 2 + 25, (float) s.pixelHeight / 2), 50,
-				(float) s.mouseY / s.pixelHeight * TWO_PI * 2,
-				(float) s.mouseY / s.pixelHeight * TWO_PI * 2 + HALF_PI);
+		Arc a1 = new Arc(new PVector(width / 2 - 25, height / 2), 50,
+				percentX * TWO_PI * 2, percentX * TWO_PI * 2 + HALF_PI);
+		Arc a2 = new Arc(new PVector(width / 2 + 25, height / 2), 50,
+				percentY * TWO_PI * 2, percentY * TWO_PI * 2 + HALF_PI);
 		s.strokeWeight(1f);
 		s.stroke(a1.overlaps(a2) ? 255: 0, 0, 0);
 		a1.draw(s);
 		a2.draw(s);
 	}
 	public void test14() {
+		// TODO: Fix clothoid start/end angle
 		PVector p1 = new PVector(200, 200);
 		PVector p2 = new PVector(700, 700);
 		s.stroke(0);
-		new Clothoid(-16 * PI* (float) s.mouseX / s.pixelWidth, 16 * PI* (float) s.mouseY / s.pixelHeight, p1, p2).draw(s);
+		new Clothoid(-4 * PI * percentX, 4 * PI * percentY, p1, p2).draw(s);
 		s.stroke(255, 0, 0);
-		new Clothoid(-16 * PI* (float) s.mouseX / s.pixelWidth, 16 * PI* (float) s.mouseY / s.pixelHeight, p1, p2).drawCurve(s);
+		new Bezier(p1, new PVector(p1.x + 100 * cos(-2 * PI * percentX), p1.y + 100 * sin(-2 * PI * percentX)),
+				new PVector(p2.x + 100 * cos(2 * PI * percentY), p2.y + 100 * sin(2 * PI * percentY)), p2).draw(s);
 	}
 	public void test15() {
 		// Testing test class
