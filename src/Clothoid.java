@@ -7,6 +7,8 @@ import static processing.core.PApplet.*;
 
 public class Clothoid implements Curve {
 	// Code from Joe (https://math.stackexchange.com/users/221133/joe), Get points in the plane of an Euler spiral given by curvature, URL (version: 2019-04-22): https://math.stackexchange.com/q/3196882
+	// This implementation generates a clothoid from angles k1 to k2, and then scales, rotates, and transforms it to fit the given start and endpoints.
+	// Unfortuntely, this means that it no longer properly fits the given input angles.
 	public ArrayList<PVector> points;
 	public float start, end;
 	public PVector first, last;

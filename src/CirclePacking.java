@@ -38,7 +38,7 @@ public class CirclePacking {
 				consecutiveFailed++;
 			} else {
 				current = new Node(x, y, min(maxRadius * Helpers.random(0.75f, 1.25f), closestCircle));
-				if (ShapeFunctions.circleNearLine(cutoff, current, vertices)) {
+				if (Geometry.circleNearLine(cutoff, current, vertices)) {
 					// Adds new node if given circle is near any line
 					nodes.add(current);
 					consecutiveFailed = 0;

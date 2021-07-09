@@ -34,6 +34,7 @@ public class Detailing extends PApplet {
 	@Override
 	public void setup() {
 		noFill();
+		frameRate(144);
 		surface.setTitle("Detailing");
 		initializeKeys();
 		test = new Test(this);
@@ -53,6 +54,9 @@ public class Detailing extends PApplet {
 		shape = ShapeFunctions.toShape(vertices, this);
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
 		calc();
+		if(doTest) {
+			println("Test mode");
+		}
 		StringBuilder init = new StringBuilder();
 		for(char c : commands.toCharArray()) {
 			init.append(conv.get(c)).append(", ");
@@ -125,6 +129,7 @@ public class Detailing extends PApplet {
 			stroke(0, 255, 0);
 			traverseArcs.get(p).draw(this);
 		}
+		//noLoop();
 	}
 	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
         /*
@@ -276,25 +281,24 @@ public class Detailing extends PApplet {
 	public void keyPressed() {
 		if(doTest) {
 			test.keyPressed(key);
-		} else {
-			String cmd;
-			if (key == 'h') {
-				StringBuilder out = new StringBuilder("Draw:\n");
-				for (char c : conv.keySet()) {
-					out.append(c).append(": ").append(conv.get(c)).append("\n");
-				}
-				print(out.toString());
-			} else if (conv.containsKey(key)) {
-				cmd = conv.get(key);
-				draw.replace(cmd, !draw.get(cmd));
-				println(cmd + ": " + draw.get(cmd));
-				loop();
-			} else if (draw.get("iterate")) {
-				p = p + 1 >= maxIter ? 0 : p + 1;
-				q = q + 1 >= maxIter ? 0 : q + 1;
-			} else {
-				mouseClicked();
+		}
+		String cmd;
+		if (key == 'h') {
+			StringBuilder out = new StringBuilder("Draw:\n");
+			for (char c : conv.keySet()) {
+				out.append(c).append(": ").append(conv.get(c)).append("\n");
 			}
+			print(out.toString());
+		} else if (conv.containsKey(key)) {
+			cmd = conv.get(key);
+			draw.replace(cmd, !draw.get(cmd));
+			println(cmd + ": " + draw.get(cmd));
+			loop();
+		} else if (draw.get("iterate")) {
+			p = p + 1 >= maxIter ? 0 : p + 1;
+			q = q + 1 >= maxIter ? 0 : q + 1;
+		} else {
+			mouseClicked();
 		}
 	}
 	@Override

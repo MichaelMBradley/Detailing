@@ -99,7 +99,7 @@ public class TreeSelection {
 			dist = Float.MAX_VALUE;
 			for (int i = 0; i < vertices.size(); i++) {
 				j = vertices.get(i + 1 == vertices.size() ? 0 : i + 1);  // Next vertex w/ wraparound
-				if (ShapeFunctions.distanceToSegment(vertices.get(i), j, n.pv) < dist) {
+				if (Geometry.distanceToSegment(vertices.get(i), j, n.pv) < dist) {
 					k = vertices.get(i);
 					l = j;
 				}

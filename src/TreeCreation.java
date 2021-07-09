@@ -163,7 +163,7 @@ public class TreeCreation {
 		HashSet<Node> touching = new HashSet<>();
 		for (Node n : nodes) {
 			for (int i = 0; i < vertices.size(); i++) {
-				if (ShapeFunctions.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {
+				if (Geometry.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv) < n.r) {
 					touching.add(n);
 					n.kruskal.add(n);
 					//println(n.pv, distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.pv), vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1));

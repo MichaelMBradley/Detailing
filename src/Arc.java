@@ -15,6 +15,7 @@ public class Arc extends Circle implements Curve {
 		start = 0f;
 		start = 0f;
 		setDraw(false, false);
+		connect = false;
 	}
 	public Arc(Arc a) {
 		super(a.x, a.y, a.r);
@@ -29,19 +30,24 @@ public class Arc extends Circle implements Curve {
 		start = s;
 		end = e;
 		setDraw(false, false);
+		connect = false;
 	}
 	public Arc(PVector location, float radius, float s, float e) {
 		super(location, radius);
 		start = s;
 		end = e;
 		setDraw(false, false);
+		connect = false;
 	}
 	
 	public Arc(PVector start, PVector end, PVector through) {
 		// Creates an Arc from "start" to "end" intersecting "through"
-		this(ShapeFunctions.triangleToCircle(start, end, through), new Circle(start), new Circle(end), false);
+		this(Geometry.triangleToCircle(start, end, through), new Circle(start), new Circle(end), false);
 	}
 	public Arc(Circle base, Circle prev, Circle next, boolean clockwise) {
+		this(base, prev, next, clockwise, false);
+	}
+	public Arc(Circle base, Circle prev, Circle next, boolean clockwise, boolean connecting) {
 		super(base.pv, base.r);
 		start = PVector.sub(prev.pv, base.pv).heading();
 		end = PVector.sub(next.pv, base.pv).heading();
@@ -61,6 +67,7 @@ public class Arc extends Circle implements Curve {
 				setDraw(false, false);
 			}
 		}
+		connect = connecting;
 	}
 	
 	private void setDraw(boolean swap, boolean e2Pi) {
@@ -87,11 +94,11 @@ public class Arc extends Circle implements Curve {
 	}
 	@Override
 	public float getStartAngle() {
-		return start == drawStart ? start + HALF_PI : start - HALF_PI;
+		return connect ? start - HALF_PI : start + HALF_PI;
 	}
 	@Override
 	public float getEndAngle() {
-		return start == drawStart ? end + HALF_PI : end - HALF_PI;
+		return connect ? end + HALF_PI : end - HALF_PI;
 	}
 	@Override
 	public PVector getStartPVector() {
@@ -109,12 +116,19 @@ public class Arc extends Circle implements Curve {
 	@Override
 	public void draw(PApplet sketch) {
 		sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
+		/*int colour = sketch.color(sketch.random(0, 255), sketch.random(0, 255), sketch.random(0, 255));
+		sketch.stroke(colour);
+		sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
+		sketch.textSize(5);
+		sketch.fill(colour);
+		sketch.text(String.valueOf(connect), x, y);
+		sketch.noFill();*/
 	}
 	public void drawCircle(PApplet sketch) {
 		sketch.circle(x, y, r * 2);
 	}
 	public boolean overlaps(Arc a) {
-		Circle[] circles = Smoothing.getAdjacent(this, a, 0f, true);
+		Circle[] circles = Touching.getAdjacent(this, a, 0f, true);
 		if(Float.isNaN(circles[0].r)) {
 			return false;
 		}

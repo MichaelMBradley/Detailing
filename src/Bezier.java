@@ -38,8 +38,7 @@ public class Bezier implements Curve {
 					info[4], info[5], info[6], info[7]);
 			m /= 2;
 		}
-		//println(String.format("From: (x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f, =: %s)\tTo: (x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f, =: %s)",
-			//from.x, from.y, from.r, from.start, from.end, from.drawStart == from.start, to.x, to.y, to.r, to.start, to.end, to.drawStart == to.start));
+		println(String.format("%s\nFrom: %s =: %s\tTo: %s, =: %s\n", Helpers.floatArrayToString(info), from, from.isConnecting(), to, to.isConnecting()));
 	}
 	
 	

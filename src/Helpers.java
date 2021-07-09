@@ -57,4 +57,12 @@ public class Helpers {
 		}
 		return node;
 	}
+	
+	public static String floatArrayToString(float[] arr) {
+		StringBuilder ret = new StringBuilder("[");
+		for(int i = 0; i < arr.length; i++) {
+			ret.append(String.format("%.2f", arr[i])).append(i != arr.length - 1 ? ", " : "]");
+		}
+		return ret.toString();
+	}
 }

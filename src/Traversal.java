@@ -2,7 +2,6 @@ import processing.core.PVector;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 
 public class Traversal {
@@ -78,13 +77,13 @@ public class Traversal {
 		System.out.println(traversal.size());
 		for (int i = 0; i < traversal.size() - 1; i++) {
 			if (traversal.get(i).kruskalAdjacent.contains(traversal.get(i + 1))) {
-				arcs.add(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);//All(Arrays.asList(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))));//
+				arcs.add(Geometry.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);//All(Arrays.asList(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))));//
 				System.out.println(arcs.get(arcs.size() - 1));
 			} else {
-				arcs.add(ShapeFunctions.arcLine(traversal.get(i).pv, traversal.get(i + 1).pv));
+				arcs.add(Geometry.arcLine(traversal.get(i).pv, traversal.get(i + 1).pv));
 			}
 		}
-		arcs.add(ShapeFunctions.arcLine(traversal.get(traversal.size() - 1).pv, traversal.get(0).pv));
+		arcs.add(Geometry.arcLine(traversal.get(traversal.size() - 1).pv, traversal.get(0).pv));
 		return arcs;
 	}
 }

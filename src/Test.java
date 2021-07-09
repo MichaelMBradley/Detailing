@@ -24,7 +24,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test14();
+		test16();
 		update();
 	}
 	public void update() {
@@ -119,10 +119,10 @@ public class Test {
 				j.draw(s);
 			}
 		}*/
-		Circle first = Smoothing.getExterior(n1, n2)[0];
-		Circle second = Smoothing.getExterior(n2, n1)[0];
-		Circle first2 = Smoothing.getExterior(n2, n3)[0];
-		Circle second2 = Smoothing.getExterior(n3, n2)[0];
+		Circle first = Touching.getExterior(n1, n2)[0];
+		Circle second = Touching.getExterior(n2, n1)[0];
+		Circle first2 = Touching.getExterior(n2, n3)[0];
+		Circle second2 = Touching.getExterior(n3, n2)[0];
 		first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
 		// a1 -> aFirst -> a2 -> aFirst2 -> a3 -> aSecond2 -> a2 -> aSecond -> a1
 		Arc a1 = new Arc(n1, second, first, false);
@@ -152,7 +152,7 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0);
 		s.randomSeed(0L);
-		ShapeFunctions.arcLine(new PVector(100, 100), new PVector(mouseX, mouseY)).draw(s);
+		Geometry.arcLine(new PVector(100, 100), new PVector(mouseX, mouseY)).draw(s);
 	}
 	public void test4() {
 		/*
@@ -197,7 +197,7 @@ public class Test {
 		Circle n2 = new Circle(mouseX, mouseY, 100);
 		n1.draw(s);
 		n2.draw(s);
-		for (Circle n : Smoothing.getInterior(n1, n2)) {
+		for (Circle n : Touching.getInterior(n1, n2)) {
 			n.draw(s);
 		}
 		//noLoop();
@@ -226,13 +226,13 @@ public class Test {
 		n2.draw(s);
 		n3.draw(s);
 		n4.draw(s);
-		for (Circle n : Smoothing.getExterior(n1, n2)) {
+		for (Circle n : Touching.getExterior(n1, n2)) {
 			n.draw(s);
 		}
-		for (Circle n : Smoothing.getExterior(n2, n3)) {
+		for (Circle n : Touching.getExterior(n2, n3)) {
 			n.draw(s);
 		}
-		for (Circle n : Smoothing.getExterior(n2, n4)) {
+		for (Circle n : Touching.getExterior(n2, n4)) {
 			n.draw(s);
 		}
 	}
@@ -244,7 +244,7 @@ public class Test {
 		Circle n2 = new Circle(mouseX, mouseY, 25);
 		n1.draw(s);
 		n2.draw(s);
-		Circle[] ext = Smoothing.getExterior(n1, n2);
+		Circle[] ext = Touching.getExterior(n1, n2);
 		for (Circle n : ext) {
 			n.draw(s);
 		}
@@ -344,10 +344,10 @@ public class Test {
 		Circle c2 = new Circle(300, 300, 40);
 		Circle c3 = new Circle(mouseX, mouseY, 30);
 		c1.draw(s);c2.draw(s);c3.draw(s);
-		for(Circle c : Smoothing.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
-		for(Circle c : Smoothing.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
-		for(Circle c : Smoothing.getAdjacent(c1, c3, (c1.r + c3.r) / 2, true)) { c.draw(s); }
-		for(Circle c : Smoothing.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c1, c3, (c1.r + c3.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
 	}
 	public void test12() {
 		float angle = new PVector(mouseX - width / 2f, mouseY - height / 2f).heading();
@@ -372,14 +372,31 @@ public class Test {
 		a2.draw(s);
 	}
 	public void test14() {
-		// TODO: Fix clothoid start/end angle
-		PVector p1 = new PVector(200, 200);
-		PVector p2 = new PVector(700, 700);
+		float angle1 = -HALF_PI;//-2 * PI * percentX;
+		float angle2 = HALF_PI;//2 * PI * percentY;
+		float fixedAngle1 = -HALF_PI;
+		float fixedAngle2 = HALF_PI;
+		PVector p1 = new PVector(200, 450);
+		PVector p2 = new PVector(700, 450);
+		PVector c1 = new PVector(p1.x + 100 * cos(fixedAngle1), p1.y + 100 * sin(fixedAngle1));
+		PVector c2 = new PVector(p2.x + 100 * cos(fixedAngle2), p2.y + 100 * sin(fixedAngle2));
+		Clothoid clothoid = new Clothoid(angle1, angle2, p1, p2);
+		Bezier bezier = new Bezier(p1, c1, c2, p2);
 		s.stroke(0);
-		new Clothoid(-4 * PI * percentX, 4 * PI * percentY, p1, p2).draw(s);
+		clothoid.draw(s);
 		s.stroke(255, 0, 0);
-		new Bezier(p1, new PVector(p1.x + 100 * cos(-2 * PI * percentX), p1.y + 100 * sin(-2 * PI * percentX)),
-				new PVector(p2.x + 100 * cos(2 * PI * percentY), p2.y + 100 * sin(2 * PI * percentY)), p2).draw(s);
+		bezier.draw(s);
+		s.stroke(0, 255, 0);
+		Helpers.drawLine(p1, c1, s);
+		Helpers.drawLine(p2, c2, s);
+		s.stroke(0);
+		s.fill(0);
+		s.text(String.format("%.2f", PVector.sub(c1, p1).heading()), c1.x, c1.y);
+		s.text(String.format("%.2f", PVector.sub(c2, p2).heading()), c2.x, c2.y);
+		s.text(String.format("%.2f", clothoid.start), p1.x, p1.y);
+		s.text(String.format("%.2f", clothoid.end), p2.x, p2.y);
+		s.text(angle2 - angle1, 0, 0);
+		s.noFill();
 	}
 	public void test15() {
 		// Testing test class
@@ -392,5 +409,25 @@ public class Test {
 				"mouseButton: %d\tmouseCount: %d\n" +
 				"iter: %d",
 				width, height, mouseX, mouseY, percentX, percentY, clicked, pressed, scrolled, key, (int) key, mouseButton, mouseCount, iter), 10, 10);
+	}
+	public void test16() {
+		mouseCount = max(-9, min(mouseCount, 10));
+		float lerp = (mouseCount + 10) / 20f;
+		Circle c1 = new Circle(300, 300, 50);
+		Circle c2 = new Circle(mouseX, mouseY, 50);
+		Circle c3 = new Circle(600, 600, 50);
+		s.stroke(0);
+		c1.draw(s);c2.draw(s);c3.draw(s);
+		s.fill(0);
+		s.text(lerp, mouseX, mouseY);
+		s.noFill();
+		s.stroke(255, 0, 0);
+		Touching.triCircleAdjacent(c1, c2, c3)[0].draw(s);
+		s.stroke(0, 255, 0);
+		Touching.triCircleAdjacent(c1, c2, c3)[1].draw(s);
+		s.stroke(255, 0, 0);
+		Touching.triCircleAdjacentSafer(c1, c2, c3, lerp)[0].draw(s);
+		s.stroke(0, 255, 0);
+		Touching.triCircleAdjacentSafer(c1, c2, c3, lerp)[1].draw(s);
 	}
 }
