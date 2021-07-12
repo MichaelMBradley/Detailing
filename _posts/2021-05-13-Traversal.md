@@ -13,7 +13,7 @@ After this, I finished an algorithm that created an order in which to traverse t
 {: style="text-align:center"}
 ![A line connects the trees around a polyline.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/KruskalTraverse.png)
 
-The algorithm works by assigning each tree to a point on the edge closest to it, and then saves the trees in the order that they appear along each edge. This has some issues, mainly that two consecutive trees can be a bit far from each other, and that it assumes the order of the trees should be based purely on the start point, but it can be improved on later.
+The algorithm works by assigning each tree to a point on the edge closest to it, then saves the trees in the order that they appear along each edge. This has some issues, mainly that two consecutive trees can be a bit far from each other, and that it assumes the order of the trees should be based purely on the start point, but it can be improved on later.
 
 {: style="text-align:center"}
 ![Trees connecting circles pop up in order around a polyline.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/gh-pages/_assets/05-13/TreeSelection.gif)
