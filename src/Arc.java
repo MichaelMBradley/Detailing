@@ -24,6 +24,9 @@ public class Arc extends Circle implements Curve {
 		drawEnd = a.drawEnd;
 		connecting = a.connecting;
 	}
+	public Arc(Circle c) {
+		this(c, 0, TWO_PI);
+	}
 	public Arc(Circle c, float s, float e) {
 		this(c.getPV(), c.getR(), s, e);
 	}
@@ -33,9 +36,6 @@ public class Arc extends Circle implements Curve {
 		endAngleBase = e;
 		setDraw(false, false);
 		connecting = false;
-	}
-	public Arc(Circle c) {
-		this(c, 0, TWO_PI);
 	}
 	
 	public Arc(PVector start, PVector end, PVector through) {

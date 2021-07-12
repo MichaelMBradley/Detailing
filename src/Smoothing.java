@@ -9,7 +9,7 @@ import static processing.core.PApplet.*;
 public class Smoothing {
 	public static ArrayList<Curve> fixedSurroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
 		ArrayList<Arc> arcTree;
-		ArrayList<Curve> arcs = new ArrayList<>(), arcInside = new ArrayList<>();
+		ArrayList<Curve> arcs = new ArrayList<>();
 		Arc arc, newArc;
 		boolean out;
 		Node base = nodes.get(0);
@@ -22,36 +22,23 @@ public class Smoothing {
 			}
 		}
 		for(ArrayList<Node> tree : trees) {
-			arcs.add(new Arc());
+			arcs.add(null);
 			out = exterior.contains(tree.get(0));
 			arcTree = fixedSurroundingArcsTree(tree, out);
 			arcs.addAll(arcTree);
-			arcInside.add(new Arc());
-			for(int i = 0; i < arcTree.size(); i++) {
-				arc = arcTree.get(i);
-				arcInside.add(new Arc(arc.getPV(), arc.getR() + (0.5f * (out == (i % 2 == 0) ? 1 : -1)), arc.getDrawStart(), arc.getDrawEnd()));
-			}
 		}
 		for(int i = 0; i < arcs.size(); i++) {
-			if (arcs.get(i).isEmpty()) {
-				if (arcs.get(i == arcs.size() - 1 ? 0 : i + 1).isEmpty()) {
+			if (arcs.get(i) == null) {
+				if (arcs.get(i == arcs.size() - 1 ? 0 : i + 1) == null) {
 					arcs.remove(i);
-					arcInside.remove(i);
 					i--;
 				} else {
 					//arcs.set(i, ShapeFunctions.connectArcs(arcs.get(i == 0 ? arcs.size() - 1 : i - 1), arcs.get(i == arcs.size() - 1 ? 0 : i + 1)));
 					arcs.set(i, new Bezier(arcs.get(i == 0 ? arcs.size() - 1 : i - 1), arcs.get(i == arcs.size() - 1 ? 0 : i + 1)));
 					//println(arcs.get(i) + "\t" + arcs.get(i == 0 ? arcs.size() - 1 : i - 1) + "\t" + arcs.get(i == arcs.size() - 1 ? 0 : i + 1));
-					if(arcs.get(i) instanceof Arc) {
-						newArc = new Arc((Arc) arcs.get(i));
-						newArc.setR(newArc.getR() - 0.5f);
-						arcInside.set(i, newArc);
-					}
-					
 				}
-				}
+			}
 		}
-		arcs.addAll(arcInside);
 		return arcs;
 	}
 	public static ArrayList<Arc> fixedSurroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
@@ -119,6 +106,26 @@ public class Smoothing {
 			}
 		}*/
 		return arcs;
+	}
+	
+	public static ArrayList<Curve> interiorCurves(ArrayList<Curve> curves) {
+		ArrayList<Curve> interior = new ArrayList<>();
+		Arc newArc;
+		for(Curve curve : curves) {
+			if (curve instanceof Arc) {
+				newArc = new Arc((Arc) curve);
+				newArc.setR(newArc.getR() + (newArc.isConnecting() ? -0.5f : 0.5f));
+			} else {
+				newArc = null;
+			}
+			interior.add(newArc);
+		}
+		for(int i = 0; i < interior.size(); i++) {
+			if(java.util.Objects.isNull(interior.get(i))) {
+				interior.set(i, new Bezier(interior.get(i == 0 ? interior.size() - 1 : i - 1), interior.get(i == interior.size() - 1 ? 0 : i + 1)));
+			}
+		}
+		return interior;
 	}
 	
 	public static ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes) {

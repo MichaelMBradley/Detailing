@@ -6,8 +6,8 @@ import processing.core.PVector;
 import static processing.core.PApplet.*;
 
 public class Circle {
-	@Getter @Setter protected float x, y, r;
-	@Getter protected PVector PV;
+	@Getter @Setter private float x, y, r;
+	@Getter private PVector PV;
 	
 	public Circle(float xPos, float yPos, float rad) {
 		x = xPos;

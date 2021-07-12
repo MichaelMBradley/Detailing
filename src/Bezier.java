@@ -73,4 +73,7 @@ public class Bezier implements Curve {
 	public void draw(PApplet sketch) {
 		sketch.bezier(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7]);
 	}
+	public String toString() {
+		return Helpers.floatArrayToString(info);
+	}
 }

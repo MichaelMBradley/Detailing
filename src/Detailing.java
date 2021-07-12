@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 @SuppressWarnings("jol")
 public class Detailing extends PApplet {
-	private ArrayList<Curve> traverseArcs;
+	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
 	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 	private ArrayList<PVector> vertices;
 	private ArrayList<Node> traverse;
@@ -100,25 +100,19 @@ public class Detailing extends PApplet {
 			}
 			if (draw.get("traversalArcs")) {
 				strokeWeight(1);
-				stroke(255, 0, 0);
-				float r = 255;
-				float b = 0;
-				float chn = 255.0f / (float) traverseArcs.size();
-			/*for (Arc a : traverseArcs) {
 				if (draw.get("gradient")) {
-					stroke(r, 0, b);
-					r -= chn;
-					b += chn;
-				}
-				a.draw(this);
-			}*/
-				stroke(255, 0, 0);
-				for (int i = traverseArcs.size() - 1; i >= 0; i--) {
-					if (i <= traverseArcs.size() / 2) {
-						stroke(0, 0, 0);
+					float r = 255;
+					float b = 0;
+					float chn = 255f / (float) traverseArcs.size();
+					for (Curve c : traverseArcsInterior) {
+						stroke(r, 0, b);
+						r -= chn;
+						b += chn;
+						c.draw(this);
 					}
-					traverseArcs.get(i).draw(this);
 				}
+				stroke(0);
+				traverseArcs.forEach(c -> c.draw(this));
 			}
 			if (draw.get("iterate")) {
 				// things can be done with p and q
@@ -131,13 +125,10 @@ public class Detailing extends PApplet {
 		}
 	}
 	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
-        /*
-        Nodes may be stored in multiple discrete sets.
-        This function draws relevant information for all nodes in a given set.
-        */
+		// Nodes may be stored in multiple discrete sets, this function draws relevant information for all nodes in a given set
 		if(!doTest) {
 			for(Node n : circles) {
-				if (drawCircles) {
+				if(drawCircles) {
 					stroke(0);
 					strokeWeight(1);
 					n.draw(this);
@@ -167,16 +158,12 @@ public class Detailing extends PApplet {
 			if (draw.get("circumcircles")) {
 				stroke(255, 0, 0);
 				strokeWeight(1);
-				for (Circle c : circumcircles) {
-					c.draw(this);
-				}
+				circumcircles.forEach(c -> c.draw(this));
 			}
 		}
 	}
 	public void gridZoom() {
-		/*
-		Manages drawing the debug grid and the zoom/pan.
-		*/
+		// Manages drawing the debug grid and the zoom/pan
 		int mx, my, og_mx = mouseX, og_my = mouseY;
 		scale(draw.get("zoom") ? zoom : 1);
 		translate(offset.x, offset.y);
@@ -222,9 +209,7 @@ public class Detailing extends PApplet {
 	}
 	
 	public ArrayList<Circle> analyze(HashSet<Node> aCircles) {
-        /*
-        The Delaunay Triangulation and tree generation is done separately for the interior and exterior circles.
-        */
+		// The Delaunay Triangulation and tree generation is done separately for the interior and exterior circles
 		ArrayList<Circle> circumcircles;
 		int start;
 		start = millis();
@@ -239,10 +224,8 @@ public class Detailing extends PApplet {
 		return circumcircles;
 	}
 	public void calc() {
-        /*
-        Completes all relevant calculations.
-        */
-		if (!doTest) {
+		// Completes all relevant calculations
+        if (!doTest) {
 			int start;
 			start = millis();
 			nodes = CirclePacking.randomFillAware(vertices, minimise);
@@ -268,6 +251,7 @@ public class Detailing extends PApplet {
 			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
 			//traverse = TreeSelection.traverseTreesSkip(nodes, vertices, true);
 			traverseArcs = Smoothing.fixedSurroundingArcs(traverse, exterior);
+			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 		} else {
 			nodes = new HashSet<>();
@@ -314,12 +298,6 @@ public class Detailing extends PApplet {
 			q = 1;
 			//altTreeCreate(circles, vertices);
 		}
-	}
-	@Override
-	public void mouseMoved() {
-		//traverse = traverseKruskalTrees2(circles, vertices, false);
-		//traverseArcs = delaunayTraversalToArcs(traverse);
-		//loop();
 	}
 	@Override
 	public void mouseWheel(MouseEvent event) {
