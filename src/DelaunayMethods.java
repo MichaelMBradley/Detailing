@@ -24,7 +24,6 @@ public class DelaunayMethods {
 	public static void updateDelaunay(HashSet<Node> nodes) {
 		updateDelaunay(nodes, delaunayTriangulation(nodes));
 	}
-	
 	public static void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
         /*
         Adds the delaunay triangulation information to the nodes.
@@ -33,8 +32,8 @@ public class DelaunayMethods {
 		HashMap<PVector, HashSet<PVector>> dict = new HashMap<>();
 		Node base, con;
 		for (Node n : nodes) {
-			conv.put(n.pv, n);
-			dict.put(n.pv, new HashSet<>());
+			conv.put(n.getPV(), n);
+			dict.put(n.getPV(), new HashSet<>());
 		}
 		for (Triangle tri : triangles) {
 			dict.get(tri.p1).add(tri.p2);
@@ -53,8 +52,8 @@ public class DelaunayMethods {
 		HashMap<PVector, Node> conv = new HashMap<>();
 		HashMap<PVector, HashSet<PVector>> dict = new HashMap<>();
 		for(Node n : nodes) {
-			conv.put(n.pv, n);
-			dict.put(n.pv, new HashSet<>());
+			conv.put(n.getPV(), n);
+			dict.put(n.getPV(), new HashSet<>());
 		}
 		Delaunay d = new Delaunay(ShapeFunctions.toFloatArray(new ArrayList<>(conv.keySet())));
 		for(float[] p : d.getEdges()) {
@@ -73,8 +72,8 @@ public class DelaunayMethods {
 			base = conv.get(pv);
 			for (PVector connect : dict.get(pv)) {
 				con = conv.get(connect);
-				if (PVector.dist(pv, connect) < (base.r + con.r) * 3) {
-					base.delaunay.add(con);
+				if (PVector.dist(pv, connect) < (base.getR() + con.getR()) * 3) {
+					base.getDelaunay().add(con);
 				}
 			}
 		}
@@ -84,7 +83,6 @@ public class DelaunayMethods {
 		return delaunayTraverse(nodes, vertices, 1f);
 		//return delaunayTraverse(nodes, vertices, (float) mouseX * 20f / w);
 	}
-	
 	public static ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
         /*
         Visits many nodes in order around the polyline, based on the delaunay triangulation.
@@ -96,21 +94,21 @@ public class DelaunayMethods {
 		for (PVector vertex : vertices) {
 			goal = Traversal.closestNode(nodes, vertex);
 			while (current != goal) {
-				if (current.delaunay.contains(goal)) {
+				if (current.getDelaunay().contains(goal)) {
 					next = goal;
 				} else {
 					closest = Float.MAX_VALUE;
-					comb = new ArrayList<>(current.kruskal);
-					comb.addAll(current.delaunay);
+					comb = new ArrayList<>(current.getKruskal());
+					comb.addAll(current.getDelaunay());
 					i = 0;
 					for (Node k : comb) {
-						if(i == current.kruskal.size() && closest != Float.MAX_VALUE) {
+						if(i == current.getKruskal().size() && closest != Float.MAX_VALUE) {
 							break;
 						}
-						angle = abs(PVector.angleBetween(PVector.sub(k.pv, current.pv), PVector.sub(goal.pv, current.pv)) - QUARTER_PI);
-						distance = PVector.dist(k.pv, goal.pv);
-						if (angle + distance / ((goal.r + k.r) / 2) * distanceWeight < closest && !traverse.contains(k)) {
-							closest = angle + distance / ((goal.r + k.r) / 2) * distanceWeight;
+						angle = abs(PVector.angleBetween(PVector.sub(k.getPV(), current.getPV()), PVector.sub(goal.getPV(), current.getPV())) - QUARTER_PI);
+						distance = PVector.dist(k.getPV(), goal.getPV());
+						if (angle + distance / ((goal.getR() + k.getR()) / 2) * distanceWeight < closest && !traverse.contains(k)) {
+							closest = angle + distance / ((goal.getR() + k.getR()) / 2) * distanceWeight;
 							next = k;
 						}
 						i++;

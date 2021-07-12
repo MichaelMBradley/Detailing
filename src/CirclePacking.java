@@ -104,8 +104,8 @@ public class CirclePacking {
 		while (!test.empty()) {
 			curr = test.pop();
 			nearby = new HashSet<>();
-			locX = (int) curr.x / w;
-			locY = (int) curr.y / h;
+			locX = (int) curr.getX() / w;
+			locY = (int) curr.getY() / h;
 			for (int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
 				for (int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
 					for (int a : available.get(i).get(j)) {
@@ -113,12 +113,12 @@ public class CirclePacking {
 					}
 				}
 			}
-			nearest = min(new float[]{curr.x, curr.y, w - curr.x, h - curr.y}) - curr.r;
+			nearest = min(new float[] { curr.getX(), curr.getY(), w - curr.getX(), h - curr.getY() }) - curr.getR();
 			for (Node n : nearby) {
 				nearest = min(nearest, n.distanceToCircle(curr));
 			}
 			if (nearest >= minRadius) {
-				curr.r = min(nearest, maxRadius);
+				curr.setR(min(nearest, maxRadius));
 				nodes.add(curr);
 				for (int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
 					for (int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
@@ -126,7 +126,11 @@ public class CirclePacking {
 					}
 				}
 				for (int m = 0; m < 10; m++) {  // number is arbitrary
-					test.push(new Node(max(0, min(w, curr.x + Helpers.random(-2 * maxRadius, 2 * maxRadius))), max(0, min(h, curr.y + Helpers.random(-2 * maxRadius, 2 * maxRadius))), 0));
+					test.push(
+							new Node(
+									max(0, min(w, curr.getX() + Helpers.random(-2 * maxRadius, 2 * maxRadius))),
+									max(0, min(h, curr.getY() + Helpers.random(-2 * maxRadius, 2 * maxRadius))),
+									0));
 				}
 			}
 		}
@@ -146,7 +150,7 @@ public class CirclePacking {
 		ArrayList<PVector> pvs = new ArrayList<>();
 		float close;
 		for(Node n : nodes) {
-			pvs.add(n.pv);
+			pvs.add(n.getPV());
 		}
 		Voronoi v = new Voronoi(ShapeFunctions.toFloatArray(pvs));
 		for(MPolygon m : v.getRegions()) {

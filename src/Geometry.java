@@ -15,7 +15,7 @@ public class Geometry {
 		float maxX = min(p1.x, p2.x) * (1f / 3f) + max(p1.x, p2.x) * (2f / 3f);
 		float maxY = min(p1.y, p2.y) * (1f / 3f) + max(p1.y, p2.y) * (2f / 3f);
 		Circle circ = triangleToCircle(p1, p2, new PVector(Helpers.random(minX, maxX), Helpers.random(minY, maxY)));
-		float[] se = Smoothing.order(p1, circ.pv, p2, true);
+		float[] se = Smoothing.order(p1, circ.getPV(), p2, true);
 		if (se[1] - se[0] > PI) {
 			return new Arc(circ, se[1] - TWO_PI, se[0]);
 		} else {
@@ -24,7 +24,7 @@ public class Geometry {
 	}
 	
 	public static Arc connectArcs(Arc a1, Arc a2) {
-		return arcLine(new PVector(a1.x + a1.r * cos(a1.end), a1.y + a1.r * sin(a1.end)), new PVector(a2.x + a2.r * cos(a2.start), a2.y + a2.r * sin(a2.start)));
+		return arcLine(a1.PVectorOnCircumference(a1.getEndAngleBase()), a1.PVectorOnCircumference(a1.getStartAngleBase()));
 	}
 	
 	public static boolean circleNearLine(float cutoff, Circle c, ArrayList<PVector> vertices) {
@@ -34,7 +34,7 @@ public class Geometry {
         */
 		for (int i = 0; i < vertices.size(); i++) {
 			int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
-			if (distanceToSegment(vertices.get(i), vertices.get(j), c.pv) - c.r <= cutoff) {
+			if (distanceToSegment(vertices.get(i), vertices.get(j), c.getPV()) - c.getR() <= cutoff) {
 				return true;
 			}
 		}
@@ -48,9 +48,9 @@ public class Geometry {
         /*
         Returns the arc between n1 and n2, passing through n3.
         */
-		Circle arcInfo = triangleToCircle(n1.pv, n2.pv, n3.pv);
-		float ang1 = PVector.sub(n1.pv, arcInfo.pv).heading();
-		float ang2 = PVector.sub(n2.pv, arcInfo.pv).heading();
+		Circle arcInfo = triangleToCircle(n1.getPV(), n2.getPV(), n3.getPV());
+		float ang1 = PVector.sub(n1.getPV(), arcInfo.getPV()).heading();
+		float ang2 = PVector.sub(n2.getPV(), arcInfo.getPV()).heading();
 		if (ang1 > ang2) {
 			ang2 += TWO_PI;
 		}
@@ -59,14 +59,14 @@ public class Geometry {
 	
 	public static Arc[] getArcKruskal(Node n1, Node n2) {
 		ArrayList<Node> n3arr = new ArrayList<>();
-		for (Node d : n1.delaunay) {
-			if (d.delaunay.contains(n2)) {
+		for (Node d : n1.getDelaunay()) {
+			if (d.getDelaunay().contains(n2)) {
 				n3arr.add(d);
 			}
 		}
 		Arc[] arcs = new Arc[n3arr.size()];
 		for (int i = 0; i < n3arr.size(); i++) {
-			arcs[i] = new Arc(n1.pv, n2.pv, n3arr.get(i).pv);
+			arcs[i] = new Arc(n1.getPV(), n2.getPV(), n3arr.get(i).getPV());
 		}
 		return arcs;
 	}

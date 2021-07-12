@@ -1,43 +1,41 @@
+import lombok.Getter;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import static processing.core.PApplet.cos;
-import static processing.core.PApplet.sin;
 import static processing.core.PConstants.HALF_PI;
 import static processing.core.PConstants.TWO_PI;
 
 public class Arc extends Circle implements Curve {
-	public float start, end, drawStart, drawEnd;
-	public boolean connect;
+	@Getter private float startAngleBase, endAngleBase, drawStart, drawEnd;
+	@Getter private final boolean connecting;
 	
 	public Arc() {
 		super();
-		start = 0f;
-		start = 0f;
+		startAngleBase = 0f;
+		startAngleBase = 0f;
 		setDraw(false, false);
-		connect = false;
+		connecting = false;
 	}
 	public Arc(Arc a) {
-		super(a.x, a.y, a.r);
-		start = a.start;
-		end = a.end;
+		super(a);
+		startAngleBase = a.startAngleBase;
+		endAngleBase = a.endAngleBase;
 		drawStart = a.drawStart;
 		drawEnd = a.drawEnd;
-		connect = a.connect;
+		connecting = a.connecting;
 	}
 	public Arc(Circle c, float s, float e) {
-		super(c.pv, c.r);
-		start = s;
-		end = e;
-		setDraw(false, false);
-		connect = false;
+		this(c.getPV(), c.getR(), s, e);
 	}
 	public Arc(PVector location, float radius, float s, float e) {
 		super(location, radius);
-		start = s;
-		end = e;
+		startAngleBase = s;
+		endAngleBase = e;
 		setDraw(false, false);
-		connect = false;
+		connecting = false;
+	}
+	public Arc(Circle c) {
+		this(c, 0, TWO_PI);
 	}
 	
 	public Arc(PVector start, PVector end, PVector through) {
@@ -47,14 +45,14 @@ public class Arc extends Circle implements Curve {
 	public Arc(Circle base, Circle prev, Circle next, boolean clockwise) {
 		this(base, prev, next, clockwise, false);
 	}
-	public Arc(Circle base, Circle prev, Circle next, boolean clockwise, boolean connecting) {
-		super(base.pv, base.r);
-		start = PVector.sub(prev.pv, base.pv).heading();
-		end = PVector.sub(next.pv, base.pv).heading();
+	public Arc(Circle base, Circle prev, Circle next, boolean clockwise, boolean connect) {
+		super(base);
+		startAngleBase = PVector.sub(prev.getPV(), base.getPV()).heading();
+		endAngleBase = PVector.sub(next.getPV(), base.getPV()).heading();
 		// Changing the start and end angles such that
 		// * end > start
 		// * end - start < 2Pi
-		if (start > end) {
+		if (startAngleBase > endAngleBase) {
 			if (clockwise) {
 				setDraw(false, true);
 			} else {
@@ -67,55 +65,48 @@ public class Arc extends Circle implements Curve {
 				setDraw(false, false);
 			}
 		}
-		connect = connecting;
+		connecting = connect;
 	}
 	
 	private void setDraw(boolean swap, boolean e2Pi) {
 		float mod = e2Pi ? TWO_PI: 0f;
 		if(swap) {
-			drawStart = end;
-			drawEnd = start + mod;
+			drawStart = endAngleBase;
+			drawEnd = startAngleBase + mod;
 		} else {
-			drawStart = start;
-			drawEnd = end + mod;
+			drawStart = startAngleBase;
+			drawEnd = endAngleBase + mod;
 		}
-	}
-	public float range() {
-		return drawEnd - drawStart;
 	}
 	
 	@Override
 	public boolean isEmpty() {
-		return r == 0f || range() == 0f;
-	}
-	@Override
-	public boolean isConnecting() {
-		return connect;
+		return getR() == 0f || drawEnd - drawStart == 0f;
 	}
 	@Override
 	public float getStartAngle() {
-		return connect ? start - HALF_PI : start + HALF_PI;
+		return startAngleBase + (connecting ? -HALF_PI :  HALF_PI);
 	}
 	@Override
 	public float getEndAngle() {
-		return connect ? end + HALF_PI : end - HALF_PI;
+		return endAngleBase + (connecting ? HALF_PI : -HALF_PI);
 	}
 	@Override
 	public PVector getStartPVector() {
-		return new PVector(x + cos(start) * r, y + sin(start) * r);
+		return PVectorOnCircumference(startAngleBase);
 	}
 	@Override
 	public PVector getEndPVector() {
-		return new PVector(x + cos(end) * r, y + sin(end) * r);
+		return PVectorOnCircumference(endAngleBase);
 	}
 	@Override
 	public float getSize() {
-		return r;
+		return getR();
 	}
 	
 	@Override
 	public void draw(PApplet sketch) {
-		sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
+		sketch.arc(getX(), getY(), getR() * 2, getR() * 2, drawStart, drawEnd);
 		/*int colour = sketch.color(sketch.random(0, 255), sketch.random(0, 255), sketch.random(0, 255));
 		sketch.stroke(colour);
 		sketch.arc(x, y, r * 2, r * 2, drawStart, drawEnd);
@@ -125,17 +116,17 @@ public class Arc extends Circle implements Curve {
 		sketch.noFill();*/
 	}
 	public void drawCircle(PApplet sketch) {
-		sketch.circle(x, y, r * 2);
+		sketch.circle(getX(), getY(), getR() * 2);
 	}
 	public boolean overlaps(Arc a) {
 		Circle[] circles = Touching.getAdjacent(this, a, 0f, true);
-		if(Float.isNaN(circles[0].r)) {
+		if(Float.isNaN(circles[0].getR())) {
 			return false;
 		}
-		return (within(PVector.sub(circles[0].pv, this.pv).heading(), drawStart, drawEnd)
-				&& within(PVector.sub(circles[0].pv, a.pv).heading(), a.drawStart, a.drawEnd))
-				|| (within(PVector.sub(circles[1].pv, this.pv).heading(), drawStart, drawEnd)
-				&& within(PVector.sub(circles[1].pv, a.pv).heading(), a.drawStart, a.drawEnd));
+		return (within(PVector.sub(circles[0].getPV(), getPV()).heading(), drawStart, drawEnd)
+				&& within(PVector.sub(circles[0].getPV(), a.getPV()).heading(), a.drawStart, a.drawEnd))
+				|| (within(PVector.sub(circles[1].getPV(), getPV()).heading(), drawStart, drawEnd)
+				&& within(PVector.sub(circles[1].getPV(), a.getPV()).heading(), a.drawStart, a.drawEnd));
 	}
 	@Override
 	public boolean overlaps(Circle c) {
@@ -152,6 +143,6 @@ public class Arc extends Circle implements Curve {
 	}
 	@Override
 	public String toString() {
-		return String.format("(x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f)", x, y, r, drawStart, drawEnd);
+		return String.format("(x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f)", getX(), getY(), getR(), drawStart, drawEnd);
 	}
 }

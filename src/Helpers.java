@@ -31,7 +31,7 @@ public class Helpers {
 		*/
 		HashSet<HashSet<Node>> MSTs = new HashSet<>();
 		for(Node n : nodes) {
-			MSTs.add(n.kruskal);
+			MSTs.add(n.getKruskal());
 		}
 		return MSTs;
 	}

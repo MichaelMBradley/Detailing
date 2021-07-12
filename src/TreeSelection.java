@@ -21,7 +21,7 @@ public class TreeSelection {
 		float distance, testDist;
 		PVector next = new PVector();
 		for (Node n : nodes) {
-			MSTs.add(n.kruskal);
+			MSTs.add(n.getKruskal());
 		}
 		options = MSTClosestNode(MSTs, vertices);
 		// Finding closest edge to node
@@ -67,8 +67,8 @@ public class TreeSelection {
 					j = i + 1 == vertices.size() ? 0 : i + 1;
 					vi = vertices.get(i);
 					vj = vertices.get(j);
-					testPV = Traversal.closestPoint2(vi, vj, n.pv);
-					test = (float) Line2D.ptSegDist(vi.x, vi.y, vj.x, vj.y, n.x, n.y) - n.r;
+					testPV = Traversal.closestPoint2(vi, vj, n.getPV());
+					test = (float) Line2D.ptSegDist(vi.x, vi.y, vj.x, vj.y, n.getX(), n.getY()) - n.getR();
 					if (test < close) {
 						touch = testPV;
 						close = test;
@@ -99,14 +99,14 @@ public class TreeSelection {
 			dist = Float.MAX_VALUE;
 			for (int i = 0; i < vertices.size(); i++) {
 				j = vertices.get(i + 1 == vertices.size() ? 0 : i + 1);  // Next vertex w/ wraparound
-				if (Geometry.distanceToSegment(vertices.get(i), j, n.pv) < dist) {
+				if (Geometry.distanceToSegment(vertices.get(i), j, n.getPV()) < dist) {
 					k = vertices.get(i);
 					l = j;
 				}
 			}
-			edge = new Node(PVector.sub(n.pv, Traversal.closestPoint2(k, l, n.pv)));
-			//println("\n" + edge + "\t" + PVector.sub(n.pv, edge.pv).heading());
-			traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.x, n.y), includeParents));
+			edge = new Node(PVector.sub(n.getPV(), Traversal.closestPoint2(k, l, n.getPV())));
+			//println("\n" + edge + "\t" + PVector.sub(n.getPV(), edge.getPV()).heading());
+			traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.getX(), n.getY()), includeParents));
 		}
 		return traverse;
 	}
@@ -126,8 +126,8 @@ public class TreeSelection {
 		Polygon shape = ShapeFunctions.toPolygon(vertices);
 		for (int i = 0; i < kruskal.size(); i++) {
 			dist = Float.MAX_VALUE;
-			for (Node n : kruskal.get(i).kruskal) {
-				for (Node m : kruskal.get(i + 1 == kruskal.size() ? 0 : i + 1).kruskal) {
+			for (Node n : kruskal.get(i).getKruskal()) {
+				for (Node m : kruskal.get(i + 1 == kruskal.size() ? 0 : i + 1).getKruskal()) {
 					if (m.distanceToCircle(n) < dist) {
 						next = m;
 						end = n;
@@ -139,7 +139,7 @@ public class TreeSelection {
 			order.add(next);
 		}
 		for (int i = 1; i < order.size(); i += 2) {
-			traverse.addAll(order.get(i).kruskalTreeTraverse(empty, shape.contains(order.get(i).x, order.get(i).y), includeParents, order.get(i + 1 == order.size() ? 0 : i + 1)));
+			traverse.addAll(order.get(i).kruskalTreeTraverse(empty, shape.contains(order.get(i).getX(), order.get(i).getY()), includeParents, order.get(i + 1 == order.size() ? 0 : i + 1)));
 		}
 		//println(order);
 		return traverse;
@@ -166,14 +166,14 @@ public class TreeSelection {
 					break;
 				}
 			}
-			conv.put(temp.pv, temp);
-			base.add(new Node(temp.x, temp.y, temp.r));
+			conv.put(temp.getPV(), temp);
+			base.add(new Node(temp.getX(), temp.getY(), temp.getR()));
 		}
 		DelaunayMethods.updateDelaunay(base);
 		TreeCreation.kruskal(base);
 		traverse = traverseTreesBase(base, vertices, true);
 		for (i = 0; i < traverse.size(); i++) {
-			traverse.set(i, conv.get(traverse.get(i).pv));
+			traverse.set(i, conv.get(traverse.get(i).getPV()));
 		}
 		return traverse;
 	}

@@ -7,8 +7,7 @@ import java.util.Arrays;
 import static processing.core.PApplet.*;
 
 public class Bezier implements Curve {
-	public float start, end;
-	public float[] info;
+	private float[] info;
 	
 	public Bezier() {
 		info = new float[8];
@@ -38,7 +37,7 @@ public class Bezier implements Curve {
 					info[4], info[5], info[6], info[7]);
 			m /= 2;
 		}
-		println(String.format("%s\nFrom: %s =: %s\tTo: %s, =: %s\n", Helpers.floatArrayToString(info), from, from.isConnecting(), to, to.isConnecting()));
+		// println(String.format("%s\nFrom: %s =: %s\tTo: %s, =: %s\n", Helpers.floatArrayToString(info), from, from.isConnecting(), to, to.isConnecting()));
 	}
 	
 	
@@ -52,11 +51,11 @@ public class Bezier implements Curve {
 	}
 	@Override
 	public float getStartAngle() {
-		return start;
+		return new PVector(info[2] - info[0], info[3] - info[1]).heading();
 	}
 	@Override
 	public float getEndAngle() {
-		return end;
+		return new PVector(info[4] - info[6], info[5] - info[7]).heading();
 	}
 	@Override
 	public PVector getStartPVector() {

@@ -1,3 +1,4 @@
+import lombok.Getter;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -9,16 +10,16 @@ public class Clothoid implements Curve {
 	// Code from Joe (https://math.stackexchange.com/users/221133/joe), Get points in the plane of an Euler spiral given by curvature, URL (version: 2019-04-22): https://math.stackexchange.com/q/3196882
 	// This implementation generates a clothoid from angles k1 to k2, and then scales, rotates, and transforms it to fit the given start and endpoints.
 	// Unfortuntely, this means that it no longer properly fits the given input angles.
-	public ArrayList<PVector> points;
-	public float start, end;
-	public PVector first, last;
+	private final ArrayList<PVector> points;
+	@Getter private final float startAngle, endAngle;
+	@Getter private final PVector startPVector, endPVector;
 	
 	public Clothoid() {
 		points = new ArrayList<>();
-		start = Float.NaN;
-		end = Float.NaN;
-		first = new PVector();
-		last = new PVector();
+		startAngle = Float.NaN;
+		endAngle = Float.NaN;
+		startPVector = new PVector();
+		endPVector = new PVector();
 	}
 	public Clothoid(Curve c1, Curve c2) {
 		this(c1.getEndAngle(), c2.getStartAngle(), c1.getEndPVector(), c2.getStartPVector());
@@ -28,10 +29,10 @@ public class Clothoid implements Curve {
 		for(float i = 0; i <= 1; i += (1f / (15f * (k2 - k1)))) {
 			points.add(fit_clothoid(i, k1, k2, p1, p2));
 		}
-		start = k1;
-		end = k2;
-		first = points.get(0);
-		last = points.get(points.size() - 1);
+		startAngle = k1;
+		endAngle = k2;
+		startPVector = points.get(0);
+		endPVector = points.get(points.size() - 1);
 	}
 	
 	public PVector quadrature(float t, float k1, float k2) {
@@ -67,31 +68,15 @@ public class Clothoid implements Curve {
 	
 	@Override
 	public boolean isEmpty() {
-		return start == end || first.equals(last);
+		return startAngle == endAngle || startPVector.equals(endPVector);
 	}
 	@Override
 	public boolean isConnecting() {
 		return false;
 	}
 	@Override
-	public float getStartAngle() {
-		return start;
-	}
-	@Override
-	public float getEndAngle() {
-		return end;
-	}
-	@Override
-	public PVector getStartPVector() {
-		return first;
-	}
-	@Override
-	public PVector getEndPVector() {
-		return last;
-	}
-	@Override
 	public float getSize() {
-		return first.dist(last);
+		return startPVector.dist(endPVector);
 	}
 	
 	@Override

@@ -34,7 +34,7 @@ public class ShapeFunctions {
 	public static ArrayList<PVector> getPVectors(HashSet<Node> nodes) {
 		ArrayList<PVector> vectors = new ArrayList<>();
 		for (Node n : nodes) {
-			vectors.add(n.pv);
+			vectors.add(n.getPV());
 		}
 		return vectors;
 	}
@@ -51,7 +51,7 @@ public class ShapeFunctions {
 		HashSet<HashSet<PVector>> tris = new HashSet<>();
 		ArrayList<PVector> triInfo;
 		for(Node n : nodes) {
-			link.put(n.pv, new HashSet<>());
+			link.put(n.getPV(), new HashSet<>());
 		}
 		for(float[] line : d.getEdges()) {
 			link.get(new PVector(line[0], line[1])).add(new PVector(line[2], line[3]));

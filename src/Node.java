@@ -1,3 +1,5 @@
+import lombok.Getter;
+import lombok.Setter;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -8,7 +10,7 @@ import java.util.HashSet;
 import static processing.core.PConstants.TWO_PI;
 
 public class Node extends Circle {
-	public HashSet<Node> delaunay, graph, touching, kruskal, kruskalAdjacent;
+	@Getter @Setter private HashSet<Node> delaunay, graph, touching, kruskal, kruskalAdjacent;
 
 	public Node(float xPos, float yPos, float rad) {
 		super(xPos, yPos, rad);
@@ -27,7 +29,7 @@ public class Node extends Circle {
 		init();
 	}
 	
-	public void init() {
+	private void init() {
 		kruskal = new HashSet<>();
 		kruskalAdjacent = new HashSet<>();
 		resetGraph();
@@ -40,8 +42,7 @@ public class Node extends Circle {
 		*/
 		delaunay = new HashSet<>();
 		touching = new HashSet<>();
-		graph = new HashSet<>();
-		graph.add(this);
+		graph = new HashSet<>(Collections.singletonList(this));
 	}
 	
 	public void findTouching(HashSet<Node> nodes) {
@@ -115,8 +116,8 @@ public class Node extends Circle {
 			return below;
 		} else if (kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
 			//float small = 0.5f;
-			r *= 0.5f;//small;
-			move(PVector.sub(call.pv, pv).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
+			setR(getR() * 0.5f);//small;
+			move(PVector.sub(call.getPV(), getPV()).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
 			return below;
 		}
 		orderedChildren = sortRelativeHeadings(orderedChildren, call, clockwise);
@@ -144,8 +145,8 @@ public class Node extends Circle {
 		ArrayList<Node> sortedNodes = new ArrayList<>();
 		float heading;
 		for (Node n : children) {
-			heading = PVector.sub(n.pv, this.pv).heading();
-			if (heading > PVector.sub(call.pv, this.pv).heading()) {
+			heading = PVector.sub(n.getPV(), getPV()).heading();
+			if (heading > PVector.sub(call.getPV(), getPV()).heading()) {
 				if (clockwise) {
 					heading -= TWO_PI;
 				}

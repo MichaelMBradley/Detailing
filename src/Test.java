@@ -65,9 +65,9 @@ public class Test {
 		/*
 		iter = (int(mouseX)/5)*5 * PI / 180f;//+= 0.01f;
 		Circle n1 = new Circle(400, 400, 50);
-		Circle n2 = new Circle(n1.x + 100 * cos(iter), n1.y + 100 * sin(iter), 50);
-		Circle n3 = new Circle(n2.x + 100 * cos(1.5 * iter), n2.y + 100 * sin(1.5 * iter), 50);
-		Circle n4 = new Circle(n2.x + 100 * cos(1.5 * iter + HALF_PI), n2.y + 100 * sin(1.5 * iter + HALF_PI), 50);
+		Circle n2 = n1.adjacent(iter, 50);
+		Circle n3 = n2.adjacent(1.5f * iter, 50);
+		Circle n4 = n3.adajcent(1.5f * iter + HALF_PI, 50);
 		*/
 		Circle n1 = new Circle(300, 200, 50);
 		Circle n2 = new Circle(300, 300, 50);
@@ -107,8 +107,8 @@ public class Test {
 		Attempts to create a safe (non-overlapping) intermediate circle.
 		*/
 		Circle n1 = new Circle(width / 2, height / 2, 50);
-		Circle n2 = new Circle(mouseX, mouseY, n1.r);
-		Circle n3 = new Circle(n2.x + cos(TWO_PI * mouseX / width) * (n2.r * 2), n2.y + sin(TWO_PI * mouseX / width) * (n2.r * 2), n2.r);
+		Circle n2 = new Circle(mouseX, mouseY, n1.getR());
+		Circle n3 = n2.adjacent(TWO_PI * mouseX / width, n2.getR());
 		s.strokeWeight(1);s.stroke(127);
 		n1.draw(s);n2.draw(s);n3.draw(s);
 		/*for (Circle n : Smoothing.getExterior(n1, n2)) {
@@ -136,7 +136,7 @@ public class Test {
 		s.strokeWeight(3);s.stroke(0);
 		a1.draw(s);a2.draw(s);a3.draw(s);a22.draw(s);aFirst.draw(s);aSecond.draw(s);aFirst2.draw(s);aSecond2.draw(s);
 		s.fill(0);
-		s.text("a22: "+a22,a22.x,a22.y);
+		s.text("a22: "+a22, a22.getX(), a22.getY());
 		//s.text("a1: "+a1,a1.x,a1.y);s.text("a2: "+a2,a2.x,a2.y);s.text("a3: "+a3,a3.x,a3.y);
 		//s.text("aFirst: "+aFirst,aFirst.x,aFirst.y);s.text("aSecond: "+aSecond,aSecond.x,aSecond.y);s.text("aFirst2: "+aFirst2,aFirst2.x,aFirst2.y);s.text("aSecond2: "+aSecond2,aSecond2.x,aSecond2.y);
 		s.noFill();
@@ -220,8 +220,8 @@ public class Test {
 		Circle n1 = new Circle(400, 400, 50);
 		Circle n2 = new Circle(400, 500, 50);
 		float r = mouseX / 20;
-		Circle n3 = new Circle(n2.x + (r + n2.r) * cos(mouseX / 100), n2.y + (r + n2.r) * sin(mouseX / 100), r);
-		Circle n4 = new Circle(n2.x + (r + n2.r) * cos(mouseY / 100), n2.y + (r + n2.r) * sin(mouseY / 100), r);
+		Circle n3 = n2.adjacent(mouseX / 100, r);
+		Circle n4 = n2.adjacent(mouseY / 100, r);
 		n1.draw(s);
 		n2.draw(s);
 		n3.draw(s);
@@ -345,9 +345,9 @@ public class Test {
 		Circle c3 = new Circle(mouseX, mouseY, 30);
 		c1.draw(s);c2.draw(s);c3.draw(s);
 		for(Circle c : Touching.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c1, c2, (c1.r + c2.r) / 2, true)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c1, c3, (c1.r + c3.r) / 2, true)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c2, c3, (c2.r + c3.r) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c1, c2, (c1.getR() + c2.getR()) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c1, c3, (c1.getR() + c3.getR()) / 2, true)) { c.draw(s); }
+		for(Circle c : Touching.getAdjacent(c2, c3, (c2.getR() + c3.getR()) / 2, true)) { c.draw(s); }
 	}
 	public void test12() {
 		float angle = new PVector(mouseX - width / 2f, mouseY - height / 2f).heading();
@@ -393,8 +393,8 @@ public class Test {
 		s.fill(0);
 		s.text(String.format("%.2f", PVector.sub(c1, p1).heading()), c1.x, c1.y);
 		s.text(String.format("%.2f", PVector.sub(c2, p2).heading()), c2.x, c2.y);
-		s.text(String.format("%.2f", clothoid.start), p1.x, p1.y);
-		s.text(String.format("%.2f", clothoid.end), p2.x, p2.y);
+		s.text(String.format("%.2f", clothoid.getStartAngle()), p1.x, p1.y);
+		s.text(String.format("%.2f", clothoid.getEndAngle()), p2.x, p2.y);
 		s.text(angle2 - angle1, 0, 0);
 		s.noFill();
 	}

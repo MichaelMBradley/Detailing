@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+@SuppressWarnings("jol")
 public class Detailing extends PApplet {
 	private ArrayList<Curve> traverseArcs;
 	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
@@ -70,42 +71,39 @@ public class Detailing extends PApplet {
 		gridZoom();
 		if (doTest) {
 			test.run();
-		}
-		if (draw.get("numCircles")) {
-			fill(0);
-			text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
-			if (draw.get("zoom")) {
-				text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
+		} else {
+			if (draw.get("numCircles")) {
+				fill(0);
+				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
+				noFill();
 			}
-			noFill();
-		}
-		if (draw.get("shape")) {
-			stroke(0);
-			strokeWeight(1);
-			shape(shape, 0, 0);
-		}
-		drawNodes(interior, interiorCircumcircles, draw.get("interior"));
-		drawNodes(exterior, exteriorCircumcircles, draw.get("exterior"));
-		if (draw.get("traversal")) {
-			stroke(255, 0, 0);
-			strokeWeight(1);
-			for (int i = 0; i < traverse.size() - 1; i++) {
-				if (!traverse.get(i).kruskal.contains(traverse.get(i + 1))) {
-					stroke(0, 0, 255);
-				} else {
-					stroke(255, 0, 0);
+			if (draw.get("shape")) {
+				stroke(0);
+				strokeWeight(1);
+				shape(shape, 0, 0);
+			}
+			drawNodes(interior, interiorCircumcircles, draw.get("interior"));
+			drawNodes(exterior, exteriorCircumcircles, draw.get("exterior"));
+			if (draw.get("traversal")) {
+				stroke(255, 0, 0);
+				strokeWeight(1);
+				for (int i = 0; i < traverse.size() - 1; i++) {
+					if (!traverse.get(i).getKruskal().contains(traverse.get(i + 1))) {
+						stroke(0, 0, 255);
+					} else {
+						stroke(255, 0, 0);
+					}
+					Helpers.drawLine(traverse.get(i).getPV(), traverse.get(i + 1).getPV(), this);
 				}
-				Helpers.drawLine(traverse.get(i).pv, traverse.get(i + 1).pv, this);
+				stroke(0, 0, 255);
+				Helpers.drawLine(traverse.get(traverse.size() - 1).getPV(), traverse.get(0).getPV(), this);
 			}
-			stroke(0, 0, 255);
-			Helpers.drawLine(traverse.get(traverse.size() - 1).pv, traverse.get(0).pv, this);
-		}
-		if (draw.get("traversalArcs")) {
-			strokeWeight(1);
-			stroke(255, 0, 0);
-			float r = 255;
-			float b = 0;
-			float chn = 255.0f / (float) traverseArcs.size();
+			if (draw.get("traversalArcs")) {
+				strokeWeight(1);
+				stroke(255, 0, 0);
+				float r = 255;
+				float b = 0;
+				float chn = 255.0f / (float) traverseArcs.size();
 			/*for (Arc a : traverseArcs) {
 				if (draw.get("gradient")) {
 					stroke(r, 0, b);
@@ -114,54 +112,55 @@ public class Detailing extends PApplet {
 				}
 				a.draw(this);
 			}*/
-			stroke(255, 0, 0);
-			for(int i = traverseArcs.size() - 1; i >= 0; i--) {
-				if(i <= traverseArcs.size() / 2) {
-					stroke(0, 0, 0);
+				stroke(255, 0, 0);
+				for (int i = traverseArcs.size() - 1; i >= 0; i--) {
+					if (i <= traverseArcs.size() / 2) {
+						stroke(0, 0, 0);
+					}
+					traverseArcs.get(i).draw(this);
 				}
-				traverseArcs.get(i).draw(this);
 			}
+			if (draw.get("iterate")) {
+				// things can be done with p and q
+				// keyPressed(); // ?
+				maxIter = traverseArcs.size();
+				stroke(0, 255, 0);
+				traverseArcs.get(p).draw(this);
+			}
+			//noLoop();
 		}
-		if (draw.get("iterate")) {
-			// things can be done with p and q
-			// keyPressed(); // ?
-			maxIter = traverseArcs.size();
-			stroke(0, 255, 0);
-			traverseArcs.get(p).draw(this);
-		}
-		//noLoop();
 	}
 	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
         /*
         Nodes may be stored in multiple discrete sets.
         This function draws relevant information for all nodes in a given set.
         */
-		if (!doTest) {
-			for (Node n : circles) {
+		if(!doTest) {
+			for(Node n : circles) {
 				if (drawCircles) {
 					stroke(0);
 					strokeWeight(1);
 					n.draw(this);
 				}
-				if (draw.get("touching")) {
+				if(draw.get("touching")) {
 					stroke(0, 0, 255);
 					strokeWeight(1);
-					for (Node t : n.touching) {
-						Helpers.drawLine(n.pv, t.pv, this);
+					for (Node t : n.getTouching()) {
+						Helpers.drawLine(n.getPV(), t.getPV(), this);
 					}
 				}
-				if (draw.get("delaunay")) {
+				if(draw.get("delaunay")) {
 					stroke(255, 0, 0);
 					strokeWeight(1);
-					for (Node t : n.delaunay) {
-						Helpers.drawLine(n.pv, t.pv, this);
+					for(Node t : n.getDelaunay()) {
+						Helpers.drawLine(n.getPV(), t.getPV(), this);
 					}
 				}
-				if (draw.get("kruskal")) {
+				if(draw.get("kruskal")) {
 					stroke(0, 255, 0);
 					strokeWeight(1);
-					for (Node t : n.kruskalAdjacent) {
-						Helpers.drawLine(n.pv, t.pv, this);
+					for(Node t : n.getKruskalAdjacent()) {
+						Helpers.drawLine(n.getPV(), t.getPV(), this);
 					}
 				}
 			}
@@ -183,14 +182,17 @@ public class Detailing extends PApplet {
 		translate(offset.x, offset.y);
 		if (draw.get("zoom")) {
 			translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
+			fill(0);
+			text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
+			noFill();
 		}
 		if (draw.get("snap") && draw.get("grid")) {
 			mx = mouseX - (int) offset.x;
 			my = mouseY - (int) offset.y;
 			for (Node n : nodes) {
-				if (n.distanceToCenter(mx, my) < n.r) {
-					mouseX = (int) (n.x + offset.x);
-					mouseY = (int) (n.y + offset.y);
+				if (n.distanceToCenter(mx, my) < n.getR()) {
+					mouseX = (int) (n.getX() + offset.x);
+					mouseY = (int) (n.getY() + offset.y);
 					break;
 				}
 			}

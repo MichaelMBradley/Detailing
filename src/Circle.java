@@ -1,26 +1,34 @@
+import lombok.Getter;
+import lombok.Setter;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import static processing.core.PApplet.dist;
+import static processing.core.PApplet.*;
 
 public class Circle {
-	public float x, y, r;
-	public PVector pv;
+	@Getter @Setter protected float x, y, r;
+	@Getter protected PVector PV;
 	
 	public Circle(float xPos, float yPos, float rad) {
 		x = xPos;
 		y = yPos;
 		r = rad;
-		pv = new PVector(x, y);
+		PV = new PVector(x, y);
 	}
 	public Circle(PVector PVec, float rad) {
 		x = PVec.x;
 		y = PVec.y;
 		r = rad;
-		pv = PVec;
+		PV = PVec;
 	}
 	public Circle(PVector PVec) {
 		this(PVec, 0f);
+	}
+	public Circle(Circle c) {
+		x = c.getX();
+		y = c.getY();
+		r = c.getR();
+		PV = c.getPV();
 	}
 	public Circle() {
 		this(0, 0, 0);
@@ -32,10 +40,10 @@ public class Circle {
 		return dist(x, y, xPos, yPos);
 	}
 	public float distanceToCenter(PVector pos) {
-		return PVector.dist(pv, pos);
+		return PVector.dist(PV, pos);
 	}
 	public float distanceToCenter(Circle c) {
-		return distanceToCenter(c.pv);
+		return distanceToCenter(c.PV);
 	}
 	
 	// Distance from a point to the perimeter of the node
@@ -46,7 +54,7 @@ public class Circle {
 		return distanceToCenter(pos) - r;
 	}
 	public float distanceToRadius(Circle c) {
-		return distanceToCenter(c.pv) - r;
+		return distanceToCenter(c.PV) - r;
 	}
 	
 	// Distance between the closest points of each node
@@ -57,27 +65,33 @@ public class Circle {
 		return distanceToRadius(pos) - r;
 	}
 	public float distanceToCircle(Circle c) {
-		return distanceToRadius(c.pv) - c.r;
+		return distanceToRadius(c.PV) - c.r;
 	}
 	
 	public boolean overlaps(Circle c) {
 		return distanceToCircle(c) < 0;
 	}
+	public PVector PVectorOnCircumference(float angle) {
+		return new PVector(x + cos(angle) * r, y + sin(angle) * r);
+	}
+	public Circle adjacent(float angle, float rNew) {
+		return new Circle(x + cos(angle) * (r + rNew), y + sin(angle) * (r + rNew), rNew);
+	}
 	
 	public void move(PVector direction) {
-		pv.add(direction);
+		PV.add(direction);
 		x += direction.x;
 		y += direction.y;
 	}
-	public void setLocation(PVector location) {
-		pv = location;
+	public void setPV(PVector location) {
+		PV = location;
 		x = location.x;
 		y = location.y;
 	}
-	public void setLocation(float newX, float newY) {
+	public void setPV(float newX, float newY) {
 		x = newX;
 		y = newY;
-		pv = new PVector(x, y);
+		PV = new PVector(x, y);
 	}
 	public void draw(PApplet sketch) {
 		sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius

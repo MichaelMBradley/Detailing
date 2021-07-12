@@ -35,8 +35,8 @@ public class Touching {
 				}
 			}
 			// Move all nodes on first graph towards other closest node
-			moveVector = PVector.sub(closeNode.pv, closeBase.pv);
-			moveVector.setMag(moveVector.mag() - closeBase.r - closeNode.r);
+			moveVector = PVector.sub(closeNode.getPV(), closeBase.getPV());
+			moveVector.setMag(moveVector.mag() - closeBase.getR() - closeNode.getR());
 			for (Node n : graphs.get(0)) {
 				n.move(moveVector);
 			}
@@ -55,20 +55,19 @@ public class Touching {
 			n.findTouching(nodes);
 		}
 		for (Node n : nodes) {
-			for (Node t : n.touching) {
+			for (Node t : n.getTouching()) {
 				n.graphing(t);
 			}
 		}
 		for (Node n : nodes) {
 			if (!used.contains(n)) {
-				graphs.add(n.graph);
-				used.addAll(n.graph);
+				graphs.add(n.getGraph());
+				used.addAll(n.getGraph());
 			}
 		}
 		return graphs;
 	}
 	
-	@SuppressWarnings("SuspiciousNameCombination")
 	public static Circle[] getAdjacent(Circle n1, Circle n2, float r0, boolean exterior) {
         /*
         Returns the two Circles touching both of the two given Circles.
@@ -81,18 +80,18 @@ public class Touching {
         if y1==y2:
            [0] is the lower circle (higher y)
         */
-		float dist = PVector.dist(n1.pv,n2.pv);
-		if(dist + n2.r < n1.r || dist + n1.r < n2.r || dist > n1.r + n2.r + (r0 * 2)) {
+		float dist = PVector.dist(n1.getPV(),n2.getPV());
+		if(dist + n2.getR() < n1.getR() || dist + n1.getR() < n2.getR() || dist > n1.getR() + n2.getR() + (r0 * 2)) {
 			// Circle 1 contains Circle 2 || Circle 2 contains Circle 1 || circles are too far apart
 			return new Circle[] { new Circle(Float.NaN, Float.NaN, Float.NaN), new Circle(Float.NaN, Float.NaN, Float.NaN) };
 		}
-		if(abs(n1.y - n2.y) > 1){
-			return getAdjacentCalc(n1.x, n1.y, n1.r, n2.x, n2.y, n2.r, r0, exterior);
+		if(abs(n1.getY() - n2.getY()) > 1){
+			return getAdjacentCalc(n1.getX(), n1.getY(), n1.getR(), n2.getX(), n2.getY(), n2.getR(), r0, exterior);
 		} else {
 			// Swapping x/y still returns valid circles and avoids div/0 errors
-			Circle[] circles = getAdjacentCalc(n1.y, n1.x, n1.r, n2.y, n2.x, n2.r, r0, exterior);
-			circles[0].setLocation(circles[0].y, circles[0].x);
-			circles[1].setLocation(circles[1].y, circles[1].x);
+			Circle[] circles = getAdjacentCalc(n1.getY(), n1.getX(), n1.getR(), n2.getY(), n2.getX(), n2.getR(), r0, exterior);
+			circles[0].setPV(circles[0].getY(), circles[0].getX());
+			circles[1].setPV(circles[1].getY(), circles[1].getX());
 			return new Circle[] {circles[1], circles[0]};
 		}
 	}
@@ -119,34 +118,34 @@ public class Touching {
 	}
 	
 	public static Circle[] getExterior(Circle n1, Circle n2) {
-		float angle = PVector.sub(n2.pv, n1.pv).heading() + 0.01f;
+		float angle = PVector.sub(n2.getPV(), n1.getPV()).heading() + 0.01f;
 		float dist = n1.distanceToCenter(n2) / 2f;
 		return getAdjacent(n1, n2,
 				triCircleAdjacent(n1, n2,
-						new Circle(n1.x + dist * cos(angle),
-								n1.y + dist * sin(angle),
-								(n1.r + n2.r) / 3)//8)
-				)[0].r, true);
+						new Circle(n1.getX() + dist * cos(angle),
+								n1.getY() + dist * sin(angle),
+								(n1.getR() + n2.getR()) / 3)//8)
+				)[0].getR(), true);
 	}
 	public static Circle[] getExteriorSafe(Circle n1, Circle n2) {
-		return getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.r,n2.r), true)[0])[1].r * 0.9), true);
+		return getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.getR(), n2.getR()), true)[0])[1].getR() * 0.9), true);
 	}
 	public static Circle[] getInterior(Circle n1, Circle n2) {
-		return getAdjacent(n1, n2, (n1.r + n2.r - PVector.dist(n1.pv, n2.pv)) / 2f, false);
+		return getAdjacent(n1, n2, (n1.getR() + n2.getR() - PVector.dist(n1.getPV(), n2.getPV())) / 2f, false);
 	}
 	
 	public static Circle[] triCircleAdjacent(Circle n1, Circle n2, Circle n3) {
 		// John Alexiou (https://math.stackexchange.com/users/3301/john-alexiou), Calculate the circle that touches three other circles, URL (version: 2019-07-18): https://math.stackexchange.com/q/3290944
 		// [0] is on opposite side of line (n1, n2) as n3
-		float x1 = n1.x;
-		float y1 = n1.y;
-		float r1 = n1.r;
-		float x2 = n2.x;
-		float y2 = n2.y;
-		float r2 = n2.r;
-		float x3 = n3.x;
-		float y3 = n3.y;
-		float r3 = n3.r;
+		float x1 = n1.getX();
+		float y1 = n1.getY();
+		float r1 = n1.getR();
+		float x2 = n2.getX();
+		float y2 = n2.getY();
+		float r2 = n2.getR();
+		float x3 = n3.getX();
+		float y3 = n3.getY();
+		float r3 = n3.getR();
 		float Ka = -pow(r1, 2) + pow(r2, 2) + pow(x1, 2) - pow(x2, 2) + pow(y1, 2) - pow(y2, 2);
 		float Kb = -pow(r1, 2) + pow(r3, 2) + pow(x1, 2) - pow(x3, 2) + pow(y1, 2) - pow(y3, 2);
 		float D = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2);
@@ -172,6 +171,13 @@ public class Touching {
 		return triCircleAdjacentSafer(lockStart, mid, lockEnd, 0.75f);
 	}
 	public static Circle[] triCircleAdjacentSafer(Circle lockStart, Circle mid, Circle lockEnd, float lerpFactor) {
-		return triCircleAdjacent(lockStart, new Circle(PVector.lerp(PVector.lerp(lockStart.pv, lockEnd.pv, lockStart.r / lockStart.distanceToCenter(lockEnd)), PVector.lerp(lockEnd.pv, lockStart.pv, lockEnd.r / lockEnd.distanceToCenter(lockStart)), 0.5f).lerp(mid.pv, lerpFactor), mid.r), lockEnd);
+		float dist = lockStart.distanceToCenter(lockEnd);
+		return triCircleAdjacent(lockStart,
+				new Circle(PVector.lerp(
+								PVector.lerp(lockStart.getPV(), lockEnd.getPV(), (lockStart.getR() / dist)),
+								PVector.lerp(lockEnd.getPV(), lockStart.getPV(), (lockEnd.getR() / dist)),
+								0.5f).lerp(mid.getPV(), lerpFactor),
+						mid.getR()),
+				lockEnd);
 	}
 }

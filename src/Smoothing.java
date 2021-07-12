@@ -15,7 +15,7 @@ public class Smoothing {
 		Node base = nodes.get(0);
 		ArrayList<ArrayList<Node>> trees = new ArrayList<>(Collections.singletonList(new ArrayList<>(Collections.singletonList(base))));
 		for(Node n : nodes.subList(1, nodes.size())) {
-			if(trees.get(trees.size() - 1).get(0).kruskal.contains(n)) {
+			if(trees.get(trees.size() - 1).get(0).getKruskal().contains(n)) {
 				trees.get(trees.size() - 1).add(n);
 			} else {
 				trees.add(new ArrayList<>(Collections.singletonList(n)));
@@ -29,7 +29,7 @@ public class Smoothing {
 			arcInside.add(new Arc());
 			for(int i = 0; i < arcTree.size(); i++) {
 				arc = arcTree.get(i);
-				arcInside.add(new Arc(arc.pv, arc.r + (0.5f * (out == (i % 2 == 0) ? 1 : -1)), arc.drawStart, arc.drawEnd));
+				arcInside.add(new Arc(arc.getPV(), arc.getR() + (0.5f * (out == (i % 2 == 0) ? 1 : -1)), arc.getDrawStart(), arc.getDrawEnd()));
 			}
 		}
 		for(int i = 0; i < arcs.size(); i++) {
@@ -44,7 +44,7 @@ public class Smoothing {
 					//println(arcs.get(i) + "\t" + arcs.get(i == 0 ? arcs.size() - 1 : i - 1) + "\t" + arcs.get(i == arcs.size() - 1 ? 0 : i + 1));
 					if(arcs.get(i) instanceof Arc) {
 						newArc = new Arc((Arc) arcs.get(i));
-						newArc.r -= 0.5f;
+						newArc.setR(newArc.getR() - 0.5f);
 						arcInside.set(i, newArc);
 					}
 					
@@ -77,7 +77,7 @@ public class Smoothing {
 					if(tri) {
 						ev.set(i, Touching.triCircleAdjacentSafer(ev.get(i - 2), ev.get(i), ev.get(i + 2))[1]);
 					}
-					if(!tri || ev.get(i).r > (ev.get(i - 2).r + ev.get(i + 2).r) * 2) {
+					if(!tri || ev.get(i).getR() > (ev.get(i - 2).getR() + ev.get(i + 2).getR()) * 2) {
 						ev.set(i, Touching.getExterior(ev.get(i - 2), ev.get(i + 2))[clockwise ? 1 : 0]);
 					}
 					ev.remove(i + 1);
@@ -94,7 +94,7 @@ public class Smoothing {
 				closeCircle = new Circle();
 				closeDist = Float.MAX_VALUE;
 				for(Circle c : nodes) {
-					test = Geometry.distanceToSegment(ev.get(i - 1).pv, ev.get(i + 1).pv, c.pv);
+					test = Geometry.distanceToSegment(ev.get(i - 1).getPV(), ev.get(i + 1).getPV(), c.getPV());
 					if(ev.get(i).overlaps(c) && test < closeDist && !ev.subList(i - 1, i + 2).contains(c)) {
 						closeCircle = c;
 						closeDist = test;
@@ -125,7 +125,7 @@ public class Smoothing {
 		ArrayList<ArrayList<Node>>trees = new ArrayList<>(Collections.singletonList(new ArrayList<>(Collections.singletonList(new Node()))));
 		ArrayList<Arc> arcs = new ArrayList<>();
 		for(Node n : nodes){
-			if(!trees.get(trees.size() - 1).get(0).kruskal.contains(n)){
+			if(!trees.get(trees.size() - 1).get(0).getKruskal().contains(n)){
 				trees.add(new ArrayList<>());
 			}
 			trees.get(trees.size() - 1).add(n);
@@ -158,13 +158,13 @@ public class Smoothing {
 			ni = nodes.get(i);
 			nj = nodes.get(i - 1);
 			// Choosing which side of the circle to put the arc on based on the direction
-			if(ni.x == nj.x){
-				choose = ni.y > nj.y ? 0 : 1;
-			}else if(ni.y == nj.y){
-				choose = ni.x > nj.x ? 1 : 0;
-			}else if(nj.y>ni.y){
+			if(ni.getX() == nj.getX()) {
+				choose = ni.getY() > nj.getY() ? 0 : 1;
+			} else if(ni.getY() == nj.getY()) {
+				choose = ni.getX() > nj.getX() ? 1 : 0;
+			} else if(nj.getY() > ni.getY()) {
 				choose = 1;
-			}else{
+			} else {
 				choose=0;
 			}
 			nc = Touching.getExterior(ni, nj)[choose];
@@ -190,7 +190,7 @@ public class Smoothing {
 			}
 			//println(j);
 			for(int i = 1; i < arcCircles.size() - 1; i++) {
-				se = order(arcCircles.get(i - 1).pv, arcCircles.get(i).pv, arcCircles.get(i + 1).pv, (i % 2 == 0));
+				se = order(arcCircles.get(i - 1).getPV(), arcCircles.get(i).getPV(), arcCircles.get(i + 1).getPV(), (i % 2 == 0));
 				arcs.add(new Arc(arcCircles.get(i), se[0], se[1]));
 			}
 		}

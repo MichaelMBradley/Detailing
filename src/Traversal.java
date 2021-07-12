@@ -10,7 +10,7 @@ public class Traversal {
 		float tempDist;
 		float distance = 1e6f;
 		for (Node n : nodes) {
-			tempDist = PVector.dist(vertex, n.pv);
+			tempDist = PVector.dist(vertex, n.getPV());
 			if (tempDist < distance) {
 				distance = tempDist;
 				close = n;
@@ -37,7 +37,6 @@ public class Traversal {
 		float y = m * (x - p1.x) + p1.y;
 		return new PVector(x, y);
 	}
-	
 	public static PVector closestPoint2(PVector p1, PVector p2, PVector p0) {
         /*
         Projects the node onto the vector between (p1, p2) to find the closest point.
@@ -56,7 +55,7 @@ public class Traversal {
 		HashSet<Node> side = new HashSet<>();
 		Polygon shape = ShapeFunctions.toPolygon(vertices);
 		for (Node n : nodes) {
-			if (shape.contains(n.x, n.y) == inside) {
+			if (shape.contains(n.getX(), n.getY()) == inside) {
 				side.add(n);
 			}
 		}
@@ -76,14 +75,14 @@ public class Traversal {
 		ArrayList<Arc> arcs = new ArrayList<>();
 		System.out.println(traversal.size());
 		for (int i = 0; i < traversal.size() - 1; i++) {
-			if (traversal.get(i).kruskalAdjacent.contains(traversal.get(i + 1))) {
+			if (traversal.get(i).getKruskalAdjacent().contains(traversal.get(i + 1))) {
 				arcs.add(Geometry.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);//All(Arrays.asList(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))));//
 				System.out.println(arcs.get(arcs.size() - 1));
 			} else {
-				arcs.add(Geometry.arcLine(traversal.get(i).pv, traversal.get(i + 1).pv));
+				arcs.add(Geometry.arcLine(traversal.get(i).getPV(), traversal.get(i + 1).getPV()));
 			}
 		}
-		arcs.add(Geometry.arcLine(traversal.get(traversal.size() - 1).pv, traversal.get(0).pv));
+		arcs.add(Geometry.arcLine(traversal.get(traversal.size() - 1).getPV(), traversal.get(0).getPV()));
 		return arcs;
 	}
 }
