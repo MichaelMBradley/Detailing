@@ -101,7 +101,6 @@ public class ShapeFunctions {
 		}
 		return proper;
 	}
-	
 	public static PVector toPVector(float[] vertices) {
 		return new PVector(vertices[0], vertices[1]);
 	}

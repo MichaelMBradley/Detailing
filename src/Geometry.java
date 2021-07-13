@@ -81,7 +81,9 @@ public class Geometry {
 		}
 		return info;
 	}
-	
+	public static Circle triangleToCircle(PVector pv1, PVector pv2, PVector pv3) {
+		return triangleToCircle(pv1.x, pv1.y, pv2.x, pv2.y, pv3.x, pv3.y);
+	}
 	public static Circle triangleToCircle(float x1, float y1, float x2, float y2, float x3, float y3) {
         /*
         Calculates the circumcircle of a triangle.
@@ -112,9 +114,5 @@ public class Geometry {
 		}
 		r = dist(x, y, x1, y1);
 		return new Circle(x, y, r);
-	}
-	
-	public static Circle triangleToCircle(PVector pv1, PVector pv2, PVector pv3) {
-		return triangleToCircle(pv1.x, pv1.y, pv2.x, pv2.y, pv3.x, pv3.y);
 	}
 }

@@ -103,6 +103,9 @@ public class Arc extends Circle implements Curve {
 	public float getSize() {
 		return getR();
 	}
+	public float getRange() {
+		return drawEnd - drawStart;
+	}
 	
 	@Override
 	public void draw(PApplet sketch) {
@@ -119,7 +122,7 @@ public class Arc extends Circle implements Curve {
 		sketch.circle(getX(), getY(), getR() * 2);
 	}
 	public boolean overlaps(Arc a) {
-		Circle[] circles = Touching.getAdjacent(this, a, 0f, true);
+		Circle[] circles = Adjacent.getAdjacent(this, a, 0f, true);
 		if(Float.isNaN(circles[0].getR())) {
 			return false;
 		}

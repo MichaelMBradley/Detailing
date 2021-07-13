@@ -137,19 +137,19 @@ public class CirclePacking {
 		return new HashSet<>(nodes);
 	}
 	
-	public static void voronoiPacking(Collection<Node> nodes) {
+	public static void voronoiPacking(Collection<Circle> nodes) {
 		voronoiPacking(nodes, -1f, -1f);
 	}
-	public static void voronoiPacking(Collection<Node> nodes, ArrayList<PVector> vertices, float minimise) {
+	public static void voronoiPacking(Collection<Circle> nodes, ArrayList<PVector> vertices, float minimise) {
 		PVector max = ShapeFunctions.extremes(vertices)[1];
 		float maxRadius = max(max.x, max.y) / (60 * minimise) * 4;
 		float minRadius = maxRadius / 2;
 		voronoiPacking(nodes, -1f, maxRadius);
 	}
-	public static void voronoiPacking(Collection<Node> nodes, float minR, float maxR) {
+	public static void voronoiPacking(Collection<Circle> nodes, float minR, float maxR) {
 		ArrayList<PVector> pvs = new ArrayList<>();
 		float close;
-		for(Node n : nodes) {
+		for(Circle n : nodes) {
 			pvs.add(n.getPV());
 		}
 		Voronoi v = new Voronoi(ShapeFunctions.toFloatArray(pvs));
@@ -161,10 +161,14 @@ public class CirclePacking {
 						close = min(close, c.distanceToRadius(co[0], co[1]));
 					}
 					if (close > 0 && close != Float.MAX_VALUE && (minR == -1f || close > minR) && (maxR == -1f || close < maxR)) {
-						nodes.add(new Node(co[0], co[1], close));
+						nodes.add(new Circle(co[0], co[1], close));
 					}
 				}
 			}
 		}
+	}
+	
+	public static void reduce(Collection<Node> circles) {
+		circles.forEach(c -> c.setR(c.getR() * 0.9f));
 	}
 }

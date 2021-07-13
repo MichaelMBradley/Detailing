@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 import static processing.core.PApplet.*;
 
-public class Touching {
+public class Adjacent {
 	public static void condense(HashSet<Node> nodes) {
         /*
         Combine many graphs into one by moving the first graph
@@ -165,7 +165,7 @@ public class Touching {
 		// println(String.format("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", Ka, Kb, D, A0, B0, A1, B1, C0, C1, C2));
 		// println(Ka + " " + Kb + " " + D + " " + A0 + " " + B0 + " " + A1 + " " + B1 + " " + C0 + " " + C1 + " " + C2);
 		// println(String.format("%s %s %s (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)", n1, n2, n3, x4, y4, r4, x5, y5, r5));
-		return new Circle[] { new Circle(x4, y4, r4), new Circle(x5, y5, r5) };
+		return new Circle[] { new Circle(x4, y4, abs(r4)), new Circle(x5, y5, abs(r5)) };
 	}
 	public static Circle[] triCircleAdjacentSafer(Circle lockStart, Circle mid, Circle lockEnd) {
 		return triCircleAdjacentSafer(lockStart, mid, lockEnd, 0.75f);

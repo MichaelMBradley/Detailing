@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/*
+TODO: Fix triCircleAdjacent() arcs overlapping each other
+TODO: Generate path such that bezier curves don't overlap arcs
+*/
+
 @SuppressWarnings("jol")
 public class Detailing extends PApplet {
 	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
@@ -67,6 +72,7 @@ public class Detailing extends PApplet {
 	
 	@Override
 	public void draw() {
+		// calc();
 		background(255);
 		gridZoom();
 		if (doTest) {
@@ -101,15 +107,15 @@ public class Detailing extends PApplet {
 			if (draw.get("traversalArcs")) {
 				strokeWeight(1);
 				if (draw.get("gradient")) {
-					float r = 255;
-					float b = 0;
-					float chn = 255f / (float) traverseArcs.size();
+					float h = 0f;
+					float chn = 360f / (float) traverseArcs.size();
+					colorMode(HSB, 360, 100, 100);
 					for (Curve c : traverseArcsInterior) {
-						stroke(r, 0, b);
-						r -= chn;
-						b += chn;
+						stroke(h, 100, 100);
+						h += chn;
 						c.draw(this);
 					}
+					colorMode(RGB, 255, 255, 255);
 				}
 				stroke(0);
 				traverseArcs.forEach(c -> c.draw(this));
@@ -229,15 +235,16 @@ public class Detailing extends PApplet {
 			int start;
 			start = millis();
 			nodes = CirclePacking.randomFillAware(vertices, minimise);
+			CirclePacking.reduce(nodes);
 			println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, nodes.size(), nodes.size() / ((float) (millis() - start) / 1000)));
 			if (draw.get("condense")) {
 				start = millis();
-				Touching.condense(nodes);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
+				Adjacent.condense(nodes);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
 				println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
 			}
 			if (draw.get("getTouching") && !draw.get("condense")) {
 				start = millis();
-				Touching.createTouchingGraphs(nodes);
+				Adjacent.createTouchingGraphs(nodes);
 				println(String.format("Touching: %.3f", (float) (millis() - start) / 1000));
 			}
 			println("-Interior-");
@@ -250,7 +257,7 @@ public class Detailing extends PApplet {
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
 			//traverse = TreeSelection.traverseTreesSkip(nodes, vertices, true);
-			traverseArcs = Smoothing.fixedSurroundingArcs(traverse, exterior);
+			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 		} else {

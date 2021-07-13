@@ -9,6 +9,7 @@ public interface Curve {
 	PVector getStartPVector();
 	PVector getEndPVector();
 	float getSize();
+	float getRange();
 	
 	void draw(PApplet sketch);
 }

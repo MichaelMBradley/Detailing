@@ -1,7 +1,6 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.awt.geom.Line2D;
 import java.util.Arrays;
 
 import static processing.core.PApplet.*;
@@ -21,23 +20,18 @@ public class Bezier implements Curve {
 	public Bezier(Curve from, Curve to) {
 		// Bezier connect
 		this();
-		float angle, m = 2f, r = min(from.getSize(), to.getSize());
+		float angle, rF = pow(to.getSize(), 0.5f), rT = pow(to.getSize(), 0.5f);
 		boolean invalid = true;
 		info = new float[8];
 		info[0] = from.getEndPVector().x;
 		info[1] = from.getEndPVector().y;
 		info[6] = to.getStartPVector().x;
 		info[7] = to.getStartPVector().y;
-		while(invalid && m > 0.01f) {
-			info[2] = info[0] + m * r * cos(from.getEndAngle());
-			info[3] = info[1] + m * r * sin(from.getEndAngle());
-			info[4] = info[6] + m * r * cos(to.getStartAngle());
-			info[5] = info[7] + m * r * sin(to.getStartAngle());
-			invalid = Line2D.linesIntersect(info[0], info[1], info[2], info[3],
-					info[4], info[5], info[6], info[7]);
-			m /= 2;
-		}
-		// println(String.format("%s\nFrom: %s =: %s\tTo: %s, =: %s\n", Helpers.floatArrayToString(info), from, from.isConnecting(), to, to.isConnecting()));
+		info[2] = info[0] + rF * cos(from.getEndAngle());
+		info[3] = info[1] + rF * sin(from.getEndAngle());
+		info[4] = info[6] + rT * cos(to.getStartAngle());
+		info[5] = info[7] + rT * sin(to.getStartAngle());
+		// println(String.format("%s\nFrom: %s\tTo: %s\n", Helpers.floatArrayToString(info), from, to));
 	}
 	
 	
@@ -68,6 +62,10 @@ public class Bezier implements Curve {
 	@Override
 	public float getSize() {
 		return new PVector(info[0], info[1]).dist(new PVector(info[6], info[7]));
+	}
+	@Override
+	public float getRange() {
+		return abs(getEndAngle() - getStartAngle());
 	}
 	
 	public void draw(PApplet sketch) {

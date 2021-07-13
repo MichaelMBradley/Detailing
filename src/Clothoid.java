@@ -78,6 +78,10 @@ public class Clothoid implements Curve {
 	public float getSize() {
 		return startPVector.dist(endPVector);
 	}
+	@Override
+	public float getRange() {
+		return endAngle - startAngle;
+	}
 	
 	@Override
 	public void draw(PApplet sketch) {

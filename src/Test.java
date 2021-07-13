@@ -97,7 +97,7 @@ public class Test {
 		/*n1.draw(s);n2.draw(s);n3.draw(s);n4.draw(s);n5.draw(s);n6.draw(s);n7.draw(s);n8.draw(s);n9.draw(s);*/
 		s.strokeWeight(1);
 		s.stroke(0);
-		ArrayList<Arc> arcs = Smoothing.fixedSurroundingArcsTree(ns, true);
+		ArrayList<Curve> arcs = Smoothing.fixedSurroundingArcsTree(ns, true);
 		for (int i = 0; i < arcs.size() * percentX; i++) {
 			arcs.get(i).draw(s);
 		}
@@ -119,10 +119,10 @@ public class Test {
 				j.draw(s);
 			}
 		}*/
-		Circle first = Touching.getExterior(n1, n2)[0];
-		Circle second = Touching.getExterior(n2, n1)[0];
-		Circle first2 = Touching.getExterior(n2, n3)[0];
-		Circle second2 = Touching.getExterior(n3, n2)[0];
+		Circle first = Adjacent.getExterior(n1, n2)[0];
+		Circle second = Adjacent.getExterior(n2, n1)[0];
+		Circle first2 = Adjacent.getExterior(n2, n3)[0];
+		Circle second2 = Adjacent.getExterior(n3, n2)[0];
 		first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
 		// a1 -> aFirst -> a2 -> aFirst2 -> a3 -> aSecond2 -> a2 -> aSecond -> a1
 		Arc a1 = new Arc(n1, second, first, false);
@@ -197,7 +197,7 @@ public class Test {
 		Circle n2 = new Circle(mouseX, mouseY, 100);
 		n1.draw(s);
 		n2.draw(s);
-		for (Circle n : Touching.getInterior(n1, n2)) {
+		for (Circle n : Adjacent.getInterior(n1, n2)) {
 			n.draw(s);
 		}
 		//noLoop();
@@ -226,13 +226,13 @@ public class Test {
 		n2.draw(s);
 		n3.draw(s);
 		n4.draw(s);
-		for (Circle n : Touching.getExterior(n1, n2)) {
+		for (Circle n : Adjacent.getExterior(n1, n2)) {
 			n.draw(s);
 		}
-		for (Circle n : Touching.getExterior(n2, n3)) {
+		for (Circle n : Adjacent.getExterior(n2, n3)) {
 			n.draw(s);
 		}
-		for (Circle n : Touching.getExterior(n2, n4)) {
+		for (Circle n : Adjacent.getExterior(n2, n4)) {
 			n.draw(s);
 		}
 	}
@@ -244,7 +244,7 @@ public class Test {
 		Circle n2 = new Circle(mouseX, mouseY, 25);
 		n1.draw(s);
 		n2.draw(s);
-		Circle[] ext = Touching.getExterior(n1, n2);
+		Circle[] ext = Adjacent.getExterior(n1, n2);
 		for (Circle n : ext) {
 			n.draw(s);
 		}
@@ -318,21 +318,21 @@ public class Test {
 	}
 	public void test10() {
 		s.randomSeed(10L);
-		Node c1 = new Node(200, 200, 100);
-		Node c2 = new Node(700, 200, 100);
-		Node c3 = new Node(200, 700, 100);
-		Node c4 = new Node(700, 700, 100);
-		Node c5 = new Node(400, 400, 100);
-		Node c6 = new Node(mouseX, mouseY, 50);
+		Circle c1 = new Circle(200, 200, 100);
+		Circle c2 = new Circle(700, 200, 100);
+		Circle c3 = new Circle(200, 700, 100);
+		Circle c4 = new Circle(700, 700, 100);
+		Circle c5 = new Circle(400, 400, 100);
+		Circle c6 = new Circle(mouseX, mouseY, 50);
 		int max = 10;
-		ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
+		ArrayList<ArrayList<Circle>> nodes = new ArrayList<>();
 		nodes.add(new ArrayList<>(Arrays.asList(c1, c2, c3, c4, c5, c6)));
 		for(int i = 0; i < max; i++) {
 			nodes.add(new ArrayList<>(nodes.get(nodes.size()-1)));
 			CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
 			s.strokeWeight(1);//2 * (max - i));
 			s.stroke(s.random(255), s.random(255), s.random(255));
-			for(Node n : nodes.get(nodes.size()-1)) {
+			for(Circle n : nodes.get(nodes.size()-1)) {
 				n.draw(s);
 			}
 		}
@@ -344,10 +344,10 @@ public class Test {
 		Circle c2 = new Circle(300, 300, 40);
 		Circle c3 = new Circle(mouseX, mouseY, 30);
 		c1.draw(s);c2.draw(s);c3.draw(s);
-		for(Circle c : Touching.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c1, c2, (c1.getR() + c2.getR()) / 2, true)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c1, c3, (c1.getR() + c3.getR()) / 2, true)) { c.draw(s); }
-		for(Circle c : Touching.getAdjacent(c2, c3, (c2.getR() + c3.getR()) / 2, true)) { c.draw(s); }
+		for(Circle c : Adjacent.triCircleAdjacent(c1, c2, c3)) { c.draw(s); }
+		for(Circle c : Adjacent.getAdjacent(c1, c2, (c1.getR() + c2.getR()) / 2, true)) { c.draw(s); }
+		for(Circle c : Adjacent.getAdjacent(c1, c3, (c1.getR() + c3.getR()) / 2, true)) { c.draw(s); }
+		for(Circle c : Adjacent.getAdjacent(c2, c3, (c2.getR() + c3.getR()) / 2, true)) { c.draw(s); }
 	}
 	public void test12() {
 		float angle = new PVector(mouseX - width / 2f, mouseY - height / 2f).heading();
@@ -422,12 +422,12 @@ public class Test {
 		s.text(lerp, mouseX, mouseY);
 		s.noFill();
 		s.stroke(255, 0, 0);
-		Touching.triCircleAdjacent(c1, c2, c3)[0].draw(s);
+		Adjacent.triCircleAdjacent(c1, c2, c3)[0].draw(s);
 		s.stroke(0, 255, 0);
-		Touching.triCircleAdjacent(c1, c2, c3)[1].draw(s);
+		Adjacent.triCircleAdjacent(c1, c2, c3)[1].draw(s);
 		s.stroke(255, 0, 0);
-		Touching.triCircleAdjacentSafer(c1, c2, c3, lerp)[0].draw(s);
+		Adjacent.triCircleAdjacentSafer(c1, c2, c3, lerp)[0].draw(s);
 		s.stroke(0, 255, 0);
-		Touching.triCircleAdjacentSafer(c1, c2, c3, lerp)[1].draw(s);
+		Adjacent.triCircleAdjacentSafer(c1, c2, c3, lerp)[1].draw(s);
 	}
 }
