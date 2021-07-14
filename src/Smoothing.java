@@ -58,6 +58,7 @@ public class Smoothing {
 			overlap = false;
 			for (int i = 2; i < ev.size() - 2; i += 2) {
 				if (ev.get(i - 1).overlaps(ev.get(i + 1))) {
+					// If the average distance from a circle to the adjacent circles is less than the distance between the circles
 					tri = (ev.get(i).distanceToCircle(ev.get(i + 2)) + ev.get(i).distanceToCircle(ev.get(i - 2))) / 2f < ev.get(i + 2).distanceToCircle(ev.get(i - 2));
 					if(tri) {
 						ev.set(i, Adjacent.triCircleAdjacentSafer(ev.get(i - 2), ev.get(i), ev.get(i + 2))[1]);
@@ -97,21 +98,6 @@ public class Smoothing {
 		}
 		return arcs;
 	}
-	
-	public static ArrayList<Curve> interiorCurves(ArrayList<Curve> curves) {
-		ArrayList<Curve> interior = new ArrayList<>();
-		Arc newArc;
-		for(Curve curve : curves) {
-			if (curve instanceof Arc) {
-				newArc = new Arc((Arc) curve);
-				newArc.setR(newArc.getR() + (newArc.isConnecting() ? -0.5f : 0.5f));
-			} else {
-				newArc = null;
-			}
-			interior.add(newArc);
-		}
-		return getBezier(interior);
-	}
 	private static ArrayList<Curve> getBezier(ArrayList<Curve> arcs) {
 		for(int i = 0; i < arcs.size(); i++) {
 			if (isNull(arcs.get(i))) {
@@ -121,6 +107,22 @@ public class Smoothing {
 			}
 		}
 		return arcs;
+	}
+	
+	public static ArrayList<Curve> interiorCurves(ArrayList<Curve> curves) {
+		ArrayList<Curve> interior = new ArrayList<>();
+		Arc newArc;
+		for(Curve curve : curves) {
+			if (curve instanceof Arc) {
+				newArc = new Arc((Arc) curve);
+				newArc.setR(newArc.getR() + (newArc.isConnecting() ? -0.5f : 0.5f));
+				interior.add(newArc);
+			} else if (curve instanceof Bezier) {
+				Collections.addAll(interior, ((Bezier) curve).getAdjacent(0.5f, 10));
+			}
+			
+		}
+		return interior;
 	}
 	
 	public static float[] order(PVector pre, PVector curr, PVector next, boolean crossing){

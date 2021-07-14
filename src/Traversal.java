@@ -62,6 +62,27 @@ public class Traversal {
 		return side;
 	}
 	
+	public static PVector crossover(PVector p1, PVector p2, PVector p3, PVector p4) {
+		float m1 = (p2.x == p1.x) ? Float.NaN : (p2.y - p1.y) / (p2.x - p1.x);
+		float m2 = (p4.x == p3.x) ? Float.NaN : (p4.y - p3.y) / (p4.x - p3.x);
+		if(Float.isNaN(m1)) {
+			if(Float.isNaN(m2)) {
+				return new PVector(Float.NaN, Float.NaN);
+			} else {
+				return new PVector(p1.x, m2 * (p1.x - p3.x) + p3.y);
+			}
+		} else if(Float.isNaN(m2)) {
+			return new PVector(p3.x, m1 * (p3.x - p1.x) + p1.y);
+		} else {
+			float x = (m1 * p1.x - m2 * p3.x - p1.y + p3.y) / (m1 - m2);
+			return new PVector(x, m1 * (x - p1.x) + p1.y);
+		}
+	}
+	
+	public static PVector newRelative(PVector base, float offset, float angle) {
+		return PVector.add(base, new PVector(1, 0).setMag(offset).rotate(angle));
+	}
+	
 	public static boolean inLine(PVector p1, PVector p2, PVector test) {
         /*
         Tests if PVector test is in the line described by p1, p2

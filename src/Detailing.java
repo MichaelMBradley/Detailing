@@ -13,7 +13,6 @@ TODO: Fix triCircleAdjacent() arcs overlapping each other
 TODO: Generate path such that bezier curves don't overlap arcs
 */
 
-@SuppressWarnings("jol")
 public class Detailing extends PApplet {
 	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
 	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;

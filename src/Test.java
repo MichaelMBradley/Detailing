@@ -24,7 +24,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test16();
+		test18();
 		update();
 	}
 	public void update() {
@@ -429,5 +429,49 @@ public class Test {
 		Adjacent.triCircleAdjacentSafer(c1, c2, c3, lerp)[0].draw(s);
 		s.stroke(0, 255, 0);
 		Adjacent.triCircleAdjacentSafer(c1, c2, c3, lerp)[1].draw(s);
+	}
+	public void test17() {
+		PVector p1 = new PVector(100, 100);
+		PVector p2 = new PVector(mouseX, mouseY);
+		PVector p3 = new PVector(100, height - 100);
+		PVector p4 = new PVector(width - 300, 100);
+		PVector con = Traversal.crossover(p1, p2, p3, p4);
+		s.stroke(0);
+		s.strokeWeight(2);
+		Helpers.drawLine(p1, p2, s);
+		Helpers.drawLine(p3, p4, s);
+		s.stroke(255, 0, 0);
+		s.strokeWeight(8);
+		Helpers.drawPoint(con, s);
+	}
+	public void test18() {
+		int mouseC = max(1, mouseCount);
+		PVector p1 = new PVector(100, 100);
+		PVector c1 = new PVector(mouseX, mouseY);
+		PVector c2 = new PVector(width - mouseX, width - mouseY);
+		PVector p2 = new PVector(width - 100, height - 100);
+		Bezier b = new Bezier(p1, c1, c2, p2);
+		Bezier bAdj = b.getAdjacent(1);
+		Bezier[] bAdjG = b.getAdjacent(1, mouseC);
+		s.strokeWeight(2);
+		s.stroke(0);
+		b.draw(s);
+		s.strokeWeight(8);
+		b.drawPoints(s);
+		s.strokeWeight(2);
+		s.stroke(255, 0, 0);
+		bAdj.draw(s);
+		s.strokeWeight(8);
+		bAdj.drawPoints(s);
+		s.stroke(0, 255, 0);
+		for(Bezier bez : bAdjG) {
+			s.strokeWeight(2);
+			bez.draw(s);
+			s.strokeWeight(8);
+			bez.drawPoints(s);
+		}
+		s.fill(0);
+		s.text(mouseC, mouseX, mouseY);
+		s.noFill();
 	}
 }

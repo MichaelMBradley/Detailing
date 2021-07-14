@@ -84,14 +84,14 @@ public class Circle {
 		y += direction.y;
 	}
 	public void setPV(PVector location) {
-		PV = location;
+		PV.set(location);
 		x = location.x;
 		y = location.y;
 	}
 	public void setPV(float newX, float newY) {
 		x = newX;
 		y = newY;
-		PV = new PVector(x, y);
+		PV.set(newX, newY);
 	}
 	public void draw(PApplet sketch) {
 		sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius

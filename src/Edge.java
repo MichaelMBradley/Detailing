@@ -4,7 +4,7 @@ import processing.core.PVector;
 // Just for Kruskal's MST algorithm
 public final class Edge implements Comparable<Edge> {
 	@Getter private final Node n1, n2;
-	@Getter private final float len;
+	private final float len;
 	
 	public Edge(Node first, Node second) {
 		n1 = first;
