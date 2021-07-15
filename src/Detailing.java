@@ -32,12 +32,10 @@ public class Detailing extends PApplet {
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
 	
-	@Override
-	public void settings() {
-		size(900, 900);
+	@Override public void settings() {
+		size(800, 800);
 	}
-	@Override
-	public void setup() {
+	@Override public void setup() {
 		noFill();
 		frameRate(144);
 		surface.setTitle("Detailing");
@@ -69,8 +67,7 @@ public class Detailing extends PApplet {
 		println(String.format("\nComplexity: %.1f\nInitial settings (press 'h' for full list):\n%s\n", minimise, init));
 	}
 	
-	@Override
-	public void draw() {
+	@Override public void draw() {
 		// calc();
 		background(255);
 		gridZoom();
@@ -107,7 +104,7 @@ public class Detailing extends PApplet {
 				strokeWeight(1);
 				if (draw.get("gradient")) {
 					float h = 0f;
-					float chn = 360f / (float) traverseArcs.size();
+					float chn = 360f / (float) traverseArcsInterior.size();
 					colorMode(HSB, 360, 100, 100);
 					for (Curve c : traverseArcsInterior) {
 						stroke(h, 100, 100);
@@ -178,18 +175,37 @@ public class Detailing extends PApplet {
 			text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
 			noFill();
 		}
-		if (draw.get("snap") && draw.get("grid")) {
-			mx = mouseX - (int) offset.x;
-			my = mouseY - (int) offset.y;
-			for (Node n : nodes) {
-				if (n.distanceToCenter(mx, my) < n.getR()) {
-					mouseX = (int) (n.getX() + offset.x);
-					mouseY = (int) (n.getY() + offset.y);
-					break;
+		if (draw.get("grid")) {
+			String msg = "";
+			if (draw.get("snap")) {
+				mx = mouseX - (int) offset.x;
+				my = mouseY - (int) offset.y;
+				if(draw.get("interior") || draw.get("exterior")) {
+					for (Node n : nodes) {
+						if (n.distanceToCenter(mx, my) < n.getR()) {
+							mouseX = (int) (n.getX() + offset.x);
+							mouseY = (int) (n.getY() + offset.y);
+							msg = n.toString();
+							break;
+						}
+					}
+				} else if(draw.get("traversalArcs")) {
+					Arc arc;
+					float h;
+					for(Curve a : traverseArcs) {
+						if(a instanceof Arc) {
+							arc = (Arc) a;
+							h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
+							if (abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
+								mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
+								mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
+								msg = a.toString();
+								break;
+							}
+						}
+					}
 				}
 			}
-		}
-		if (draw.get("grid")) {
 			fill(127);
 			stroke(127);
 			strokeWeight(1);
@@ -204,10 +220,10 @@ public class Detailing extends PApplet {
 			}
 			fill(0);
 			stroke(0);
-			text("(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
+			text(!msg.equals("") ? msg : "(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
+			noFill();
 			line(mouseX - offset.x, -offset.y, mouseX - offset.x, h - offset.y);
 			line(-offset.x, mouseY - offset.y, w - offset.x, mouseY - offset.y);
-			noFill();
 		}
 		mouseX = og_mx;
 		mouseY = og_my;
@@ -254,8 +270,7 @@ public class Detailing extends PApplet {
 			exteriorCircumcircles = analyze(exterior);
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
-			//traverseArcs = Traversal.delaunayTraversalToArcs(traverse);
-			//traverse = TreeSelection.traverseTreesSkip(nodes, vertices, true);
+			//traverse = TreeSelection.traverseTreesHull(nodes, vertices);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
@@ -269,8 +284,7 @@ public class Detailing extends PApplet {
 	}
 	
 	// Input
-	@Override
-	public void keyPressed() {
+	@Override public void keyPressed() {
 		if(doTest) {
 			test.keyPressed(key);
 		}
@@ -293,11 +307,11 @@ public class Detailing extends PApplet {
 			mouseClicked();
 		}
 	}
-	@Override
-	public void mouseClicked() {
-		if(doTest) {
-			test.mouseClicked(mouseButton);
-		} else {
+	@Override public void keyReleased() {
+		test.keyReleased();
+	}
+	@Override public void mouseClicked() {
+		if(!doTest) {
 			calc();
 			loop();
 			p = 0;
@@ -305,12 +319,17 @@ public class Detailing extends PApplet {
 			//altTreeCreate(circles, vertices);
 		}
 	}
-	@Override
-	public void mouseWheel(MouseEvent event) {
+	@Override public void mouseWheel(MouseEvent event) {
 		zoom *= pow(0.9f, event.getCount());
 		if (doTest) {
 			test.mouseWheel(event.getCount());
 		}
+	}
+	@Override public void mousePressed() {
+		test.mousePressed(mouseButton);
+	}
+	@Override public void mouseReleased() {
+		test.mouseReleased();
 	}
 	
 	public void initializeKeys() {

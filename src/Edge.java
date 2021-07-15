@@ -12,12 +12,10 @@ public final class Edge implements Comparable<Edge> {
 		len = PVector.dist(n1.getPV(), n2.getPV());
 	}
 	
-	@Override
-	public int compareTo(Edge edge) {
+	@Override public int compareTo(Edge edge) {
 		return Float.compare(len, edge.len);
 	}
-	@Override
-	public boolean equals(Object obj) {
+	@Override public boolean equals(Object obj) {
 		if (obj instanceof Edge) {
 			Edge edge = (Edge) obj;
 			return (n1.getPV().equals(edge.n1.getPV()) && n2.getPV().equals(edge.n2.getPV())) ||
@@ -25,8 +23,7 @@ public final class Edge implements Comparable<Edge> {
 		}
 		return false;
 	}
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		int hash = 13;
 		hash = 37 * hash + n1.hashCode();
 		hash = 37 * hash * n2.hashCode();

@@ -97,8 +97,7 @@ public class Circle {
 		sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius
 	}
 	
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return String.format("(x: %.2f, y: %.2f, r: %.2f)", x, y, r);
 	}
 }

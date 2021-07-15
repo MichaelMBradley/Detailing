@@ -79,36 +79,47 @@ public class Arc extends Circle implements Curve {
 		}
 	}
 	
-	@Override
-	public boolean isEmpty() {
+	@Override public boolean isEmpty() {
 		return getR() == 0f || drawEnd - drawStart == 0f;
 	}
-	@Override
-	public float getStartAngle() {
+	@Override public float getStartAngle() {
 		return startAngleBase + (connecting ? -HALF_PI :  HALF_PI);
 	}
-	@Override
-	public float getEndAngle() {
+	@Override public float getEndAngle() {
 		return endAngleBase + (connecting ? HALF_PI : -HALF_PI);
 	}
-	@Override
-	public PVector getStartPVector() {
+	@Override public PVector getStartPVector() {
 		return PVectorOnCircumference(startAngleBase);
 	}
-	@Override
-	public PVector getEndPVector() {
+	@Override public PVector getEndPVector() {
 		return PVectorOnCircumference(endAngleBase);
 	}
-	@Override
-	public float getSize() {
+	@Override public float getSize() {
 		return getR();
 	}
-	public float getRange() {
+	@Override public float getRange() {
 		return drawEnd - drawStart;
 	}
 	
-	@Override
-	public void draw(PApplet sketch) {
+	public boolean overlaps(Arc a) {
+		Circle[] circles = Adjacent.getAdjacent(this, a, 0f, true);
+		if(Float.isNaN(circles[0].getR())) {
+			return false;
+		}
+		return (inRange(PVector.sub(circles[0].getPV(), getPV()).heading())
+				&& a.inRange(PVector.sub(circles[0].getPV(), a.getPV()).heading()))
+				|| (inRange(PVector.sub(circles[1].getPV(), getPV()).heading())
+				&& a.inRange(PVector.sub(circles[1].getPV(), a.getPV()).heading()));
+	}
+	public boolean inRange(float chk) {
+		while(chk < drawStart) {
+			chk += TWO_PI;
+		}
+		chk %= TWO_PI;
+		return drawStart < chk && chk < drawEnd;
+	}
+	
+	@Override public void draw(PApplet sketch) {
 		sketch.arc(getX(), getY(), getR() * 2, getR() * 2, drawStart, drawEnd);
 		/*int colour = sketch.color(sketch.random(0, 255), sketch.random(0, 255), sketch.random(0, 255));
 		sketch.stroke(colour);
@@ -121,31 +132,10 @@ public class Arc extends Circle implements Curve {
 	public void drawCircle(PApplet sketch) {
 		sketch.circle(getX(), getY(), getR() * 2);
 	}
-	public boolean overlaps(Arc a) {
-		Circle[] circles = Adjacent.getAdjacent(this, a, 0f, true);
-		if(Float.isNaN(circles[0].getR())) {
-			return false;
-		}
-		return (within(PVector.sub(circles[0].getPV(), getPV()).heading(), drawStart, drawEnd)
-				&& within(PVector.sub(circles[0].getPV(), a.getPV()).heading(), a.drawStart, a.drawEnd))
-				|| (within(PVector.sub(circles[1].getPV(), getPV()).heading(), drawStart, drawEnd)
-				&& within(PVector.sub(circles[1].getPV(), a.getPV()).heading(), a.drawStart, a.drawEnd));
-	}
-	@Override
-	public boolean overlaps(Circle c) {
+	@Override public boolean overlaps(Circle c) {
 		return overlaps(new Arc(c, 0, TWO_PI));
 	}
-	private boolean within(float check, float min, float max) {
-		while(check < min) {
-			check += TWO_PI;
-		}
-		while(check > max) {
-			check -= TWO_PI;
-		}
-		return check > min;
-	}
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return String.format("(x: %.2f, y: %.2f, r: %.2f, s: %.2f, e: %.2f)", getX(), getY(), getR(), drawStart, drawEnd);
 	}
 }

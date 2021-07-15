@@ -28,6 +28,13 @@ public class Helpers {
 		sketch.point(p.x, p.y);
 	}
 	
+	public static Object getArrayListSafe(ArrayList<?> al, int ind) {
+		while(ind < 0) {
+			ind += al.size();
+		}
+		return al.get(ind % al.size());
+	}
+	
 	public static HashSet<HashSet<Node>> getMSTs(HashSet<Node> nodes) {
 		/*
 		Returns a HashSet of the minimum spanning trees.
@@ -66,5 +73,13 @@ public class Helpers {
 			ret.append(String.format("%.2f", arr[i])).append(i != arr.length - 1 ? ", " : "]");
 		}
 		return ret.toString();
+	}
+	
+	public static ArrayList<Node> offsetList(ArrayList<Node> nodes, int amt) {
+		ArrayList<Node> offset = new ArrayList<>();
+		for(int i = 0; i < nodes.size(); i++) {
+			offset.add((Node) getArrayListSafe(nodes, i + amt));
+		}
+		return offset;
 	}
 }

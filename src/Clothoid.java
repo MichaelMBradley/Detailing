@@ -66,25 +66,20 @@ public class Clothoid implements Curve {
 		return PVector.add(p, p1);
 	}
 	
-	@Override
-	public boolean isEmpty() {
+	@Override public boolean isEmpty() {
 		return startAngle == endAngle || startPVector.equals(endPVector);
 	}
-	@Override
-	public boolean isConnecting() {
+	@Override public boolean isConnecting() {
 		return false;
 	}
-	@Override
-	public float getSize() {
+	@Override public float getSize() {
 		return startPVector.dist(endPVector);
 	}
-	@Override
-	public float getRange() {
+	@Override public float getRange() {
 		return endAngle - startAngle;
 	}
 	
-	@Override
-	public void draw(PApplet sketch) {
+	@Override public void draw(PApplet sketch) {
 		for(int i = 0; i < points.size() - 1; i++) {
 			sketch.line(points.get(i).x, points.get(i).y, points.get(i + 1).x, points.get(i + 1).y);
 		}

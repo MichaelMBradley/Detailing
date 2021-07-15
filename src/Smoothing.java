@@ -56,8 +56,8 @@ public class Smoothing {
 		ev.remove(ev.size() - 1);
 		while(overlap) {
 			overlap = false;
-			for (int i = 2; i < ev.size() - 2; i += 2) {
-				if (ev.get(i - 1).overlaps(ev.get(i + 1))) {
+			for(int i = 2; i < ev.size() - 2; i += 2) {
+				if(ev.get(i - 1).overlaps(ev.get(i + 1))) {
 					// If the average distance from a circle to the adjacent circles is less than the distance between the circles
 					tri = (ev.get(i).distanceToCircle(ev.get(i + 2)) + ev.get(i).distanceToCircle(ev.get(i - 2))) / 2f < ev.get(i + 2).distanceToCircle(ev.get(i - 2));
 					if(tri) {
@@ -74,7 +74,7 @@ public class Smoothing {
 			}
 		}
 		// Swap 1 -> 3 for a somewhat cleaner curve, but with less detail in the centre
-		int help = 1;
+		int help = 2;
 		for(int i = help; i < ev.size() - help; i++) {
 			arcs.add(new Arc(ev.get(i), ev.get(i - 1), ev.get(i + 1), clockwise == (i % 2 == 0), clockwise == (i % 2 == 0)));
 		}

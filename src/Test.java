@@ -20,11 +20,13 @@ public class Test {
 		iter = 0;
 		iterNext = 1;
 		mouseCount = 0;
+		pressed = false;
+		clicked = false;
 		update();
 	}
 	
 	public void run() {
-		test18();
+		test19();
 		update();
 	}
 	public void update() {
@@ -36,8 +38,6 @@ public class Test {
 		percentY = mouseY / width;
 		key = s.key;
 		mouseButton = s.mouseButton;
-		pressed = false;
-		clicked = false;
 		scrolled = false;
 	}
 	private void iterate(int max) {
@@ -49,9 +49,15 @@ public class Test {
 		key = keyDown;
 		pressed = true;
 	}
-	public void mouseClicked(int mouseB) {
+	public void keyReleased() {
+		pressed = false;
+	}
+	public void mousePressed(int mouseB) {
 		mouseButton = mouseB;
 		clicked = true;
+	}
+	public void mouseReleased() {
+		clicked = false;
 	}
 	public void mouseWheel(int count) {
 		mouseCount += count;
@@ -473,5 +479,29 @@ public class Test {
 		s.fill(0);
 		s.text(mouseC, mouseX, mouseY);
 		s.noFill();
+	}
+	public void test19() {
+		float r = 50;
+		PVector pv1 = new PVector(width / 4, height / 4);
+		PVector pv2 = new PVector(mouseX, mouseY);
+		PVector pv3 = new PVector(width * 3 / 4, height / 2);
+		Circle c1 = new Circle(pv1, r);
+		Circle c2 = new Circle(pv2, r);
+		Circle c3 = new Circle(pv3, r);
+		Circle c2n = new Circle(pv2, -r);
+		Circle c3n = new Circle(pv3, -r);
+		s.stroke(0);
+		c1.draw(s);c2.draw(s);c3.draw(s);
+		s.randomSeed(0L);
+		s.stroke(s.random(255), s.random(255), s.random(255));
+		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3)).iterator().forEachRemaining(c -> c.draw(s));
+		s.stroke(s.random(255), s.random(255), s.random(255));
+		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3n)).iterator().forEachRemaining(c -> c.draw(s));
+		s.stroke(s.random(255), s.random(255), s.random(255));
+		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2n, c3)).iterator().forEachRemaining(c -> c.draw(s));
+		s.stroke(s.random(255), s.random(255), s.random(255));
+		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2n, c3n)).iterator().forEachRemaining(c -> c.draw(s));
+		s.stroke(s.random(255), s.random(255), s.random(255));
+		// The other four possible combinations are just inversions of what has already been called
 	}
 }

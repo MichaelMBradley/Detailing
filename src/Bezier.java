@@ -4,7 +4,7 @@ import processing.core.PVector;
 import static processing.core.PApplet.*;
 
 public class Bezier implements Curve {
-	private PVector p1, c1, c2, p2;
+	private final PVector p1, c1, c2, p2;
 	
 	public Bezier() {
 		p1 = new PVector();
@@ -41,36 +41,28 @@ public class Bezier implements Curve {
 	}
 	
 	
-	@Override
-	public boolean isEmpty() {
+	@Override public boolean isEmpty() {
 		return new PVector().equals(p1) && p1.equals(c1) && c1.equals(c2) && c2.equals(p2);
 	}
-	@Override
-	public boolean isConnecting() {
+	@Override public boolean isConnecting() {
 		return true;
 	}
-	@Override
-	public float getStartAngle() {
+	@Override public float getStartAngle() {
 		return PVector.sub(c1, p1).heading();
 	}
-	@Override
-	public float getEndAngle() {
+	@Override public float getEndAngle() {
 		return PVector.sub(p2, c2).heading();
 	}
-	@Override
-	public PVector getStartPVector() {
+	@Override public PVector getStartPVector() {
 		return p1;
 	}
-	@Override
-	public PVector getEndPVector() {
+	@Override public PVector getEndPVector() {
 		return p2;
 	}
-	@Override
-	public float getSize() {
+	@Override public float getSize() {
 		return p1.dist(p2);
 	}
-	@Override
-	public float getRange() {
+	@Override public float getRange() {
 		return abs(getEndAngle() - getStartAngle());
 	}
 	
@@ -109,7 +101,7 @@ public class Bezier implements Curve {
 		return cut(max)[0].cut(min / max)[1];
 	}
 	
-	public void draw(PApplet sketch) {
+	@Override public void draw(PApplet sketch) {
 		sketch.bezier(p1.x, p1.y, c1.x, c1.y, c2.x, c2.y, p2.x, p2.y);
 	}
 	public void drawPoints(PApplet sketch) {
@@ -118,7 +110,7 @@ public class Bezier implements Curve {
 		sketch.point(c1.x, c1.y);
 		sketch.point(c2.x, c2.y);
 	}
-	public String toString() {
+	@Override public String toString() {
 		return String.format("[%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f]",
 							   p1.x, p1.y, c1.x, c1.y, c2.x, c2.y, p2.x, p2.y);
 	}

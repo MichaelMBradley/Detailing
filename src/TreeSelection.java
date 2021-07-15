@@ -1,19 +1,15 @@
+import megamu.mesh.Hull;
 import processing.core.PVector;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import static processing.core.PApplet.println;
 
 public class TreeSelection {
 	public static ArrayList<Node> kruskalTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /*
-        Returns one node of each MST. Each node is
-        in order around the perimeter of the shape.
-        */
+		// Returns one node of each MST. Each node is in order around the perimeter of the shape.
 		ArrayList<HashMap<PVector, Node>> options;
 		ArrayList<Node> traversal = new ArrayList<>();
 		HashSet<HashSet<Node>> MSTs = new HashSet<>();
@@ -107,6 +103,24 @@ public class TreeSelection {
 			edge = new Node(PVector.sub(n.getPV(), Traversal.closestPoint2(k, l, n.getPV())));
 			//println("\n" + edge + "\t" + PVector.sub(n.getPV(), edge.getPV()).heading());
 			traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.getX(), n.getY()), includeParents));
+		}
+		return traverse;
+	}
+	
+	public static ArrayList<Node> traverseTreesHull(HashSet<Node> nodes, ArrayList<PVector> vertices) {
+		ArrayList<Node> bases = kruskalTraverse(nodes, vertices), temp = new ArrayList<>(), traverse = new ArrayList<>();
+		HashMap<PVector, Node> dict = new HashMap<>();
+		Polygon p = ShapeFunctions.toPolygon(vertices);
+		for(Node n : nodes) {
+			dict.put(n.getPV(), n);
+		}
+		for(Node n : bases) {
+			temp.clear();
+			Arrays.stream(new Hull(ShapeFunctions.toFloatArray(ShapeFunctions.getPVectors(n.getKruskal()))).getRegion().getCoords()).iterator().forEachRemaining(f -> temp.add(dict.get(ShapeFunctions.toPVector(f))));
+			if(p.contains(temp.get(0).getX(), temp.get(0).getY())) {
+				Collections.reverse(temp);
+			}
+			traverse.addAll(temp);
 		}
 		return traverse;
 	}
