@@ -171,6 +171,9 @@ public class Adjacent {
 		return triCircleAdjacentSafer(lockStart, mid, lockEnd, 0.75f);
 	}
 	public static Circle[] triCircleAdjacentSafer(Circle lockStart, Circle mid, Circle lockEnd, float lerpFactor) {
+		//lerpfactor:
+		//	0.01 -> straight line (breaks at 0)
+		//	1 -> normal triCircleAdjacent()
 		float dist = lockStart.distanceToCenter(lockEnd);
 		return triCircleAdjacent(lockStart,
 				new Circle(PVector.lerp(

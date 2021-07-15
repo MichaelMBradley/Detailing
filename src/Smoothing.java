@@ -73,24 +73,6 @@ public class Smoothing {
 				}
 			}
 		}
-		/*overlap = true;
-		while(overlap) {
-			overlap = false;
-			for(int i = 1; i < ev.size() - 1; i += 2) {
-				closeCircle = new Circle();
-				closeDist = Float.MAX_VALUE;
-				for(Circle c : nodes) {
-					test = Geometry.distanceToSegment(ev.get(i - 1).getPV(), ev.get(i + 1).getPV(), c.getPV());
-					if(ev.get(i).overlaps(c) && test < closeDist && !ev.subList(i - 1, i + 2).contains(c)) {
-						closeCircle = c;
-						closeDist = test;
-					}
-				}
-				if(closeDist != Float.MAX_VALUE) {
-					ev.set(i, Adjacent.triCircleAdjacent(ev.get(i - 1), ev.get(i + 1), closeCircle)[0]);
-				}
-			}
-		}*/
 		// Swap 1 -> 3 for a somewhat cleaner curve, but with less detail in the centre
 		int help = 1;
 		for(int i = help; i < ev.size() - help; i++) {
