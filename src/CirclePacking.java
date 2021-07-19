@@ -12,9 +12,9 @@ import static processing.core.PApplet.min;
 
 public class CirclePacking {
 	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
-        /*
-        Creates a circle packing of the given vertices.
-        */
+		/*
+		Creates a circle packing of the given vertices.
+		*/
 		HashSet<Node> nodes = new HashSet<>();
 		float x, y, r, closestCircle;
 		Node current;
@@ -51,9 +51,9 @@ public class CirclePacking {
 	}
 	
 	public static HashSet<Node> randomFill(int w, int h, float minimise) {
-        /*
-        Creates a circle packing in the given area.
-        */
+		/*
+		Creates a circle packing in the given area.
+		*/
 		HashSet<Node> nodes = new HashSet<>();
 		float x, y, r, closestCircle;
 		float minRadius = (w + h) / (60 * minimise);
@@ -80,11 +80,11 @@ public class CirclePacking {
 	}
 	
 	public static HashSet<Node> randomFillPoisson(int w, int h, float minimise) {
-        /*
-        This implementation is worse than dart throwing.
-        It attempts to use a 2D array to determine the
-        closest other node.
-        */
+		/*
+		This implementation is worse than dart throwing.
+		It attempts to use a 2D array to determine the
+		closest other node.
+		*/
 		ArrayList<Node> nodes = new ArrayList<>();
 		float minRadius = (w + h) / (60 * minimise);
 		float maxRadius = minRadius * 4;

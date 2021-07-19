@@ -12,9 +12,9 @@ public class TreeCreation {
 		kruskal(nodes, (int) sqrt(sqrt(nodes.size())));
 	}
 	public static void kruskal(HashSet<Node> nodes, int restrictSize) {
-        /*
-        Creates a minimum spanning tree of the nodes.
-        */
+		/*
+		Creates a minimum spanning tree of the nodes.
+		*/
 		ArrayList<Edge> edges = new ArrayList<>();
 		for (Node b : nodes) {
 			for (Node t : b.getDelaunay()) {
@@ -28,9 +28,9 @@ public class TreeCreation {
 	}
 	
 	public static void kruskalWithin(HashSet<Node> nodes, int restrictSize) {
-        /*
-        Creates a minimum spanning tree of the nodes.
-        */
+		/*
+		Creates a minimum spanning tree of the nodes.
+		*/
 		ArrayList<Edge> edges = new ArrayList<>();
 		for (Node b : nodes) {
 			for (Node t : b.getDelaunay()) {
@@ -46,9 +46,9 @@ public class TreeCreation {
 	}
 	
 	public static void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /*
-        Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
-        */
+		/*
+		Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
+		*/
 		HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
 		HashSet<Node> valid;
 		Node use;
@@ -82,10 +82,10 @@ public class TreeCreation {
 	}
 	
 	public static void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /*
-        Creates trees based on the closest node touching the polyline to each node available.
-        Uses a random weighting to create variability in the size of the trees.
-        */
+		/*
+		Creates trees based on the closest node touching the polyline to each node available.
+		Uses a random weighting to create variability in the size of the trees.
+		*/
 		HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
 		HashMap<Node, Float> weights = new HashMap<>();
 		HashMap<Node, HashSet<Node>> groups = new HashMap<>();
@@ -156,9 +156,9 @@ public class TreeCreation {
 	}
 	
 	public static HashSet<Node> getNodesTouchingPolyline(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /*
-        Helper function that returns the set of nodes intersected by a segment of the given polyline.
-        */
+		/*
+		Helper function that returns the set of nodes intersected by a segment of the given polyline.
+		*/
 		HashSet<Node> touching = new HashSet<>();
 		for (Node n : nodes) {
 			for (int i = 0; i < vertices.size(); i++) {

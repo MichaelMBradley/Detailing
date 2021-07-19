@@ -7,11 +7,11 @@ import static processing.core.PApplet.*;
 
 public class Adjacent {
 	public static void condense(HashSet<Node> nodes) {
-        /*
-        Combine many graphs into one by moving the first graph
-        to be touching it's closest neighbour. Keeps doing this
-        until there is only one graph left.
-        */
+		/*
+		Combine many graphs into one by moving the first graph
+		to be touching it's closest neighbour. Keeps doing this
+		until there is only one graph left.
+		*/
 		ArrayList<HashSet<Node>> graphs = createTouchingGraphs(nodes);
 		Node closeBase, closeNode;
 		PVector moveVector;
@@ -45,9 +45,9 @@ public class Adjacent {
 	}
 	
 	public static ArrayList<HashSet<Node>> createTouchingGraphs(HashSet<Node> nodes) {
-        /*
-        Takes a list of nodes, returns the set of sets of touching nodes.
-        */
+		/*
+		Takes a list of nodes, returns the set of sets of touching nodes.
+		*/
 		ArrayList<HashSet<Node>> graphs = new ArrayList<>();
 		HashSet<Node> used = new HashSet<>();
 		for (Node n : nodes) {
@@ -69,17 +69,17 @@ public class Adjacent {
 	}
 	
 	public static Circle[] getAdjacent(Circle n1, Circle n2, float r0, boolean exterior) {
-        /*
-        Returns the two Circles touching both of the two given Circles.
-        if sign(x2-x1) != sign(y2-y1):  # +/-, -/+
-           [0] is (higher y than) line passing through centres
-        if sign(x2-x1) == sign(y2-y1):  # +/+, -/-
-           [0] is (lower y than) line passing through centres
-        if x1==x2:
-           [0] is to the right
-        if y1==y2:
-           [0] is the lower circle (higher y)
-        */
+		/*
+		Returns the two Circles touching both of the two given Circles.
+		if sign(x2-x1) != sign(y2-y1):  # +/-, -/+
+			[0] is (higher y than) line passing through centres
+		if sign(x2-x1) == sign(y2-y1):  # +/+, -/-
+			[0] is (lower y than) line passing through centres
+		if x1==x2:
+			[0] is to the right
+		if y1==y2:
+			[0] is the lower circle (higher y)
+		*/
 		float dist = PVector.dist(n1.getPV(),n2.getPV());
 		if(dist + n2.getR() < n1.getR() || dist + n1.getR() < n2.getR() || dist > n1.getR() + n2.getR() + (r0 * 2)) {
 			// Circle 1 contains Circle 2 || Circle 2 contains Circle 1 || circles are too far apart
@@ -117,6 +117,9 @@ public class Adjacent {
 		}
 	}
 	
+	public static Circle getExterior(Circle from, Circle to, boolean clockwise) {
+		return getExterior(from, to)[clockwise ? 1 : 0];
+	}
 	public static Circle[] getExterior(Circle n1, Circle n2) {
 		float angle = PVector.sub(n2.getPV(), n1.getPV()).heading() + 0.01f;
 		float dist = n1.distanceToCenter(n2) / 2f;
@@ -127,8 +130,14 @@ public class Adjacent {
 								(n1.getR() + n2.getR()) / 3)//8)
 				)[0].getR(), true);
 	}
+	public static Circle getExteriorSafe(Circle from, Circle to, boolean clockwise) {
+		return getExteriorSafe(from, to)[clockwise ? 1 : 0];
+	}
 	public static Circle[] getExteriorSafe(Circle n1, Circle n2) {
 		return getAdjacent(n1, n2, (float) (triCircleAdjacent(n1, n2, getAdjacent(n1, n2, min(n1.getR(), n2.getR()), true)[0])[1].getR() * 0.9), true);
+	}
+	public static Circle getInterior(Circle from, Circle to, boolean clockwise) {
+		return getInterior(from, to)[clockwise ? 1 : 0];
 	}
 	public static Circle[] getInterior(Circle n1, Circle n2) {
 		return getAdjacent(n1, n2, (n1.getR() + n2.getR() - PVector.dist(n1.getPV(), n2.getPV())) / 2f, false);

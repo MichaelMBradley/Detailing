@@ -11,10 +11,10 @@ import java.util.HashSet;
 
 public class ShapeFunctions {
 	public static PVector[] extremes(ArrayList<PVector> vertices) {
-        /*
-        Returns two PVectors bounding a list of PVectors.
-        [min, max]
-        */
+		/*
+		Returns two PVectors bounding a list of PVectors.
+		[min, max]
+		*/
 		float[][] ends = {{vertices.get(0).x, vertices.get(0).y}, {vertices.get(0).x, vertices.get(0).y}};
 		for (PVector pv : vertices) {
 			if (pv.x < ends[0][0]) {
@@ -74,9 +74,9 @@ public class ShapeFunctions {
 	}
 	
 	public static Polygon toPolygon(ArrayList<PVector> vertices) {
-        /*
-        Returns a polygon object with given vertices.
-        */
+		/*
+		Returns a polygon object with given vertices.
+		*/
 		int size = vertices.size();
 		int[] x = new int[size];
 		int[] y = new int[size];
@@ -90,11 +90,11 @@ public class ShapeFunctions {
 	}
 	
 	public static ArrayList<PVector> toPVector(float[][] vertices) {
-        /*
-        Takes a list of vertices as an array of floats
-        and turns it into a list of PVectors. Personally
-        I just find it easier to enter vertices this way.
-        */
+		/*
+		Takes a list of vertices as an array of floats
+		and turns it into a list of PVectors. Personally
+		I just find it easier to enter vertices this way.
+		*/
 		ArrayList<PVector> proper = new ArrayList<>();
 		for(float[] vertex : vertices) {
 			proper.add(toPVector(vertex));
@@ -118,9 +118,9 @@ public class ShapeFunctions {
 	}
 	
 	public static PShape toShape(ArrayList<PVector> vertices, PApplet sketch) {
-        /*
-        Takes a list of PVectors and turns it into a PShape
-        */
+		/*
+		Takes a list of PVectors and turns it into a PShape
+		*/
 		PShape polygon = sketch.createShape();
 		polygon.beginShape();
 		for (PVector pv : vertices) {

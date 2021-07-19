@@ -80,7 +80,7 @@ public class Arc extends Circle implements Curve {
 	}
 	
 	@Override public boolean isEmpty() {
-		return getR() == 0f || drawEnd - drawStart == 0f;
+		return getR() == 0f || getRange() == 0f;
 	}
 	@Override public float getStartAngle() {
 		return startAngleBase + (connecting ? -HALF_PI :  HALF_PI);

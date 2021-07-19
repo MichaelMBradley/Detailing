@@ -20,11 +20,11 @@ public class Traversal {
 	}
 	
 	public static PVector closestPoint(PVector p1, PVector p2, PVector p0) {
-        /*
-        Uses basic point-slope formulas to find the intersection of (p1, p2)
-        and the line perpendicular to (p1, p2) passing through the node.
-        Slightly slower.
-        */
+		/*
+		Uses basic point-slope formulas to find the intersection of (p1, p2)
+		and the line perpendicular to (p1, p2) passing through the node.
+		Slightly slower.
+		*/
 		if (p1.x == p2.x) {
 			return new PVector(p1.x, p0.y);
 		}
@@ -38,20 +38,20 @@ public class Traversal {
 		return new PVector(x, y);
 	}
 	public static PVector closestPoint2(PVector p1, PVector p2, PVector p0) {
-        /*
-        Projects the node onto the vector between (p1, p2) to find the closest point.
-        Slightly faster.
-        */
+		/*
+		Projects the node onto the vector between (p1, p2) to find the closest point.
+		Slightly faster.
+		*/
 		PVector y = PVector.sub(p0, p1);
 		PVector u = PVector.sub(p2, p1);
 		return u.mult(y.dot(u) / u.magSq()).add(p1);
 	}
 	
 	public static HashSet<Node> containing(ArrayList<PVector> vertices, HashSet<Node> nodes, boolean inside) {
-        /*
-        Accepts a set of nodes, returns the subset
-        that is either inside or outside the shape.
-        */
+		/*
+		Accepts a set of nodes, returns the subset
+		that is either inside or outside the shape.
+		*/
 		HashSet<Node> side = new HashSet<>();
 		Polygon shape = ShapeFunctions.toPolygon(vertices);
 		for (Node n : nodes) {
@@ -84,11 +84,11 @@ public class Traversal {
 	}
 	
 	public static boolean inLine(PVector p1, PVector p2, PVector test) {
-        /*
-        Tests if PVector test is in the line described by p1, p2
-        by determining of it's distance to the closest point on that
-        line is approximately 0 (for rounding errors).
-        */
+		/*
+		Tests if PVector test is in the line described by p1, p2
+		by determining of it's distance to the closest point on that
+		line is approximately 0 (for rounding errors).
+		*/
 		return PVector.dist(test, closestPoint2(p1, p2, test)) < 1;
 	}
 	

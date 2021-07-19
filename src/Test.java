@@ -26,7 +26,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test19();
+		test20();
 		update();
 	}
 	public void update() {
@@ -103,7 +103,7 @@ public class Test {
 		/*n1.draw(s);n2.draw(s);n3.draw(s);n4.draw(s);n5.draw(s);n6.draw(s);n7.draw(s);n8.draw(s);n9.draw(s);*/
 		s.strokeWeight(1);
 		s.stroke(0);
-		ArrayList<Curve> arcs = Smoothing.fixedSurroundingArcsTree(ns, true);
+		ArrayList<Curve> arcs = Smoothing.surroundingArcsTree(ns, true);
 		for (int i = 0; i < arcs.size() * percentX; i++) {
 			arcs.get(i).draw(s);
 		}
@@ -503,5 +503,19 @@ public class Test {
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2n, c3n)).iterator().forEachRemaining(c -> c.draw(s));
 		s.stroke(s.random(255), s.random(255), s.random(255));
 		// The other four possible combinations are just inversions of what has already been called
+	}
+	public void test20() {
+		Circle from = new Circle(width / 2, height / 2, 50);
+		Circle to = new Circle(mouseX, mouseY, 50);
+		from.draw(s);to.draw(s);
+		Adjacent.getExterior(from, to, true).draw(s);
+		s.fill(0);
+		s.text(String.format("m = 0: %s\nm = inf: %s\nm = +: %s\nm = -: %s",
+				from.getY() == to.getY(),
+				from.getX() == to.getX(),
+				(to.getY() - from.getY()) / (to.getX() - from.getX()) > 0,
+				(to.getY() - from.getY()) / (to.getX() - from.getX()) < 0
+				), 10, 10);
+		s.noFill();
 	}
 }

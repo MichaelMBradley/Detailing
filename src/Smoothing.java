@@ -25,7 +25,7 @@ public class Smoothing {
 		for(ArrayList<Node> tree : trees) {
 			arcs.add(null);
 			out = exterior.contains(tree.get(0));
-			arcTree = fixedSurroundingArcsTree(tree, out);
+			arcTree = surroundingArcsTree(tree, out);
 			arcs.addAll(arcTree);
 		}
 		for(int i = 0; i < arcs.size(); i++) {
@@ -38,7 +38,7 @@ public class Smoothing {
 		}
 		return getBezier(arcs);
 	}
-	public static ArrayList<Curve> fixedSurroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
+	public static ArrayList<Curve> surroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
 		ArrayList<Curve> arcs = new ArrayList<>();
 		ArrayList<Circle> ev = new ArrayList<>();
 		Circle closeCircle;
@@ -57,11 +57,13 @@ public class Smoothing {
 		while(overlap) {
 			overlap = false;
 			for(int i = 2; i < ev.size() - 2; i += 2) {
+				//If circle(prev, this) overlaps circle(this, next)
 				if(ev.get(i - 1).overlaps(ev.get(i + 1))) {
 					// If the average distance from a circle to the adjacent circles is less than the distance between the circles
 					tri = (ev.get(i).distanceToCircle(ev.get(i + 2)) + ev.get(i).distanceToCircle(ev.get(i - 2))) / 2f < ev.get(i + 2).distanceToCircle(ev.get(i - 2));
 					if(tri) {
 						ev.set(i, Adjacent.triCircleAdjacentSafer(ev.get(i - 2), ev.get(i), ev.get(i + 2))[1]);
+						//ev.set(i, Adjacent.getExteriorSafe(ev.get(i - 2), ev.get(i + 2), clockwise));
 					}
 					if(!tri || ev.get(i).getR() > (ev.get(i - 2).getR() + ev.get(i + 2).getR()) * 2) {
 						ev.set(i, Adjacent.getExterior(ev.get(i - 2), ev.get(i + 2))[clockwise ? 1 : 0]);

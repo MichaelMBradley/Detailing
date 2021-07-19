@@ -28,10 +28,10 @@ public class Geometry {
 	}
 	
 	public static boolean circleNearLine(float cutoff, Circle c, ArrayList<PVector> vertices) {
-        /*
-        Returns if a given node is suitably close (cutoff) to any
-        of the line segments on the polyline described by the vertices.
-        */
+		/*
+		Returns if a given node is suitably close (cutoff) to any
+		of the line segments on the polyline described by the vertices.
+		*/
 		for (int i = 0; i < vertices.size(); i++) {
 			int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
 			if (distanceToSegment(vertices.get(i), vertices.get(j), c.getPV()) - c.getR() <= cutoff) {
@@ -45,9 +45,9 @@ public class Geometry {
 		return (float) Line2D.ptSegDist(v1.x, v1.y, v2.x, v2.y, test.x, test.y);
 	}
 	public static Arc getArc(Circle n1, Circle n2, Circle n3) {
-        /*
-        Returns the arc between n1 and n2, passing through n3.
-        */
+		/*
+		Returns the arc between n1 and n2, passing through n3.
+		*/
 		Circle arcInfo = triangleToCircle(n1.getPV(), n2.getPV(), n3.getPV());
 		float ang1 = PVector.sub(n1.getPV(), arcInfo.getPV()).heading();
 		float ang2 = PVector.sub(n2.getPV(), arcInfo.getPV()).heading();
@@ -72,9 +72,9 @@ public class Geometry {
 	}
 	
 	public static ArrayList<Circle> triangleToCircle(ArrayList<Triangle> triangles) {
-        /*
-        Return list of circumcircles for the triangles.
-        */
+		/*
+		Return list of circumcircles for the triangles.
+		*/
 		ArrayList<Circle> info = new ArrayList<>();
 		for (Triangle tri : triangles) {
 			info.add(triangleToCircle(tri.p1, tri.p2, tri.p3));
@@ -85,13 +85,13 @@ public class Geometry {
 		return triangleToCircle(pv1.x, pv1.y, pv2.x, pv2.y, pv3.x, pv3.y);
 	}
 	public static Circle triangleToCircle(float x1, float y1, float x2, float y2, float x3, float y3) {
-        /*
-        Calculates the circumcircle of a triangle.
-        In short, it calculates the intersection point
-        of the line perpendicular to (p1, p2)
-        splitting (p1, p2) in half and the same line for
-        (p2, p3).
-        */
+		/*
+		Calculates the circumcircle of a triangle.
+		In short, it calculates the intersection point
+		of the line perpendicular to (p1, p2)
+		splitting (p1, p2) in half and the same line for
+		(p2, p3).
+		*/
 		float x, y, r;
 		if ((x1 == x2 && x2 == x3) || (y1 == y2 && y2 == y3)) {
 			// Impossible to find circumcircle for points in a straight line

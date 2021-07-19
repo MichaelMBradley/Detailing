@@ -25,7 +25,7 @@ public class Detailing extends PApplet {
 	private PShape shape;
 	private PVector offset;
 	
-	private final boolean doTest = false;
+	private final boolean doTest = true;
 	private final String commands = "acmn";
 	private final float minimise = 4;
 	
@@ -246,7 +246,7 @@ public class Detailing extends PApplet {
 	}
 	public void calc() {
 		// Completes all relevant calculations
-        if (!doTest) {
+		if (!doTest) {
 			int start;
 			start = millis();
 			nodes = CirclePacking.randomFillAware(vertices, minimise);

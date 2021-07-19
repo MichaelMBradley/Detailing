@@ -15,9 +15,9 @@ import static processing.core.PConstants.QUARTER_PI;
 
 public class DelaunayMethods {
 	public static ArrayList<Triangle> delaunayTriangulation(HashSet<Node> nodes) {
-        /*
-        Accepts a set of nodes, creates a triangulation of their centres.
-        */
+		/*
+		Accepts a set of nodes, creates a triangulation of their centres.
+		*/
 		return Triangulate.triangulate(ShapeFunctions.getPVectors(nodes));
 	}
 	
@@ -25,9 +25,9 @@ public class DelaunayMethods {
 		updateDelaunay(nodes, delaunayTriangulation(nodes));
 	}
 	public static void updateDelaunay(HashSet<Node> nodes, ArrayList<Triangle> triangles) {
-        /*
-        Adds the delaunay triangulation information to the nodes.
-        */
+		/*
+		Adds the delaunay triangulation information to the nodes.
+		*/
 		HashMap<PVector, Node> conv = new HashMap<>();
 		HashMap<PVector, HashSet<PVector>> dict = new HashMap<>();
 		Node base, con;
@@ -84,9 +84,9 @@ public class DelaunayMethods {
 		//return delaunayTraverse(nodes, vertices, (float) mouseX * 20f / w);
 	}
 	public static ArrayList<Node> delaunayTraverse(HashSet<Node> nodes, ArrayList<PVector> vertices, float distanceWeight) {
-        /*
-        Visits many nodes in order around the polyline, based on the delaunay triangulation.
-        */
+		/*
+		Visits many nodes in order around the polyline, based on the delaunay triangulation.
+		*/
 		ArrayList<Node> comb, traverse = new ArrayList<>();
 		float closest, angle, distance;
 		int i;

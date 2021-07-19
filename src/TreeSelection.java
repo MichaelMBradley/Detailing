@@ -41,10 +41,10 @@ public class TreeSelection {
 	}
 	
 	public static ArrayList<HashMap<PVector, Node>> MSTClosestNode(HashSet<HashSet<Node>> MSTs, ArrayList<PVector> vertices) {
-        /*
-        Returns a list of pairs of points, where each HashMap on the list corresponds to a line, and each entry in the hashmap
-        represents the closest point on that line to a minimum spanning tree.
-        */
+		/*
+		Returns a list of pairs of points, where each HashMap on the list corresponds to a line, and each entry in the hashmap
+		represents the closest point on that line to a minimum spanning tree.
+		*/
 		ArrayList<HashMap<PVector, Node>> options = new ArrayList<>();
 		float close, test;
 		int j, q;
@@ -82,9 +82,9 @@ public class TreeSelection {
 	}
 	
 	public static ArrayList<Node> traverseTreesBase(HashSet<Node> nodes, ArrayList<PVector> vertices, boolean includeParents) {
-        /*
-        Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
-        */
+		/*
+		Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
+		*/
 		ArrayList<Node> traverse = new ArrayList<>();
 		ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);
 		Node edge;
@@ -126,10 +126,10 @@ public class TreeSelection {
 	}
 	
 	public static ArrayList<Node> traverseTreesSkip(HashSet<Node> nodes, ArrayList<PVector> vertices, boolean includeParents) {
-        /*
-        Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
-        This method starts and stops on the closest nodes to the adjacent trees.
-        */
+		/*
+		Visits every kruskal (ish) tree in order, and traverses those trees in a relevant manner.
+		This method starts and stops on the closest nodes to the adjacent trees.
+		*/
 		ArrayList<Node> traverse = new ArrayList<>();
 		ArrayList<Node> order = new ArrayList<>();
 		ArrayList<Node> kruskal = kruskalTraverse(nodes, vertices);//kruskalRecursive(nodes, vertices);//
@@ -160,9 +160,9 @@ public class TreeSelection {
 	}
 	
 	public static ArrayList<Node> kruskalRecursive(HashSet<Node> nodes, ArrayList<PVector> vertices) {
-        /*
-        Traverses the minimum spanning trees by traversing the minimum spanning tree of the minimum spanning trees.
-        */
+		/*
+		Traverses the minimum spanning trees by traversing the minimum spanning tree of the minimum spanning trees.
+		*/
 		HashSet<Node> base = new HashSet<>();
 		HashMap<PVector, Node> conv = new HashMap<>();
 		HashSet<HashSet<Node>> MSTs = Helpers.getMSTs(nodes);
