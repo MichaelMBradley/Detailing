@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
-FIXME: Arcs around start/end of tree can be too large
+TODO: Seperate minimise into circleSize and circleAmount?
 */
 
 public class Detailing extends PApplet {
