@@ -8,7 +8,7 @@ public class Traversal {
 	public static Node closestNode(HashSet<Node> nodes, PVector vertex) {
 		Node close = new Node();
 		float tempDist;
-		float distance = 1e6f;
+		float distance = Float.MAX_VALUE;
 		for (Node n : nodes) {
 			tempDist = PVector.dist(vertex, n.getPV());
 			if (tempDist < distance) {

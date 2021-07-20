@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
-TODO: Fix triCircleAdjacent() arcs overlapping each other
-TODO: Generate path such that bezier curves don't overlap arcs
+FIXME: Arcs around start/end of tree can be too large
 */
 
 public class Detailing extends PApplet {
@@ -25,7 +24,7 @@ public class Detailing extends PApplet {
 	private PShape shape;
 	private PVector offset;
 	
-	private final boolean doTest = true;
+	private final boolean doTest = false;
 	private final String commands = "acmn";
 	private final float minimise = 4;
 	
@@ -114,7 +113,13 @@ public class Detailing extends PApplet {
 					colorMode(RGB, 255, 255, 255);
 				}
 				stroke(0);
-				traverseArcs.forEach(c -> c.draw(this));
+				for(Curve c : traverseArcs) {
+					if(draw.get("arcCircles") && c instanceof Arc) {
+						((Arc) c).drawCircle(this);
+					} else {
+						c.draw(this);
+					}
+				}
 			}
 			if (draw.get("iterate")) {
 				// things can be done with p and q
@@ -165,6 +170,10 @@ public class Detailing extends PApplet {
 		}
 	}
 	public void gridZoom() {
+		if(draw.get("pause")) {
+			mouseX = pmouseX;
+			mouseY = pmouseY;
+		}
 		// Manages drawing the debug grid and the zoom/pan
 		int mx, my, og_mx = mouseX, og_my = mouseY;
 		scale(draw.get("zoom") ? zoom : 1);
@@ -342,15 +351,17 @@ public class Detailing extends PApplet {
 				{'g', "grid"},
 				{'i', "interior"},
 				{'k', "kruskal"},
+				{'l', "iterate"},
 				{'m', "gradient"},
 				{'n', "snap"},
 				{'o', "condense"},
-				{'p', "iterate"},
+				{'p', "pause"},
 				{'q', "getTouching"},
 				{'r', "traversal"},
 				{'s', "shape"},
 				{'t', "touching"},
 				{'u', "circumcircles"},
+				{'w', "arcCircles"},
 				{'z', "zoom"},
 		};
 		conv = new HashMap<>();

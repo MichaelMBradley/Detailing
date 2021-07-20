@@ -24,7 +24,7 @@ public class TreeSelection {
 		for (int i = 0; i < vertices.size(); i++) {
 			current = options.get(i);
 			while (!current.isEmpty()) {
-				distance = 1e6f;
+				distance = Float.MAX_VALUE;
 				for (PVector pv : current.keySet()) {
 					testDist = PVector.dist(pv, vertices.get(i));
 					if (testDist < distance) {
@@ -100,7 +100,8 @@ public class TreeSelection {
 					l = j;
 				}
 			}
-			edge = new Node(PVector.sub(n.getPV(), Traversal.closestPoint2(k, l, n.getPV())));
+			edge = new Node(Traversal.closestPoint2(k, l, n.getPV()));
+			//edge = new Node(PVector.sub(n.getPV(), Traversal.closestPoint2(k, l, n.getPV())));
 			//println("\n" + edge + "\t" + PVector.sub(n.getPV(), edge.getPV()).heading());
 			traverse.addAll(n.kruskalTreeTraverse(edge, !shape.contains(n.getX(), n.getY()), includeParents));
 		}

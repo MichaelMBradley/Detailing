@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import static java.util.Objects.isNull;
-import static processing.core.PConstants.PI;
-import static processing.core.PConstants.TWO_PI;
+import static processing.core.PConstants.*;
 
 public class Smoothing {
 	public static ArrayList<Curve> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
@@ -25,8 +24,7 @@ public class Smoothing {
 		for(ArrayList<Node> tree : trees) {
 			arcs.add(null);
 			out = exterior.contains(tree.get(0));
-			arcTree = surroundingArcsTree(tree, out);
-			arcs.addAll(arcTree);
+			arcs.addAll(surroundingArcsTree(tree, out));
 		}
 		for(int i = 0; i < arcs.size(); i++) {
 			if(isNull(arcs.get(i))) {
@@ -38,11 +36,11 @@ public class Smoothing {
 		}
 		return getBezier(arcs);
 	}
-	public static ArrayList<Curve> surroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
-		ArrayList<Curve> arcs = new ArrayList<>();
-		ArrayList<Circle> ev = new ArrayList<>();
+	public static ArrayList<Arc> surroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
+		ArrayList<Arc> arcs = new ArrayList<>();
+		ArrayList<Circle> baseCircles = new ArrayList<>();
 		Circle closeCircle;
-		Curve prev, next;
+		Arc prev, next;
 		float closeDist, test;
 		boolean tri, overlap = true;
 		int rel;
@@ -50,26 +48,30 @@ public class Smoothing {
 			return arcs;
 		}
 		for(int i = 0; i < nodes.size(); i++) {
-			ev.add(nodes.get(i));
-			ev.add(Adjacent.getExterior(nodes.get(i), nodes.get(i == nodes.size() - 1 ? 0 : i + 1))[clockwise ? 1 : 0]);
+			baseCircles.add(nodes.get(i));
+			baseCircles.add(Adjacent.getExterior(nodes.get(i), nodes.get(i == nodes.size() - 1 ? 0 : i + 1))[clockwise ? 1 : 0]);
 		}
-		ev.remove(ev.size() - 1);
+		baseCircles.remove(baseCircles.size() - 1);
 		while(overlap) {
 			overlap = false;
-			for(int i = 2; i < ev.size() - 2; i += 2) {
+			for(int i = 2; i < baseCircles.size() - 2; i += 2) {
 				//If circle(prev, this) overlaps circle(this, next)
-				if(ev.get(i - 1).overlaps(ev.get(i + 1))) {
+				prev = new Arc(baseCircles.get(i - 1), baseCircles.get(i - 2), baseCircles.get(i), !clockwise, !clockwise);
+				next = new Arc(baseCircles.get(i + 1), baseCircles.get(i), baseCircles.get(i + 2), !clockwise, !clockwise);
+				if(prev.overlaps(next)) {//baseCircles.get(i - 1).overlaps(baseCircles.get(i + 1))) {
 					// If the average distance from a circle to the adjacent circles is less than the distance between the circles
-					tri = (ev.get(i).distanceToCircle(ev.get(i + 2)) + ev.get(i).distanceToCircle(ev.get(i - 2))) / 2f < ev.get(i + 2).distanceToCircle(ev.get(i - 2));
+					tri = (baseCircles.get(i).distanceToCircle(baseCircles.get(i + 2)) + baseCircles.get(i).distanceToCircle(baseCircles.get(i - 2))) / 3f
+							< baseCircles.get(i + 2).distanceToCircle(baseCircles.get(i - 2));
 					if(tri) {
-						ev.set(i, Adjacent.triCircleAdjacentSafer(ev.get(i - 2), ev.get(i), ev.get(i + 2))[1]);
-						//ev.set(i, Adjacent.getExteriorSafe(ev.get(i - 2), ev.get(i + 2), clockwise));
+						baseCircles.set(i, Adjacent.triCircleAdjacentSafer(baseCircles.get(i - 2), baseCircles.get(i), baseCircles.get(i + 2))[1]);
+						//baseCircles.set(i, Adjacent.getExteriorSafe(baseCircles.get(i - 2), baseCircles.get(i + 2), clockwise));
 					}
-					if(!tri || ev.get(i).getR() > (ev.get(i - 2).getR() + ev.get(i + 2).getR()) * 2) {
-						ev.set(i, Adjacent.getExterior(ev.get(i - 2), ev.get(i + 2))[clockwise ? 1 : 0]);
+					// else, or current r too big: current.r > (prev.r + next.r) * 2
+					if(!tri || baseCircles.get(i).getR() > (baseCircles.get(i - 2).getR() + baseCircles.get(i + 2).getR()) * 2) {
+						baseCircles.set(i, Adjacent.getExterior(baseCircles.get(i - 2), baseCircles.get(i + 2))[clockwise ? 1 : 0]);
 					}
-					ev.remove(i + 1);
-					ev.remove(i - 1);
+					baseCircles.remove(i + 1);
+					baseCircles.remove(i - 1);
 					i -= 2;
 					overlap = true;
 				}
@@ -77,17 +79,23 @@ public class Smoothing {
 		}
 		// Swap 1 -> 3 for a somewhat cleaner curve, but with less detail in the centre
 		int help = 2;
-		for(int i = help; i < ev.size() - help; i++) {
-			arcs.add(new Arc(ev.get(i), ev.get(i - 1), ev.get(i + 1), clockwise == (i % 2 == 0), clockwise == (i % 2 == 0)));
+		for(int i = help; i < baseCircles.size() - help; i++) {
+			arcs.add(new Arc(baseCircles.get(i), baseCircles.get(i - 1), baseCircles.get(i + 1), clockwise == (i % 2 == 0), clockwise == (i % 2 == 0)));
 		}
 		return arcs;
 	}
 	private static ArrayList<Curve> getBezier(ArrayList<Curve> arcs) {
+		int prev, next;
 		for(int i = 0; i < arcs.size(); i++) {
 			if (isNull(arcs.get(i))) {
-				//arcs.set(i, ShapeFunctions.connectArcs(arcs.get(i == 0 ? arcs.size() - 1 : i - 1), arcs.get(i == arcs.size() - 1 ? 0 : i + 1)));
-				arcs.set(i, new Bezier(arcs.get(i == 0 ? arcs.size() - 1 : i - 1), arcs.get(i == arcs.size() - 1 ? 0 : i + 1)));
-				//println(arcs.get(i) + "\t" + arcs.get(i == 0 ? arcs.size() - 1 : i - 1) + "\t" + arcs.get(i == arcs.size() - 1 ? 0 : i + 1));
+				prev = i == 0 ? arcs.size() - 1 : i - 1;
+				next = i == arcs.size() - 1 ? 0 : i + 1;
+				((Arc) arcs.get(prev)).setEndAngle((Arc) arcs.get(next), false);
+				((Arc) arcs.get(next)).setStartAngle((Arc) arcs.get(prev), false);
+				arcs.set(i, new Bezier(arcs.get(prev), arcs.get(next)));
+				//arcs.set(i, new Clothoid(-8 * HALF_PI, 8 * HALF_PI, arcs.get(prev).getEndPVector(), arcs.get(next).getStartPVector()));
+				//arcs.set(i, ShapeFunctions.connectArcs(arcs.get(prev), arcs.get(next)));
+				//println(arcs.get(i) + "\t" + arcs.get(prev) + "\t" + arcs.get(next));
 			}
 		}
 		return arcs;

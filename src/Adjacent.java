@@ -19,7 +19,7 @@ public class Adjacent {
 		while (graphs.size() > 1) {
 			closeBase = new Node();
 			closeNode = new Node();
-			closeDistance = 1e6f;  // Arbitrary large number
+			closeDistance = Float.MAX_VALUE;  // Arbitrary large number
 			// Find closest node outside the first graph to the first graph
 			for (Node n : graphs.get(0)) {  // For every node in the first graph
 				for (int i = 1; i < graphs.size(); i++) {
@@ -182,7 +182,7 @@ public class Adjacent {
 	public static Circle[] triCircleAdjacentSafer(Circle lockStart, Circle mid, Circle lockEnd, float lerpFactor) {
 		//lerpfactor:
 		//	0.01 -> straight line (breaks at 0)
-		//	1 -> normal triCircleAdjacent()
+		//	1.00 -> normal triCircleAdjacent()
 		float dist = lockStart.distanceToCenter(lockEnd);
 		return triCircleAdjacent(lockStart,
 				new Circle(PVector.lerp(

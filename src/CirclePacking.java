@@ -28,7 +28,7 @@ public class CirclePacking {
 			r = Helpers.random(minRadius, maxRadius);
 			x = Helpers.random(r - offset, max.x + offset - r);
 			y = Helpers.random(r - offset, max.y + offset - r);
-			closestCircle = 1e6f;
+			closestCircle = Float.MAX_VALUE;
 			for (Node n : nodes) {
 				// Find overall closest circle (the actual node is irrelevant)
 				closestCircle = min(closestCircle, n.distanceToRadius(x, y));

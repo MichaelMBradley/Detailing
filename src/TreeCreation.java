@@ -125,7 +125,25 @@ public class TreeCreation {
 			}
 		}
 		for (HashSet<Node> g : groups.values()) {
-			kruskalWithin(g, -1);
+			HashSet<Node> t = new HashSet<>();
+			Node c = new Node(), b = new Node();
+			for(Node n : g) {
+				if(!touching.contains(n)) {
+					t.add(n);
+				} else {
+					b = n;
+				}
+			}
+			kruskalWithin(t, -1);
+			for(Node n : g) {
+				if(n.distanceToCircle(b) < c.distanceToCircle(b) && n != b) {
+					c = n;
+				}
+			}
+			if(c.getR() != 0f) {
+				c.addKruskal(b);
+			}
+			//kruskalWithin(g, -1);
 		}
 		for (Node n : nodes) {
 			// Checks for trees that are unconnected to nodes touching the polyline
