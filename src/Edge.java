@@ -16,7 +16,7 @@ public final class Edge implements Comparable<Edge> {
 		return Float.compare(len, edge.len);
 	}
 	@Override public boolean equals(Object obj) {
-		if (obj instanceof Edge) {
+		if(obj instanceof Edge) {
 			Edge edge = (Edge) obj;
 			return (n1.getPV().equals(edge.n1.getPV()) && n2.getPV().equals(edge.n2.getPV())) ||
 					(n1.getPV().equals(edge.n2.getPV()) && n2.getPV().equals(edge.n1.getPV()));

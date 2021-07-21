@@ -9,9 +9,9 @@ public class Traversal {
 		Node close = new Node();
 		float tempDist;
 		float distance = Float.MAX_VALUE;
-		for (Node n : nodes) {
+		for(Node n : nodes) {
 			tempDist = PVector.dist(vertex, n.getPV());
-			if (tempDist < distance) {
+			if(tempDist < distance) {
 				distance = tempDist;
 				close = n;
 			}
@@ -25,10 +25,10 @@ public class Traversal {
 		and the line perpendicular to (p1, p2) passing through the node.
 		Slightly slower.
 		*/
-		if (p1.x == p2.x) {
+		if(p1.x == p2.x) {
 			return new PVector(p1.x, p0.y);
 		}
-		if (p1.y == p2.y) {
+		if(p1.y == p2.y) {
 			return new PVector(p0.x, p1.y);
 		}
 		float m = (p2.y - p1.y) / (p2.x - p1.x);
@@ -54,8 +54,8 @@ public class Traversal {
 		*/
 		HashSet<Node> side = new HashSet<>();
 		Polygon shape = ShapeFunctions.toPolygon(vertices);
-		for (Node n : nodes) {
-			if (shape.contains(n.getX(), n.getY()) == inside) {
+		for(Node n : nodes) {
+			if(shape.contains(n.getX(), n.getY()) == inside) {
 				side.add(n);
 			}
 		}
@@ -95,8 +95,8 @@ public class Traversal {
 	public static ArrayList<Arc> delaunayTraversalToArcs(ArrayList<Node> traversal) {
 		ArrayList<Arc> arcs = new ArrayList<>();
 		System.out.println(traversal.size());
-		for (int i = 0; i < traversal.size() - 1; i++) {
-			if (traversal.get(i).getKruskalAdjacent().contains(traversal.get(i + 1))) {
+		for(int i = 0; i < traversal.size() - 1; i++) {
+			if(traversal.get(i).getKruskalAdjacent().contains(traversal.get(i + 1))) {
 				arcs.add(Geometry.getArcKruskal(traversal.get(i), traversal.get(i + 1))[0]);//All(Arrays.asList(ShapeFunctions.getArcKruskal(traversal.get(i), traversal.get(i + 1))));//
 				System.out.println(arcs.get(arcs.size() - 1));
 			} else {

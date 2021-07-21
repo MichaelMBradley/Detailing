@@ -46,8 +46,8 @@ public class Node extends Circle {
 	}
 	
 	public void findTouching(HashSet<Node> nodes) {
-		for (Node n : nodes) {
-			if (this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors
+		for(Node n : nodes) {
+			if(this != n && distanceToCircle(n) <= 1) {  // Allow for rounding errors
 				touching.add(n);
 			}
 		}
@@ -58,9 +58,9 @@ public class Node extends Circle {
 		but only if it does not already have this node in it's graph
 		(prevents and infinite recursive loop).
 		*/
-		if (!graph.contains(n)) {
+		if(!graph.contains(n)) {
 			graph.add(n);
-			for (Node t : touching) {
+			for(Node t : touching) {
 				t.graphing(n);
 			}
 		}
@@ -74,11 +74,11 @@ public class Node extends Circle {
 		If the spanning tree that this node is a part of doesn't
 		contain Node n, combine the trees.
 		*/
-		if (!kruskal.contains(n) && (kruskal.size() < restrictSize || restrictSize == -1)) {
+		if(!kruskal.contains(n) && (kruskal.size() < restrictSize || restrictSize == -1)) {
 			ArrayList<Node> og = new ArrayList<>(kruskal);
 			kruskal.addAll(n.kruskal);
 			kruskal.add(n);
-			for (Node k : og) {
+			for(Node k : og) {
 				k.kruskal.addAll(kruskal);
 			}
 			kruskalAdjacent.add(n);
@@ -93,7 +93,7 @@ public class Node extends Circle {
 		kruskal.addAll(n.kruskal);
 		kruskal.add(n);
 		ArrayList<Node> og = new ArrayList<>(kruskal);
-		for (Node k : og) {
+		for(Node k : og) {
 			k.kruskal.addAll(kruskal);
 		}
 		kruskalAdjacent.add(n);
@@ -112,23 +112,23 @@ public class Node extends Circle {
 		ArrayList<Node> orderedChildren = new ArrayList<>(kruskalAdjacent);
 		orderedChildren.remove(call);
 		below.add(this);
-		if (kruskalAdjacent.size() == 0) {
+		if(kruskalAdjacent.size() == 0) {
 			return below;
-		} else if (kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
+		} else if(kruskalAdjacent.size() == 1 && kruskalAdjacent.contains(call)) {
 			//float small = 0.5f;
 			setR(getR() * 0.5f);//small;
 			move(PVector.sub(call.getPV(), getPV()).setMag(distanceToCircle(call)));//(1 - small) * r / 2));
 			return below;
 		}
 		orderedChildren = sortRelativeHeadings(orderedChildren, call, clockwise);
-		for (Node n : orderedChildren) {
-			for (Node k : n.kruskalTreeTraverse(this, clockwise, includeParents)) {
+		for(Node n : orderedChildren) {
+			for(Node k : n.kruskalTreeTraverse(this, clockwise, includeParents)) {
 				below.add(k);
-				if (k == exit) {
+				if(k == exit) {
 					break;
 				}
 			}
-			if (includeParents && below.get(below.size() - 1) != exit) {
+			if(includeParents && below.get(below.size() - 1) != exit) {
 				below.add(this);
 			}
 		}
@@ -144,14 +144,14 @@ public class Node extends Circle {
 		ArrayList<Float> sortedHeadings = new ArrayList<>();
 		ArrayList<Node> sortedNodes = new ArrayList<>();
 		float heading;
-		for (Node n : children) {
+		for(Node n : children) {
 			heading = PVector.sub(n.getPV(), getPV()).heading();
-			if (heading > PVector.sub(call.getPV(), getPV()).heading()) {
-				if (clockwise) {
+			if(heading > PVector.sub(call.getPV(), getPV()).heading()) {
+				if(clockwise) {
 					heading -= TWO_PI;
 				}
 			} else {
-				if (!clockwise) {
+				if(!clockwise) {
 					heading += TWO_PI;
 				}
 			}
@@ -159,10 +159,10 @@ public class Node extends Circle {
 			sortedHeadings.add(heading);
 		}
 		Collections.sort(sortedHeadings);
-		if (!clockwise) {
+		if(!clockwise) {
 			Collections.reverse(sortedHeadings);
 		}
-		for (Float h : sortedHeadings) {
+		for(Float h : sortedHeadings) {
 			sortedNodes.add(headings.get(h));
 		}
 		return sortedNodes;

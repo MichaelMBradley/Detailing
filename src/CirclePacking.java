@@ -27,21 +27,21 @@ public class CirclePacking {
 		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * circleDepth / 3);
 		float offset = cutoff + maxRadius;
 		int consecutiveFailed = 0;
-		while (consecutiveFailed < 3000 / circleSize) {
+		while(consecutiveFailed < 3000 / circleSize) {
 			r = Helpers.random(minRadius, maxRadius);
 			x = Helpers.random(r - offset, max.x + offset - r);
 			y = Helpers.random(r - offset, max.y + offset - r);
 			closestCircle = Float.MAX_VALUE;
-			for (Node n : nodes) {
+			for(Node n : nodes) {
 				// Find overall closest circle (the actual node is irrelevant)
 				closestCircle = min(closestCircle, n.distanceToRadius(x, y));
 			}
-			if (closestCircle < minRadius) {
+			if(closestCircle < minRadius) {
 				// Fails if chosen position would require a node to be too small
 				consecutiveFailed++;
 			} else {
 				current = new Node(x, y, min(maxRadius * Helpers.random(0.75f, 1.25f), closestCircle));
-				if (Geometry.circleNearLine(cutoff, current, vertices)) {
+				if(Geometry.circleNearLine(cutoff, current, vertices)) {
 					// Adds new node if given circle is near any line
 					nodes.add(current);
 					consecutiveFailed = 0;
@@ -62,16 +62,16 @@ public class CirclePacking {
 		float minRadius = (w + h) / (60 * circleSize);
 		float maxRadius = minRadius * 4;
 		int consecutiveFailed = 0;
-		while (consecutiveFailed < 3000 / circleSize) {
+		while(consecutiveFailed < 3000 / circleSize) {
 			r = Helpers.random(minRadius, maxRadius);
 			x = Helpers.random(r, w - r);
 			y = Helpers.random(r, h - r);
 			closestCircle = min(new float[]{x, y, w - x, h - y});
-			for (Node n : nodes) {
+			for(Node n : nodes) {
 				// Find overall closest circle (the actual node is irrelevant)
 				closestCircle = min(closestCircle, n.distanceToRadius(x, y));
 			}
-			if (closestCircle < minRadius) {
+			if(closestCircle < minRadius) {
 				// Fails if chosen position would require a node to be too small
 				consecutiveFailed++;
 			} else {
@@ -92,9 +92,9 @@ public class CirclePacking {
 		float minRadius = (w + h) / (60 * circleSize);
 		float maxRadius = minRadius * 4;
 		ArrayList<ArrayList<ArrayList<Integer>>> available = new ArrayList<>();
-		for (int i = 0; i < w / maxRadius; i++) {
+		for(int i = 0; i < w / maxRadius; i++) {
 			available.add(new ArrayList<>());
-			for (int j = 0; j < h / maxRadius; j++) {
+			for(int j = 0; j < h / maxRadius; j++) {
 				available.get(i).add(new ArrayList<>());
 			}
 		}
@@ -104,31 +104,31 @@ public class CirclePacking {
 		test.push(new Node(Helpers.random(minRadius, w - minRadius), Helpers.random(minRadius, h - minRadius), 0));
 		int locX, locY;
 		float nearest;
-		while (!test.empty()) {
+		while(!test.empty()) {
 			curr = test.pop();
 			nearby = new HashSet<>();
 			locX = (int) curr.getX() / w;
 			locY = (int) curr.getY() / h;
-			for (int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
-				for (int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
-					for (int a : available.get(i).get(j)) {
+			for(int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
+				for(int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
+					for(int a : available.get(i).get(j)) {
 						nearby.add(nodes.get(a));
 					}
 				}
 			}
 			nearest = min(new float[] { curr.getX(), curr.getY(), w - curr.getX(), h - curr.getY() }) - curr.getR();
-			for (Node n : nearby) {
+			for(Node n : nearby) {
 				nearest = min(nearest, n.distanceToCircle(curr));
 			}
-			if (nearest >= minRadius) {
+			if(nearest >= minRadius) {
 				curr.setR(min(nearest, maxRadius));
 				nodes.add(curr);
-				for (int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
-					for (int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
+				for(int i = max(0, locX - 1); i <= min(available.size(), locX + 1); i++) {
+					for(int j = max(0, locY - 1); j <= min(available.get(0).size(), locY + 1); j++) {
 						available.get(i).get(j).add(nodes.size() - 1);
 					}
 				}
-				for (int m = 0; m < 10; m++) {  // number is arbitrary
+				for(int m = 0; m < 10; m++) {  // number is arbitrary
 					test.push(
 							new Node(
 									max(0, min(w, curr.getX() + Helpers.random(-2 * maxRadius, 2 * maxRadius))),
@@ -160,10 +160,10 @@ public class CirclePacking {
 			for(float[] co : m.getCoords()) {
 				if(min(co) > -100 && max(co) < 1100) {
 					close = Float.MAX_VALUE;
-					for (Circle c : nodes) {
+					for(Circle c : nodes) {
 						close = min(close, c.distanceToRadius(co[0], co[1]));
 					}
-					if (close > 0 && close != Float.MAX_VALUE && (minR == -1f || close > minR) && (maxR == -1f || close < maxR)) {
+					if(close > 0 && close != Float.MAX_VALUE && (minR == -1f || close > minR) && (maxR == -1f || close < maxR)) {
 						nodes.add(new Circle(co[0], co[1], close));
 					}
 				}

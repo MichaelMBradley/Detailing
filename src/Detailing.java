@@ -9,8 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
-TODO: Seperate minimise into circleSize and circleAmount?
 TODO: Refactor to better conform to OOP principles
+TODO: Seperate trees further
+TODO: Replace Bezier with muultiple circles
+TODO: Remove large connective circles
+TODO: Replace valid circle packing band with probability zone
 */
 
 public class Detailing extends PApplet {
@@ -24,7 +27,7 @@ public class Detailing extends PApplet {
 	private Test test;
 	private PShape shape;
 	private PVector offset;
-	private Slider size, depth, reduce;
+	private Slider size, depth;
 	
 	private final boolean doTest = false;
 	private final String commands = "acmn";
@@ -58,7 +61,6 @@ public class Detailing extends PApplet {
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
 		size = new Slider(1, 4, 15, 10, 100, 20, h - 110, 0.5f, "Size");
 		depth = new Slider(1, 4, 15, 10, 100, 70, h - 110, 0.5f, "Depth");
-		reduce = new Slider(0, 0.9f, 1.5f, 10, 100, 120, h - 110, 0.1f, "Reduce");
 		calc();
 		if(doTest) {
 			println("Test mode");
@@ -67,38 +69,37 @@ public class Detailing extends PApplet {
 		for(char c : commands.toCharArray()) {
 			init.append(conv.get(c)).append(", ");
 		}
-		println(String.format("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\n\tReduce: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
-				size.getValue(), depth.getValue(), reduce.getValue(), init));
+		println(String.format("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
+				size.getValue(), depth.getValue(), init));
 	}
 	
 	@Override public void draw() {
 		// calc();
 		background(255);
-		if (doTest) {
+		if(doTest) {
 			gridZoom();
 			test.run();
 		} else {
 			size.draw(this);
 			depth.draw(this);
-			reduce.draw(this);
 			gridZoom();
-			if (draw.get("numCircles")) {
+			if(draw.get("numCircles")) {
 				fill(0);
 				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
 				noFill();
 			}
-			if (draw.get("shape")) {
+			if(draw.get("shape")) {
 				stroke(0);
 				strokeWeight(1);
 				shape(shape, 0, 0);
 			}
 			drawNodes(interior, interiorCircumcircles, draw.get("interior"));
 			drawNodes(exterior, exteriorCircumcircles, draw.get("exterior"));
-			if (draw.get("traversal")) {
+			if(draw.get("traversal")) {
 				stroke(255, 0, 0);
 				strokeWeight(1);
-				for (int i = 0; i < traverse.size() - 1; i++) {
-					if (!traverse.get(i).getKruskal().contains(traverse.get(i + 1))) {
+				for(int i = 0; i < traverse.size() - 1; i++) {
+					if(!traverse.get(i).getKruskal().contains(traverse.get(i + 1))) {
 						stroke(0, 0, 255);
 					} else {
 						stroke(255, 0, 0);
@@ -108,16 +109,14 @@ public class Detailing extends PApplet {
 				stroke(0, 0, 255);
 				Helpers.drawLine(traverse.get(traverse.size() - 1).getPV(), traverse.get(0).getPV(), this);
 			}
-			if (draw.get("traversalArcs")) {
+			if(draw.get("traversalArcs")) {
 				strokeWeight(1);
-				if (draw.get("gradient")) {
-					float h = 0f;
-					float chn = 360f / (float) traverseArcsInterior.size();
-					colorMode(HSB, 360, 100, 100);
-					for (Curve c : traverseArcsInterior) {
-						stroke(h, 100, 100);
-						h += chn;
-						c.draw(this);
+				if(draw.get("gradient")) {
+					int arcCount = traverseArcsInterior.size();
+					colorMode(HSB, arcCount, 100, 100);
+					for(int i = 0; i < arcCount; i++) {
+						stroke(i, 100, 100);
+						traverseArcsInterior.get(i).draw(this);
 					}
 					colorMode(RGB, 255, 255, 255);
 				}
@@ -130,7 +129,7 @@ public class Detailing extends PApplet {
 					}
 				}
 			}
-			if (draw.get("iterate")) {
+			if(draw.get("iterate")) {
 				// things can be done with p and q
 				// keyPressed(); // ?
 				maxIter = traverseArcs.size();
@@ -152,7 +151,7 @@ public class Detailing extends PApplet {
 				if(draw.get("touching")) {
 					stroke(0, 0, 255);
 					strokeWeight(1);
-					for (Node t : n.getTouching()) {
+					for(Node t : n.getTouching()) {
 						Helpers.drawLine(n.getPV(), t.getPV(), this);
 					}
 				}
@@ -171,7 +170,7 @@ public class Detailing extends PApplet {
 					}
 				}
 			}
-			if (draw.get("circumcircles")) {
+			if(draw.get("circumcircles")) {
 				stroke(255, 0, 0);
 				strokeWeight(1);
 				circumcircles.forEach(c -> c.draw(this));
@@ -187,20 +186,20 @@ public class Detailing extends PApplet {
 		int mx, my, og_mx = mouseX, og_my = mouseY;
 		scale(draw.get("zoom") ? zoom : 1);
 		translate(offset.x, offset.y);
-		if (draw.get("zoom")) {
+		if(draw.get("zoom")) {
 			translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
 			fill(0);
 			text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
 			noFill();
 		}
-		if (draw.get("grid")) {
+		if(draw.get("grid")) {
 			String msg = "";
-			if (draw.get("snap")) {
+			if(draw.get("snap")) {
 				mx = mouseX - (int) offset.x;
 				my = mouseY - (int) offset.y;
 				if(draw.get("interior") || draw.get("exterior")) {
-					for (Node n : nodes) {
-						if (n.distanceToCenter(mx, my) < n.getR()) {
+					for(Node n : nodes) {
+						if(n.distanceToCenter(mx, my) < n.getR()) {
 							mouseX = (int) (n.getX() + offset.x);
 							mouseY = (int) (n.getY() + offset.y);
 							msg = n.toString();
@@ -214,7 +213,7 @@ public class Detailing extends PApplet {
 						if(a instanceof Arc) {
 							arc = (Arc) a;
 							h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
-							if (abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
+							if(abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
 								mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
 								mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
 								msg = a.toString();
@@ -228,11 +227,11 @@ public class Detailing extends PApplet {
 			stroke(127);
 			strokeWeight(1);
 			int freq = 25;
-			for (int i = ((int) offset.x / freq) * -freq; i < w - offset.x; i += freq) {
+			for(int i = ((int) offset.x / freq) * -freq; i < w - offset.x; i += freq) {
 				line(i, -offset.y, i, h - offset.y);
 				text("" + i, i + 2, 10 - offset.y);
 			}
-			for (int i = ((int) offset.y / freq) * -freq; i < h - offset.y; i += freq) {
+			for(int i = ((int) offset.y / freq) * -freq; i < h - offset.y; i += freq) {
 				line(-offset.x, i, w - offset.x, i);
 				text("" + i, -offset.x, i + 12);
 			}
@@ -264,18 +263,18 @@ public class Detailing extends PApplet {
 	}
 	public void calc() {
 		// Completes all relevant calculations
-		if (!doTest) {
+		if(!doTest) {
 			int start;
 			start = millis();
 			nodes = CirclePacking.randomFillAware(vertices, size.getValue(), depth.getValue());
-			CirclePacking.reduce(nodes, reduce.getValue());
+			CirclePacking.reduce(nodes, 0.9f);
 			println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, nodes.size(), nodes.size() / ((float) (millis() - start) / 1000)));
-			if (draw.get("condense")) {
+			if(draw.get("condense")) {
 				start = millis();
 				Adjacent.condense(nodes);  // Takes a similar amount of time as the circle packing. Only use if you need to ensure all circles are touching.
 				println(String.format("Condensing: %.3f", (float) (millis() - start) / 1000));
 			}
-			if (draw.get("getTouching") && !draw.get("condense")) {
+			if(draw.get("getTouching") && !draw.get("condense")) {
 				start = millis();
 				Adjacent.createTouchingGraphs(nodes);
 				println(String.format("Touching: %.3f", (float) (millis() - start) / 1000));
@@ -307,18 +306,18 @@ public class Detailing extends PApplet {
 			test.keyPressed(key);
 		}
 		String cmd;
-		if (key == 'h') {
+		if(key == 'h') {
 			StringBuilder out = new StringBuilder("Draw:\n");
-			for (char c : conv.keySet()) {
+			for(char c : conv.keySet()) {
 				out.append(c).append(": ").append(conv.get(c)).append("\n");
 			}
 			print(out.toString());
-		} else if (conv.containsKey(key)) {
+		} else if(conv.containsKey(key)) {
 			cmd = conv.get(key);
 			draw.replace(cmd, !draw.get(cmd));
 			println(cmd + ": " + draw.get(cmd));
 			loop();
-		} else if (draw.get("iterate")) {
+		} else if(draw.get("iterate")) {
 			p = p + 1 >= maxIter ? 0 : p + 1;
 			q = q + 1 >= maxIter ? 0 : q + 1;
 		} else {
@@ -330,7 +329,7 @@ public class Detailing extends PApplet {
 	}
 	@Override public void mouseClicked() {
 		if(!doTest) {
-			if(!(size.update(mouseX, mouseY) || depth.update(mouseX, mouseY) || reduce.update(mouseX, mouseY))) {
+			if(!(size.update(mouseX, mouseY) || depth.update(mouseX, mouseY))) {
 				calc();
 				p = 0;
 				q = 1;
@@ -341,11 +340,10 @@ public class Detailing extends PApplet {
 	@Override public void mouseDragged() {
 		size.update(mouseX, mouseY);
 		depth.update(mouseX, mouseY);
-		reduce.update(mouseX, mouseY);
 	}
 	@Override public void mouseWheel(MouseEvent event) {
 		zoom *= pow(0.9f, event.getCount());
-		if (doTest) {
+		if(doTest) {
 			test.mouseWheel(event.getCount());
 		}
 	}
@@ -381,7 +379,7 @@ public class Detailing extends PApplet {
 		};
 		conv = new HashMap<>();
 		draw = new HashMap<>();
-		for (Object[] arr : cmd) {
+		for(Object[] arr : cmd) {
 			conv.put((char) arr[0], (String) arr[1]);
 			draw.put((String) arr[1], !doTest && (commands.indexOf((char) arr[0]) != -1));
 		}

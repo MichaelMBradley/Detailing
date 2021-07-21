@@ -16,17 +16,17 @@ public class Adjacent {
 		Node closeBase, closeNode;
 		PVector moveVector;
 		float closeDistance, tempCD;
-		while (graphs.size() > 1) {
+		while(graphs.size() > 1) {
 			closeBase = new Node();
 			closeNode = new Node();
 			closeDistance = Float.MAX_VALUE;  // Arbitrary large number
 			// Find closest node outside the first graph to the first graph
-			for (Node n : graphs.get(0)) {  // For every node in the first graph
-				for (int i = 1; i < graphs.size(); i++) {
-					for (Node o : graphs.get(i)) {  // For every node not in the first graph
+			for(Node n : graphs.get(0)) {  // For every node in the first graph
+				for(int i = 1; i < graphs.size(); i++) {
+					for(Node o : graphs.get(i)) {  // For every node not in the first graph
 						tempCD = n.distanceToCircle(o);
 						//println(n + " " + o + " " + tempCD);
-						if (tempCD < closeDistance) {  // Save closest pair
+						if(tempCD < closeDistance) {  // Save closest pair
 							closeDistance = tempCD;
 							closeBase = n;
 							closeNode = o;
@@ -37,7 +37,7 @@ public class Adjacent {
 			// Move all nodes on first graph towards other closest node
 			moveVector = PVector.sub(closeNode.getPV(), closeBase.getPV());
 			moveVector.setMag(moveVector.mag() - closeBase.getR() - closeNode.getR());
-			for (Node n : graphs.get(0)) {
+			for(Node n : graphs.get(0)) {
 				n.move(moveVector);
 			}
 			graphs = createTouchingGraphs(nodes);
@@ -50,17 +50,17 @@ public class Adjacent {
 		*/
 		ArrayList<HashSet<Node>> graphs = new ArrayList<>();
 		HashSet<Node> used = new HashSet<>();
-		for (Node n : nodes) {
+		for(Node n : nodes) {
 			n.resetGraph();
 			n.findTouching(nodes);
 		}
-		for (Node n : nodes) {
-			for (Node t : n.getTouching()) {
+		for(Node n : nodes) {
+			for(Node t : n.getTouching()) {
 				n.graphing(t);
 			}
 		}
-		for (Node n : nodes) {
-			if (!used.contains(n)) {
+		for(Node n : nodes) {
+			if(!used.contains(n)) {
 				graphs.add(n.getGraph());
 				used.addAll(n.getGraph());
 			}

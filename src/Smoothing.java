@@ -87,7 +87,7 @@ public class Smoothing {
 	private static ArrayList<Curve> getBezier(ArrayList<Curve> arcs) {
 		int prev, next;
 		for(int i = 0; i < arcs.size(); i++) {
-			if (isNull(arcs.get(i))) {
+			if(isNull(arcs.get(i))) {
 				prev = i == 0 ? arcs.size() - 1 : i - 1;
 				next = i == arcs.size() - 1 ? 0 : i + 1;
 				((Arc) arcs.get(prev)).setEndAngle((Arc) arcs.get(next), false);
@@ -105,11 +105,11 @@ public class Smoothing {
 		ArrayList<Curve> interior = new ArrayList<>();
 		Arc newArc;
 		for(Curve curve : curves) {
-			if (curve instanceof Arc) {
+			if(curve instanceof Arc) {
 				newArc = new Arc((Arc) curve);
 				newArc.setR(newArc.getR() + (newArc.isConnecting() ? -0.5f : 0.5f));
 				interior.add(newArc);
-			} else if (curve instanceof Bezier) {
+			} else if(curve instanceof Bezier) {
 				Collections.addAll(interior, ((Bezier) curve).getAdjacent(0.5f, 10));
 			}
 			

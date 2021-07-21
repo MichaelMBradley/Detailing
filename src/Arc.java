@@ -71,14 +71,14 @@ public class Arc extends Circle implements Curve {
 		// * end > start
 		// * end - start < 2Pi
 		if(!anglesCalculated) {
-			if (startAngleBase > endAngleBase) {
-				if (clockwise) {
+			if(startAngleBase > endAngleBase) {
+				if(clockwise) {
 					setDraw(false, true);
 				} else {
 					setDraw(true, false);
 				}
 			} else {
-				if (!clockwise) {
+				if(!clockwise) {
 					setDraw(true, true);
 				} else {
 					setDraw(false, false);

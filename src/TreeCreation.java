@@ -16,13 +16,13 @@ public class TreeCreation {
 		Creates a minimum spanning tree of the nodes.
 		*/
 		ArrayList<Edge> edges = new ArrayList<>();
-		for (Node b : nodes) {
-			for (Node t : b.getDelaunay()) {
+		for(Node b : nodes) {
+			for(Node t : b.getDelaunay()) {
 				edges.add(new Edge(b, t));
 			}
 		}
 		Collections.sort(edges);
-		for (Edge e : edges) {
+		for(Edge e : edges) {
 			e.getN1().addKruskal(e.getN2(), restrictSize);
 		}
 	}
@@ -32,15 +32,15 @@ public class TreeCreation {
 		Creates a minimum spanning tree of the nodes.
 		*/
 		ArrayList<Edge> edges = new ArrayList<>();
-		for (Node b : nodes) {
-			for (Node t : b.getDelaunay()) {
-				if (nodes.contains(t)) {
+		for(Node b : nodes) {
+			for(Node t : b.getDelaunay()) {
+				if(nodes.contains(t)) {
 					edges.add(new Edge(b, t));
 				}
 			}
 		}
 		Collections.sort(edges);
-		for (Edge e : edges) {
+		for(Edge e : edges) {
 			e.getN1().addKruskal(e.getN2(), restrictSize);
 		}
 	}
@@ -54,24 +54,24 @@ public class TreeCreation {
 		Node use;
 		boolean add = true;
 		// While there are still more nodes to add
-		while (add) {
+		while(add) {
 			add = false;
-			for (Node n : touching) {
+			for(Node n : touching) {
 				valid = new HashSet<>();
-				for (Node k : n.getKruskal()) {
-					for (Node d : k.getDelaunay()) {
-						if (d.getKruskal().size() == 0 && !touching.contains(d)) {
+				for(Node k : n.getKruskal()) {
+					for(Node d : k.getDelaunay()) {
+						if(d.getKruskal().size() == 0 && !touching.contains(d)) {
 							// Add node connected by triangulation if it is unclaimed and is not touching the polyline
 							valid.add(d);
 						}
 					}
 				}
-				if (valid.size() > 0) {
+				if(valid.size() > 0) {
 					add = true;
 					use = Helpers.randomFromHashSet(valid);
 					// Add random available node, if one is available
-					for (Node k : n.getKruskal()) {
-						if (k.getDelaunay().contains(use)) {
+					for(Node k : n.getKruskal()) {
+						if(k.getDelaunay().contains(use)) {
 							k.addKruskal(use, -1);
 							break;
 						}
@@ -92,17 +92,17 @@ public class TreeCreation {
 		float dist, testDist;
 		boolean valid;
 		Node close = new Node();
-		for (Node t : touching) {
+		for(Node t : touching) {
 			weights.put(t, Helpers.random(1, 3));
 			groups.put(t, new HashSet<>());
 			groups.get(t).add(t);
 		}
-		for (Node n : nodes) {
-			if (!touching.contains(n)) {
+		for(Node n : nodes) {
+			if(!touching.contains(n)) {
 				dist = Float.MAX_VALUE;
-				for (Node t : touching) {
+				for(Node t : touching) {
 					testDist = n.distanceToCircle(t) * weights.get(t);
-					if (testDist < dist) {
+					if(testDist < dist) {
 						dist = testDist;
 						close = t;
 					}
@@ -110,12 +110,12 @@ public class TreeCreation {
 				groups.get(close).add(n);
 			}
 		}
-		for (Node g : touching) {
-			if (groups.get(g).size() == 1) {
+		for(Node g : touching) {
+			if(groups.get(g).size() == 1) {
 				dist = Float.MAX_VALUE;
-				for (Node t : touching) {
+				for(Node t : touching) {
 					testDist = g.distanceToCircle(t);
-					if (testDist > 0 && testDist < dist && groups.containsKey(t)) {
+					if(testDist > 0 && testDist < dist && groups.containsKey(t)) {
 						close = t;
 						dist = testDist;
 					}
@@ -124,7 +124,7 @@ public class TreeCreation {
 				groups.get(close).add(g);
 			}
 		}
-		for (HashSet<Node> g : groups.values()) {
+		for(HashSet<Node> g : groups.values()) {
 			HashSet<Node> t = new HashSet<>();
 			Node c = new Node(), b = new Node();
 			for(Node n : g) {
@@ -145,28 +145,28 @@ public class TreeCreation {
 			}
 			//kruskalWithin(g, -1);
 		}
-		for (Node n : nodes) {
+		for(Node n : nodes) {
 			// Checks for trees that are unconnected to nodes touching the polyline
 			valid = false;
-			for (Node t : touching) {
-				if (n.getKruskal().contains(t)) {
+			for(Node t : touching) {
+				if(n.getKruskal().contains(t)) {
 					valid = true;
 					break;
 				}
 			}
-			if (!valid) {
+			if(!valid) {
 				dist = Float.MAX_VALUE;
 				close = new Node();
-				for (Node d : n.getDelaunay()) {
-					if (!n.getKruskal().contains(d)) {
+				for(Node d : n.getDelaunay()) {
+					if(!n.getKruskal().contains(d)) {
 						testDist = n.distanceToCircle(d);
-						if (testDist < dist) {
+						if(testDist < dist) {
 							close = d;
 							dist = testDist;
 						}
 					}
 				}
-				if (close.getR() != 0f) {
+				if(close.getR() != 0f) {
 					n.addKruskal(close);
 				}
 			}
@@ -178,9 +178,9 @@ public class TreeCreation {
 		Helper function that returns the set of nodes intersected by a segment of the given polyline.
 		*/
 		HashSet<Node> touching = new HashSet<>();
-		for (Node n : nodes) {
-			for (int i = 0; i < vertices.size(); i++) {
-				if (Geometry.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.getPV()) < n.getR()) {
+		for(Node n : nodes) {
+			for(int i = 0; i < vertices.size(); i++) {
+				if(Geometry.distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.getPV()) < n.getR()) {
 					touching.add(n);
 					n.getKruskal().add(n);
 					//println(n.getPV(), distanceToSegment(vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1), n.getPV()), vertices.get(i), vertices.get(i + 1 == vertices.size() ? 0 : i + 1));

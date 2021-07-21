@@ -57,9 +57,9 @@ public class Helpers {
 		float r = random(h.size());
 		int i = 0;
 		Node node = new Node();
-		for (Node n : h) {
+		for(Node n : h) {
 			node = n;
-			if (i > r) {
+			if(i > r) {
 				break;
 			}
 			i++;

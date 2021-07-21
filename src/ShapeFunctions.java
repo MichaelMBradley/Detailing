@@ -16,15 +16,15 @@ public class ShapeFunctions {
 		[min, max]
 		*/
 		float[][] ends = {{vertices.get(0).x, vertices.get(0).y}, {vertices.get(0).x, vertices.get(0).y}};
-		for (PVector pv : vertices) {
-			if (pv.x < ends[0][0]) {
+		for(PVector pv : vertices) {
+			if(pv.x < ends[0][0]) {
 				ends[0][0] = pv.x;
-			} else if (pv.x > ends[1][0]) {
+			} else if(pv.x > ends[1][0]) {
 				ends[1][0] = pv.x;
 			}
-			if (pv.y < ends[0][1]) {
+			if(pv.y < ends[0][1]) {
 				ends[0][1] = pv.y;
-			} else if (pv.y > ends[1][1]) {
+			} else if(pv.y > ends[1][1]) {
 				ends[1][1] = pv.y;
 			}
 		}
@@ -33,14 +33,14 @@ public class ShapeFunctions {
 	
 	public static ArrayList<PVector> getPVectors(HashSet<Node> nodes) {
 		ArrayList<PVector> vectors = new ArrayList<>();
-		for (Node n : nodes) {
+		for(Node n : nodes) {
 			vectors.add(n.getPV());
 		}
 		return vectors;
 	}
 	
 	public static void scaleVertices(float scalingFactor, ArrayList<PVector> vertices) {
-		for (PVector pv : vertices) {
+		for(PVector pv : vertices) {
 			pv.mult(scalingFactor);
 		}
 	}
@@ -60,7 +60,7 @@ public class ShapeFunctions {
 		for(PVector pv : link.keySet()) {
 			for(PVector con : link.get(pv)) {
 				for(PVector con2 : link.get(con)) {
-					if (link.get(con2).contains(pv)) {
+					if(link.get(con2).contains(pv)) {
 						tris.add(new HashSet<>(Arrays.asList(pv, con, con2)));
 					}
 				}
@@ -81,7 +81,7 @@ public class ShapeFunctions {
 		int[] x = new int[size];
 		int[] y = new int[size];
 		float[] array;
-		for (int i = 0; i < size; i++) {
+		for(int i = 0; i < size; i++) {
 			array = vertices.get(i).array();
 			x[i] = (int) array[0];
 			y[i] = (int) array[1];
@@ -123,7 +123,7 @@ public class ShapeFunctions {
 		*/
 		PShape polygon = sketch.createShape();
 		polygon.beginShape();
-		for (PVector pv : vertices) {
+		for(PVector pv : vertices) {
 			polygon.vertex(pv.x, pv.y);
 		}
 		polygon.vertex(vertices.get(0).x, vertices.get(0).y);

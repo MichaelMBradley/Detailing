@@ -104,7 +104,7 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0);
 		ArrayList<Arc> arcs = Smoothing.surroundingArcsTree(ns, true);
-		for (int i = 0; i < arcs.size() * percentX; i++) {
+		for(int i = 0; i < arcs.size() * percentX; i++) {
 			arcs.get(i).draw(s);
 		}
 	}
@@ -117,10 +117,10 @@ public class Test {
 		Circle n3 = n2.adjacent(TWO_PI * mouseX / width, n2.getR());
 		s.strokeWeight(1);s.stroke(127);
 		n1.draw(s);n2.draw(s);n3.draw(s);
-		/*for (Circle n : Smoothing.getExterior(n1, n2)) {
+		/*for(Circle n : Smoothing.getExterior(n1, n2)) {
 			s.stroke(255, 0, 0);
 			n.draw(s);
-			for (Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
+			for(Circle j : Smoothing.triCircleAdjacent(n1, n2, n)) {
 				s.stroke(0, 0, 255);
 				j.draw(s);
 			}
@@ -203,7 +203,7 @@ public class Test {
 		Circle n2 = new Circle(mouseX, mouseY, 100);
 		n1.draw(s);
 		n2.draw(s);
-		for (Circle n : Adjacent.getInterior(n1, n2)) {
+		for(Circle n : Adjacent.getInterior(n1, n2)) {
 			n.draw(s);
 		}
 		//noLoop();
@@ -232,13 +232,13 @@ public class Test {
 		n2.draw(s);
 		n3.draw(s);
 		n4.draw(s);
-		for (Circle n : Adjacent.getExterior(n1, n2)) {
+		for(Circle n : Adjacent.getExterior(n1, n2)) {
 			n.draw(s);
 		}
-		for (Circle n : Adjacent.getExterior(n2, n3)) {
+		for(Circle n : Adjacent.getExterior(n2, n3)) {
 			n.draw(s);
 		}
-		for (Circle n : Adjacent.getExterior(n2, n4)) {
+		for(Circle n : Adjacent.getExterior(n2, n4)) {
 			n.draw(s);
 		}
 	}
@@ -251,7 +251,7 @@ public class Test {
 		n1.draw(s);
 		n2.draw(s);
 		Circle[] ext = Adjacent.getExterior(n1, n2);
-		for (Circle n : ext) {
+		for(Circle n : ext) {
 			n.draw(s);
 		}
 		s.fill(0);
@@ -260,9 +260,9 @@ public class Test {
 		/*
 		color f;
 		s.loadPixels();
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (smoothing.getExterior(n1, new Circle(x, y, 100 * mouseX / width))[0].x > Float.MIN_VALUE) {
+		for(int x = 0; x < width; x++) {
+			for(int y = 0; y < height; y++) {
+				if(smoothing.getExterior(n1, new Circle(x, y, 100 * mouseX / width))[0].x > Float.MIN_VALUE) {
 					f = color(0, 255, 0);
 				} else {
 					f = color(255, 0, 0);
@@ -278,17 +278,17 @@ public class Test {
 		float j = 0f;
 		float num = 1e9f;
 		int t = s.millis();
-		for (int i = 0; i < num; i++) {
+		for(int i = 0; i < num; i++) {
 			j = PVector.dist(p1, p2);
 		}
 		println(".dist: " + (s.millis() - t));
 		t = s.millis();
-		for (int i = 0; i < num; i++) {
+		for(int i = 0; i < num; i++) {
 			j = PVector.sub(p1, p2).magSq();
 		}
 		println(".sub.magSq: " + (s.millis() - t));
 		t = s.millis();
-		for (int i = 0; i < num; i++) {
+		for(int i = 0; i < num; i++) {
 			j = pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2);
 		}
 		println("custom: " + (s.millis() - t));
