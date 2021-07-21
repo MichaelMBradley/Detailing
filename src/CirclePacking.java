@@ -11,7 +11,10 @@ import static processing.core.PApplet.max;
 import static processing.core.PApplet.min;
 
 public class CirclePacking {
-	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float minimise) {
+	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize) {
+		return randomFillAware(vertices, circleSize, circleSize);
+	}
+	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize, float circleDepth) {
 		/*
 		Creates a circle packing of the given vertices.
 		*/
@@ -19,12 +22,12 @@ public class CirclePacking {
 		float x, y, r, closestCircle;
 		Node current;
 		PVector max = ShapeFunctions.extremes(vertices)[1];
-		float maxRadius = max(max.x, max.y) / (60 * minimise) * 4;
+		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
 		float minRadius = maxRadius / 2;
-		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * minimise / 3);
+		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * circleDepth / 3);
 		float offset = cutoff + maxRadius;
 		int consecutiveFailed = 0;
-		while (consecutiveFailed < 3000 / minimise) {
+		while (consecutiveFailed < 3000 / circleSize) {
 			r = Helpers.random(minRadius, maxRadius);
 			x = Helpers.random(r - offset, max.x + offset - r);
 			y = Helpers.random(r - offset, max.y + offset - r);
@@ -50,16 +53,16 @@ public class CirclePacking {
 		return nodes;
 	}
 	
-	public static HashSet<Node> randomFill(int w, int h, float minimise) {
+	public static HashSet<Node> randomFill(int w, int h, float circleSize) {
 		/*
 		Creates a circle packing in the given area.
 		*/
 		HashSet<Node> nodes = new HashSet<>();
 		float x, y, r, closestCircle;
-		float minRadius = (w + h) / (60 * minimise);
+		float minRadius = (w + h) / (60 * circleSize);
 		float maxRadius = minRadius * 4;
 		int consecutiveFailed = 0;
-		while (consecutiveFailed < 3000 / minimise) {
+		while (consecutiveFailed < 3000 / circleSize) {
 			r = Helpers.random(minRadius, maxRadius);
 			x = Helpers.random(r, w - r);
 			y = Helpers.random(r, h - r);
@@ -79,14 +82,14 @@ public class CirclePacking {
 		return nodes;
 	}
 	
-	public static HashSet<Node> randomFillPoisson(int w, int h, float minimise) {
+	public static HashSet<Node> randomFillPoisson(int w, int h, float circleSize) {
 		/*
 		This implementation is worse than dart throwing.
 		It attempts to use a 2D array to determine the
 		closest other node.
 		*/
 		ArrayList<Node> nodes = new ArrayList<>();
-		float minRadius = (w + h) / (60 * minimise);
+		float minRadius = (w + h) / (60 * circleSize);
 		float maxRadius = minRadius * 4;
 		ArrayList<ArrayList<ArrayList<Integer>>> available = new ArrayList<>();
 		for (int i = 0; i < w / maxRadius; i++) {
@@ -140,9 +143,9 @@ public class CirclePacking {
 	public static void voronoiPacking(Collection<Circle> nodes) {
 		voronoiPacking(nodes, -1f, -1f);
 	}
-	public static void voronoiPacking(Collection<Circle> nodes, ArrayList<PVector> vertices, float minimise) {
+	public static void voronoiPacking(Collection<Circle> nodes, ArrayList<PVector> vertices, float circleSize) {
 		PVector max = ShapeFunctions.extremes(vertices)[1];
-		float maxRadius = max(max.x, max.y) / (60 * minimise) * 4;
+		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
 		float minRadius = maxRadius / 2;
 		voronoiPacking(nodes, -1f, maxRadius);
 	}
@@ -169,6 +172,9 @@ public class CirclePacking {
 	}
 	
 	public static void reduce(Collection<Node> circles) {
-		circles.forEach(c -> c.setR(c.getR() * 0.9f));
+		reduce(circles, 0.9f);
+	}
+	public static void reduce(Collection<Node> circles, float amt) {
+		circles.forEach(c -> c.setR(c.getR() * amt));
 	}
 }

@@ -10,6 +10,7 @@ import java.util.HashSet;
 
 /*
 TODO: Seperate minimise into circleSize and circleAmount?
+TODO: Refactor to better conform to OOP principles
 */
 
 public class Detailing extends PApplet {
@@ -23,10 +24,10 @@ public class Detailing extends PApplet {
 	private Test test;
 	private PShape shape;
 	private PVector offset;
+	private Slider size, depth, reduce;
 	
 	private final boolean doTest = false;
 	private final String commands = "acmn";
-	private final float minimise = 4;
 	
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
@@ -55,6 +56,9 @@ public class Detailing extends PApplet {
 		ShapeFunctions.scaleVertices((float) w / 30, vertices);
 		shape = ShapeFunctions.toShape(vertices, this);
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
+		size = new Slider(1, 4, 15, 10, 100, 20, h - 110, 0.5f, "Size");
+		depth = new Slider(1, 4, 15, 10, 100, 70, h - 110, 0.5f, "Depth");
+		reduce = new Slider(0, 0.9f, 1.5f, 10, 100, 120, h - 110, 0.1f, "Reduce");
 		calc();
 		if(doTest) {
 			println("Test mode");
@@ -63,16 +67,21 @@ public class Detailing extends PApplet {
 		for(char c : commands.toCharArray()) {
 			init.append(conv.get(c)).append(", ");
 		}
-		println(String.format("\nComplexity: %.1f\nInitial settings (press 'h' for full list):\n%s\n", minimise, init));
+		println(String.format("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\n\tReduce: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
+				size.getValue(), depth.getValue(), reduce.getValue(), init));
 	}
 	
 	@Override public void draw() {
 		// calc();
 		background(255);
-		gridZoom();
 		if (doTest) {
+			gridZoom();
 			test.run();
 		} else {
+			size.draw(this);
+			depth.draw(this);
+			reduce.draw(this);
+			gridZoom();
 			if (draw.get("numCircles")) {
 				fill(0);
 				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
@@ -258,8 +267,8 @@ public class Detailing extends PApplet {
 		if (!doTest) {
 			int start;
 			start = millis();
-			nodes = CirclePacking.randomFillAware(vertices, minimise);
-			CirclePacking.reduce(nodes);
+			nodes = CirclePacking.randomFillAware(vertices, size.getValue(), depth.getValue());
+			CirclePacking.reduce(nodes, reduce.getValue());
 			println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f", (float) (millis() - start) / 1000, nodes.size(), nodes.size() / ((float) (millis() - start) / 1000)));
 			if (draw.get("condense")) {
 				start = millis();
@@ -321,12 +330,18 @@ public class Detailing extends PApplet {
 	}
 	@Override public void mouseClicked() {
 		if(!doTest) {
-			calc();
+			if(!(size.update(mouseX, mouseY) || depth.update(mouseX, mouseY) || reduce.update(mouseX, mouseY))) {
+				calc();
+				p = 0;
+				q = 1;
+			}
 			loop();
-			p = 0;
-			q = 1;
-			//altTreeCreate(circles, vertices);
 		}
+	}
+	@Override public void mouseDragged() {
+		size.update(mouseX, mouseY);
+		depth.update(mouseX, mouseY);
+		reduce.update(mouseX, mouseY);
 	}
 	@Override public void mouseWheel(MouseEvent event) {
 		zoom *= pow(0.9f, event.getCount());
