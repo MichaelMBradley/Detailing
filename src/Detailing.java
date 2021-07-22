@@ -11,7 +11,7 @@ import java.util.HashSet;
 /*
  * TODO: Refactor to better conform to OOP principles
  * TODO: Seperate trees further
- * TODO: Replace Bezier with muultiple circles
+ * TODO: Replace Bezier with multiple circles
  * TODO: Remove large connective circles
  * TODO: Replace valid circle packing band with probability zone
  */
