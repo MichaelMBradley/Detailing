@@ -70,7 +70,7 @@ public class Bezier implements Curve {
 		PVector n1 = Traversal.newRelative(p1, offset, getStartAngle() + HALF_PI);
 		PVector n2 = Traversal.newRelative(c1, offset, getStartAngle() + HALF_PI);
 		PVector n3 = Traversal.newRelative(c1, offset, PVector.sub(c2, c1).heading() + HALF_PI);
-		PVector n4 = Traversal.newRelative(c2, offset, PVector.sub(c2, c1).heading() + HALF_PI);;
+		PVector n4 = Traversal.newRelative(c2, offset, PVector.sub(c2, c1).heading() + HALF_PI);
 		PVector n5 = Traversal.newRelative(c2, offset, getEndAngle() + HALF_PI);
 		PVector n6 = Traversal.newRelative(p2, offset, getEndAngle() + HALF_PI);
 		return new Bezier(n1, Traversal.crossover(n1, n2, n3, n4), Traversal.crossover(n3, n4, n5, n6), n6);

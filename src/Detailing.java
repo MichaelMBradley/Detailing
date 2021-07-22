@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
-TODO: Refactor to better conform to OOP principles
-TODO: Seperate trees further
-TODO: Replace Bezier with muultiple circles
-TODO: Remove large connective circles
-TODO: Replace valid circle packing band with probability zone
-*/
+ * TODO: Refactor to better conform to OOP principles
+ * TODO: Seperate trees further
+ * TODO: Replace Bezier with muultiple circles
+ * TODO: Remove large connective circles
+ * TODO: Replace valid circle packing band with probability zone
+ */
 
 public class Detailing extends PApplet {
 	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
@@ -22,7 +22,7 @@ public class Detailing extends PApplet {
 	private ArrayList<PVector> vertices;
 	private ArrayList<Node> traverse;
 	private HashSet<Node> nodes, interior, exterior;
-	private int w, h;
+	private int w, h, iter, maxIter;
 	private float zoom = 2f;
 	private Test test;
 	private PShape shape;
@@ -109,10 +109,9 @@ public class Detailing extends PApplet {
 			if(draw.get("traversalArcs")) {
 				strokeWeight(1);
 				if(draw.get("gradient")) {
-					int arcCount = traverseArcsInterior.size();
-					colorMode(HSB, arcCount, 100, 100);
-					for(int i = 0; i < arcCount; i++) {
-						stroke(i, 100, 100);
+					colorMode(HSB, maxIter, 100, 100);
+					for(int i = 0; i < maxIter; i++) {
+						stroke((i + iter) % maxIter, 100, 100);
 						traverseArcsInterior.get(i).draw(this);
 					}
 					colorMode(RGB, 255, 255, 255);
@@ -124,6 +123,12 @@ public class Detailing extends PApplet {
 					} else {
 						c.draw(this);
 					}
+				}
+			}
+			if(draw.get("iterate")) {
+				iter++;
+				if(iter == maxIter) {
+					iter = 0;
 				}
 			}
 			//noLoop();
@@ -180,7 +185,7 @@ public class Detailing extends PApplet {
 			if(draw.get("snap")) {
 				mx = mouseX - (int) offset.x;
 				my = mouseY - (int) offset.y;
-				if(draw.get("interior") || draw.get("exterior")) {
+				if(draw.get("circles")) {
 					for(Node n : nodes) {
 						if(n.distanceToCenter(mx, my) < n.getR()) {
 							mouseX = (int) (n.getX() + offset.x);
@@ -220,7 +225,8 @@ public class Detailing extends PApplet {
 			}
 			fill(0);
 			stroke(0);
-			text(!msg.equals("") ? msg : "(" + (int) (mouseX - offset.x) + ", " + (int) (mouseY - offset.y) + ")", mouseX + 2 - offset.x, mouseY - 2 - offset.y);
+			
+			text(!msg.equals("") ? msg : String.format("(%.0f, %.0f)", (mouseX - offset.x), (mouseY - offset.y)), mouseX + 2 - offset.x, mouseY - 2 - offset.y);
 			noFill();
 			line(mouseX - offset.x, -offset.y, mouseX - offset.x, h - offset.y);
 			line(-offset.x, mouseY - offset.y, w - offset.x, mouseY - offset.y);
@@ -246,6 +252,7 @@ public class Detailing extends PApplet {
 	}
 	public void calc() {
 		// Completes all relevant calculations
+		iter = 0;
 		if(!doTest) {
 			int start;
 			start = millis();
@@ -264,6 +271,7 @@ public class Detailing extends PApplet {
 			//traverse = TreeSelection.traverseTreesHull(nodes, vertices);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
+			maxIter = traverseArcsInterior.size();
 			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
 		} else {
 			nodes = new HashSet<>();
@@ -332,14 +340,15 @@ public class Detailing extends PApplet {
 				{'c', "circles"},
 				{'d', "delaunay"},
 				{'g', "grid"},
+				{'i', "iterate"},
 				{'k', "kruskal"},
 				{'m', "gradient"},
 				{'n', "numCircles"},
+				{'o', "arcCircles"},
 				{'p', "pause"},
 				{'r', "traversal"},
 				{'s', "shape"},
 				{'u', "circumcircles"},
-				{'w', "arcCircles"},
 				{'x', "snap"},
 				{'z', "zoom"},
 		};
