@@ -9,15 +9,58 @@ import java.util.Stack;
 
 import static processing.core.PApplet.max;
 import static processing.core.PApplet.min;
+import static processing.core.PConstants.TWO_PI;
 
 public class CirclePacking {
+	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float circleSize, float circleDepth) {
+		PVector max = ShapeFunctions.extremes(vertices)[1];
+		HashSet<Node> nodes = new HashSet<>();
+		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
+		float minRadius = maxRadius / 2;
+		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * circleDepth / 3);
+		float[] dists = new float[vertices.size()];
+		for(int i = 0; i < dists.length; i++) {
+			dists[i] = PVector.dist(vertices.get(i), vertices.get((i + 1) % vertices.size()));
+			if(i!=0) {
+				dists[i] += dists[i - 1];
+			}
+		}
+		float length, closestCircle;
+		PVector base, next;
+		int consecutiveFailed = 0;
+		Node test;
+		while(consecutiveFailed < 300) {
+			length = Helpers.random(dists[dists.length - 1]);
+			base = vertices.get(0);
+			next = vertices.get(1);
+			closestCircle = maxRadius;
+			for(int j = 0; j < dists.length; j++) {
+				if(dists[j] < length) {
+					base = vertices.get((j + 1) % vertices.size());
+					next = vertices.get((j + 2) % vertices.size());
+					break;
+				}
+			}
+			test = new Node(new Circle(PVector.lerp(base, next, Helpers.random(1))).PVectorOnCircumference(Helpers.random(TWO_PI)));
+			for(Node n : nodes) {
+				closestCircle = min(closestCircle, n.distanceToCircle(test));
+			}
+			if(closestCircle < minRadius) {
+				consecutiveFailed++;
+			} else {
+				consecutiveFailed = 0;
+				test.setR(closestCircle);
+				nodes.add(test);
+			}
+		}
+		return nodes;
+	}
+	
 	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize) {
 		return randomFillAware(vertices, circleSize, circleSize);
 	}
 	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize, float circleDepth) {
-		/*
-		Creates a circle packing of the given vertices.
-		*/
+		// Creates a circle packing of the given vertices.
 		HashSet<Node> nodes = new HashSet<>();
 		float x, y, r, closestCircle;
 		Node current;

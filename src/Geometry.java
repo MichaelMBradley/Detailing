@@ -32,13 +32,24 @@ public class Geometry {
 		Returns if a given node is suitably close (cutoff) to any
 		of the line segments on the polyline described by the vertices.
 		*/
+		int j;
 		for(int i = 0; i < vertices.size(); i++) {
-			int j = i + 1 == vertices.size() ? 0 : i + 1;  // Wraps index of next vertex to 0 to avoid index out of range
+			j = i + 1 == vertices.size() ? 0 : i + 1;
 			if(distanceToSegment(vertices.get(i), vertices.get(j), c.getPV()) - c.getR() <= cutoff) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public static float nearestLineDistance(Circle c, ArrayList<PVector> vertices) {
+		int j;
+		float close = Float.MAX_VALUE;
+		for(int i = 0; i < vertices.size(); i++) {
+			j = (i + 1) % vertices.size();
+			close = min(close, distanceToSegment(vertices.get(i), vertices.get(j), c.getPV()) - c.getR());
+		}
+		return close;
 	}
 	
 	public static float distanceToSegment(PVector v1, PVector v2, PVector test) {

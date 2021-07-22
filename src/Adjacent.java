@@ -171,9 +171,9 @@ public class Adjacent {
 		float y4 = B0 + B1 * r4;
 		float x5 = A0 + A1 * r5;
 		float y5 = B0 + B1 * r5;
-		// println(String.format("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", Ka, Kb, D, A0, B0, A1, B1, C0, C1, C2));
+		// System.out.printf("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", Ka, Kb, D, A0, B0, A1, B1, C0, C1, C2));
 		// println(Ka + " " + Kb + " " + D + " " + A0 + " " + B0 + " " + A1 + " " + B1 + " " + C0 + " " + C1 + " " + C2);
-		// println(String.format("%s %s %s (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)", n1, n2, n3, x4, y4, r4, x5, y5, r5));
+		// System.out.printf("%s %s %s (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)", n1, n2, n3, x4, y4, r4, x5, y5, r5));
 		return new Circle[] { new Circle(x4, y4, abs(r4)), new Circle(x5, y5, abs(r5)) };
 	}
 	public static Circle[] triCircleAdjacentSafer(Circle lockStart, Circle mid, Circle lockEnd) {

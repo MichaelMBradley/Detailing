@@ -134,12 +134,12 @@ public class DelaunayMethods {
 		float[][] po = ShapeFunctions.toFloatArray(pv);
 		int t = sketch.millis();
 		Delaunay test = new Delaunay(po);
-		println(String.format("Mesh: %dms", sketch.millis() - t));
+		System.out.printf("Mesh: %dms", sketch.millis() - t);
 		t = sketch.millis();
 		Triangulate.triangulate(pv);
-		println(String.format("Triangulate: %dms", sketch.millis() - t));
+		System.out.printf("Triangulate: %dms", sketch.millis() - t);
 		sketch.millis();
 		Voronoi testV = new Voronoi(po);
-		println(String.format("Voronoi: %dms", sketch.millis() - t));
+		System.out.printf("Voronoi: %dms", sketch.millis() - t);
 	}
 }

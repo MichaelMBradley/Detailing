@@ -27,13 +27,13 @@ public class Detailing extends PApplet {
 	private Test test;
 	private PShape shape;
 	private PVector offset;
-	private Slider size, depth;
 	
 	private final boolean doTest = false;
 	private final String commands = "amnx";
 	
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
+	private HashMap<String, Slider> sliders;
 	
 	@Override public void settings() {
 		size(800, 800);
@@ -57,8 +57,7 @@ public class Detailing extends PApplet {
 		ShapeFunctions.scaleVertices((float) w / 30, vertices);
 		shape = ShapeFunctions.toShape(vertices, this);
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
-		size = new Slider(1, 4, 15, 10, 100, 20 - offset.x, h - 110 - offset.y, 0.5f, "Size");
-		depth = new Slider(1, 4, 15, 10, 100, 70 - offset.x, h - 110 - offset.y, 0.5f, "Depth");
+		initializeSliders();
 		calc();
 		if(doTest) {
 			println("Test mode");
@@ -67,8 +66,8 @@ public class Detailing extends PApplet {
 		for(char c : commands.toCharArray()) {
 			init.append(conv.get(c)).append(", ");
 		}
-		println(String.format("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
-				size.getValue(), depth.getValue(), init));
+		System.out.printf("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
+				sliderVal("size"), sliderVal("depth"), init);
 	}
 	
 	@Override public void draw() {
@@ -82,8 +81,7 @@ public class Detailing extends PApplet {
 				fill(0);
 				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
 				noFill();
-				size.draw(this);
-				depth.draw(this);
+				sliders.values().forEach(s -> s.draw(this));
 			}
 			if(draw.get("shape")) {
 				stroke(0);
@@ -134,7 +132,7 @@ public class Detailing extends PApplet {
 			//noLoop();
 		}
 	}
-	public void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
+	private void drawNodes(HashSet<Node> circles, ArrayList<Circle> circumcircles, boolean drawCircles) {
 		// Nodes may be stored in multiple discrete sets, this function draws relevant information for all nodes in a given set
 		if(!doTest) {
 			for(Node n : circles) {
@@ -165,7 +163,7 @@ public class Detailing extends PApplet {
 			}
 		}
 	}
-	public void gridZoom() {
+	private void gridZoom() {
 		if(draw.get("pause")) {
 			mouseX = pmouseX;
 			mouseY = pmouseY;
@@ -235,19 +233,19 @@ public class Detailing extends PApplet {
 		mouseY = og_my;
 	}
 	
-	public ArrayList<Circle> analyze(HashSet<Node> aCircles) {
+	private ArrayList<Circle> analyze(HashSet<Node> aCircles) {
 		// The Delaunay Triangulation and tree generation is done separately for the interior and exterior circles
 		ArrayList<Circle> circumcircles;
 		int start;
 		start = millis();
 		Delaunay d = DelaunayMethods.delaunayMesh(aCircles);
 		circumcircles = ShapeFunctions.delaunayMeshToCircle(d, aCircles);
-		println(String.format("\tTriangulation: %.3f", (float) (millis() - start) / 1000));
+		System.out.printf("\tTriangulation: %.3f", (float) (millis() - start) / 1000);
 		start = millis();
 		// kruskal(aCircles);
 		// altTreeCreate(aCircles, vertices);
 		TreeCreation.treeNearest(aCircles, vertices);
-		println(String.format("\tKruskal: %.3f", (float) (millis() - start) / 1000));
+		System.out.printf("\tKruskal: %.3f", (float) (millis() - start) / 1000);
 		return circumcircles;
 	}
 	public void calc() {
@@ -256,10 +254,10 @@ public class Detailing extends PApplet {
 		if(!doTest) {
 			int start;
 			start = millis();
-			nodes = CirclePacking.randomFillAware(vertices, size.getValue(), depth.getValue());
+			nodes = CirclePacking.randomFillAware(vertices, sliderVal("size"), sliderVal("depth"));
 			CirclePacking.reduce(nodes, 0.9f);
-			println(String.format("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f",
-					(millis() - start) / 1000f, nodes.size(), nodes.size() / ((millis() - start) / 1000f)));
+			System.out.printf("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f",
+					(millis() - start) / 1000f, nodes.size(), nodes.size() / ((millis() - start) / 1000f));
 			println("-Interior-");
 			interior = Traversal.containing(vertices, nodes, true);
 			interiorCircumcircles = analyze(interior);
@@ -268,11 +266,10 @@ public class Detailing extends PApplet {
 			exteriorCircumcircles = analyze(exterior);
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
-			//traverse = TreeSelection.traverseTreesHull(nodes, vertices);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
-			println(String.format("Traversal: %.3f", (float) (millis() - start) / 1000));
+			System.out.printf("Traversal: %.3f", (float) (millis() - start) / 1000);
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
@@ -308,7 +305,8 @@ public class Detailing extends PApplet {
 	}
 	@Override public void mouseClicked() {
 		if(!doTest) {
-			if(draw.get("numCircles") && !(size.update(mouseX, mouseY) || depth.update(mouseX, mouseY))) {
+			if(draw.get("numCircles") &&
+					!(sliders.get("size").update(mouseX, mouseY) || sliders.get("depth").update(mouseX, mouseY))) {
 				calc();
 			}
 			loop();
@@ -316,8 +314,7 @@ public class Detailing extends PApplet {
 	}
 	@Override public void mouseDragged() {
 		if(draw.get("numCircles")) {
-			size.update(mouseX - offset.x, mouseY - offset.y);
-			depth.update(mouseX - offset.x, mouseY - offset.y);
+			sliders.values().forEach(s -> s.update(mouseX - offset.x, mouseY - offset.y));
 		}
 	}
 	@Override public void mouseWheel(MouseEvent event) {
@@ -333,7 +330,7 @@ public class Detailing extends PApplet {
 		test.mouseReleased();
 	}
 	
-	public void initializeKeys() {
+	private void initializeKeys() {
 		// key, name, value
 		Object[][] cmd = new Object[][]{
 				{'a', "traversalArcs"},
@@ -358,6 +355,29 @@ public class Detailing extends PApplet {
 			conv.put((char) arr[0], (String) arr[1]);
 			draw.put((String) arr[1], !doTest && (commands.indexOf((char) arr[0]) != -1));
 		}
+	}
+	private void initializeSliders() {
+		sliders = new HashMap<>();
+		String[] names = new String[] {
+				"size",
+				"depth",
+				"hard",
+		};
+		float[][] params = new float[][] {
+				{1, 4, 15, 0.5f},
+				{1, 4, 15, 0.5f},
+				{0, 1, 1, 1},
+		};
+		for(int i = 0; i < names.length; i++) {
+			sliders.put(names[i],
+					new Slider(params[i][0], params[i][1], params[i][2],
+							10, 100,
+							20 + (i * 50) - offset.x, h - 110 - offset.y,
+							params[i][3], names[i]));
+		}
+	}
+	private float sliderVal(String slider) {
+		return sliders.get(slider).getValue();
 	}
 	public static void main(String[] args) {
 		PApplet.runSketch(new String[] {"Detailing"}, new Detailing());

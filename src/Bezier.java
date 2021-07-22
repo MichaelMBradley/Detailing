@@ -37,7 +37,7 @@ public class Bezier implements Curve {
 		c1 = Traversal.newRelative(p1, rF, from.getEndAngle());
 		p2 = to.getStartPVector();
 		c2 = Traversal.newRelative(p2, rT, to.getStartAngle());
-		// println(String.format("%s\nFrom: %s\tTo: %s\n", Helpers.floatArrayToString(info), from, to));
+		// System.out.printf("%s\nFrom: %s\tTo: %s\n", Helpers.floatArrayToString(info), from, to));
 	}
 	
 	
