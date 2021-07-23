@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-/*
- * TODO: Refactor to better conform to OOP principles
+/* TODO: Refactor to better conform to OOP principles
  * TODO: Seperate trees further
  * TODO: Replace Bezier with multiple circles
  * TODO: Remove large connective circles
@@ -29,7 +28,7 @@ public class Detailing extends PApplet {
 	private PVector offset;
 	
 	private final boolean doTest = false;
-	private final String commands = "amnx";
+	private final String commands = "cmnsx";//"amnx";
 	
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
@@ -240,12 +239,12 @@ public class Detailing extends PApplet {
 		start = millis();
 		Delaunay d = DelaunayMethods.delaunayMesh(aCircles);
 		circumcircles = ShapeFunctions.delaunayMeshToCircle(d, aCircles);
-		System.out.printf("\tTriangulation: %.3f", (float) (millis() - start) / 1000);
+		System.out.printf("\tTriangulation: %.3f\n", (float) (millis() - start) / 1000);
 		start = millis();
 		// kruskal(aCircles);
 		// altTreeCreate(aCircles, vertices);
 		TreeCreation.treeNearest(aCircles, vertices);
-		System.out.printf("\tKruskal: %.3f", (float) (millis() - start) / 1000);
+		System.out.printf("\tKruskal: %.3f\n", (float) (millis() - start) / 1000);
 		return circumcircles;
 	}
 	public void calc() {
@@ -254,9 +253,10 @@ public class Detailing extends PApplet {
 		if(!doTest) {
 			int start;
 			start = millis();
-			nodes = CirclePacking.randomFillAware(vertices, sliderVal("size"), sliderVal("depth"));
+			//nodes = CirclePacking.randomFillAware(vertices, sliderVal("size"), sliderVal("depth"));
+			nodes = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts"));
 			CirclePacking.reduce(nodes, 0.9f);
-			System.out.printf("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f",
+			System.out.printf("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f\n",
 					(millis() - start) / 1000f, nodes.size(), nodes.size() / ((millis() - start) / 1000f));
 			println("-Interior-");
 			interior = Traversal.containing(vertices, nodes, true);
@@ -269,7 +269,8 @@ public class Detailing extends PApplet {
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
-			System.out.printf("Traversal: %.3f", (float) (millis() - start) / 1000);
+			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
+			//CirclePacking.comparePackings(this, vertices);
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
@@ -362,11 +363,13 @@ public class Detailing extends PApplet {
 				"size",
 				"depth",
 				"hard",
+				"attempts",
 		};
 		float[][] params = new float[][] {
 				{1, 4, 15, 0.5f},
 				{1, 4, 15, 0.5f},
 				{0, 1, 1, 1},
+				{10, 3000, 5000, 10}
 		};
 		for(int i = 0; i < names.length; i++) {
 			sliders.put(names[i],
@@ -376,7 +379,7 @@ public class Detailing extends PApplet {
 							params[i][3], names[i]));
 		}
 	}
-	private float sliderVal(String slider) {
+	public float sliderVal(String slider) {
 		return sliders.get(slider).getValue();
 	}
 	public static void main(String[] args) {

@@ -12,7 +12,7 @@ import static processing.core.PApplet.min;
 import static processing.core.PConstants.TWO_PI;
 
 public class CirclePacking {
-	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float circleSize, float circleDepth) {
+	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float circleSize, float circleDepth, int numAttempts) {
 		PVector max = ShapeFunctions.extremes(vertices)[1];
 		HashSet<Node> nodes = new HashSet<>();
 		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
@@ -21,15 +21,15 @@ public class CirclePacking {
 		float[] dists = new float[vertices.size()];
 		for(int i = 0; i < dists.length; i++) {
 			dists[i] = PVector.dist(vertices.get(i), vertices.get((i + 1) % vertices.size()));
-			if(i!=0) {
-				dists[i] += dists[i - 1];
+			if(i != 0) {
+				dists[i] = dists[i] + dists[i - 1];
 			}
 		}
 		float length, closestCircle;
 		PVector base, next;
 		int consecutiveFailed = 0;
 		Node test;
-		while(consecutiveFailed < 300) {
+		while(consecutiveFailed < numAttempts / circleSize) {
 			length = Helpers.random(dists[dists.length - 1]);
 			base = vertices.get(0);
 			next = vertices.get(1);
@@ -38,10 +38,12 @@ public class CirclePacking {
 				if(dists[j] < length) {
 					base = vertices.get((j + 1) % vertices.size());
 					next = vertices.get((j + 2) % vertices.size());
+				} else {
 					break;
 				}
 			}
-			test = new Node(new Circle(PVector.lerp(base, next, Helpers.random(1))).PVectorOnCircumference(Helpers.random(TWO_PI)));
+			test = new Node(new Circle(PVector.lerp(base, next, Helpers.random(1f)), Helpers.random(cutoff))
+					.PVectorOnCircumference(Helpers.random(TWO_PI)));
 			for(Node n : nodes) {
 				closestCircle = min(closestCircle, n.distanceToCircle(test));
 			}
@@ -56,10 +58,10 @@ public class CirclePacking {
 		return nodes;
 	}
 	
-	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize) {
-		return randomFillAware(vertices, circleSize, circleSize);
-	}
 	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize, float circleDepth) {
+		return randomFillAware(vertices, circleSize, circleDepth, 3000);
+	}
+	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize, float circleDepth, int numAttempts) {
 		// Creates a circle packing of the given vertices.
 		HashSet<Node> nodes = new HashSet<>();
 		float x, y, r, closestCircle;
@@ -219,5 +221,22 @@ public class CirclePacking {
 	}
 	public static void reduce(Collection<Node> circles, float amt) {
 		circles.forEach(c -> c.setR(c.getR() * amt));
+	}
+	
+	public static void comparePackings(Detailing d, ArrayList<PVector> vertices) {
+		HashSet<Node> nodes;
+		int[] nums = new int[] {12, 30, 100, 300, 500, 1000, 3000, 5000, 10000};
+		int t;
+		String strNum;
+		System.out.println("\t\t\taware()\t\t\tline\nAttempts\tTime\tCount\tTime\tCount");
+		for(int num : nums) {
+			strNum = num + ((num < 1000) ? "\t" : "");
+			t = d.millis();
+			nodes = randomFillAware(vertices, d.sliderVal("size"), d.sliderVal("depth"), num);
+			System.out.printf("%s\t\t%.2f\t%d", strNum, (d.millis() - t) / 1000f, nodes.size());
+			t = d.millis();
+			nodes = lineFill(vertices, d.sliderVal("size"), d.sliderVal("depth"), num);
+			System.out.printf("\t\t%.2f\t%d\n", (d.millis() - t) / 1000f, nodes.size());
+		}
 	}
 }
