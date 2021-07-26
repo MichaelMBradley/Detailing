@@ -27,7 +27,7 @@ public class Detailing extends PApplet {
 	private PShape shape;
 	private PVector offset;
 	
-	private final boolean doTest = false;
+	private final boolean doTest = true;
 	private final String commands = "cmnsx";//"amnx";
 	
 	private HashMap<Character, String> conv;

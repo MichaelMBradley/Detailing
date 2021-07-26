@@ -3,11 +3,51 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 import static java.util.Objects.isNull;
-import static processing.core.PConstants.*;
+import static processing.core.PConstants.PI;
+import static processing.core.PConstants.TWO_PI;
 
 public class Smoothing {
+	public static ArrayList<Circle> spacedOutBezier(Bezier b, int num) {
+		ArrayList<Circle> circles = new ArrayList<>();
+		ArrayList<Float> dists = new ArrayList<>();
+		float r = b.distance() / (num * 2f);
+		for(int i = 0; i < num; i++) {
+			dists.add(r * ((2 * i) + 1));
+		}
+		LinkedHashMap<Float, Float> lhm = b.speed(20);
+		//int curr = 0;
+		float past = -Float.MAX_VALUE;
+		for(Float next : lhm.keySet()) {
+			if(past != -Float.MAX_VALUE) {
+				for(int curr = 0; curr < dists.size(); curr++) {
+					if (lhm.get(past) < dists.get(curr) && dists.get(curr) < lhm.get(next)) {
+						circles.add(new Circle(PVector.lerp(b.pointAt(past), b.pointAt(next),
+								(dists.get(curr) - lhm.get(past)) / (lhm.get(next) - lhm.get(past))), r));
+						/*curr++;
+						if(curr == dists.size()) {
+							break;
+						}*/
+					}
+				}
+			}
+			past = next;
+		}
+		return circles;
+	}
+	
+	public static ArrayList<Arc> connectArcs(Arc from, Arc to, int num) {
+		ArrayList<Arc> arcs = new ArrayList<>();
+		if(num < 2) {
+			return arcs;
+		}
+		ArrayList<Circle> circles = spacedOutBezier(new Bezier(from, to), num);
+		
+		return arcs;
+	}
+	
 	public static ArrayList<Curve> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
 		ArrayList<Curve> arcTree, arcs = new ArrayList<>();
 		Arc arc, newArc;

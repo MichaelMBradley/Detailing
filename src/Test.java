@@ -5,6 +5,8 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static processing.core.PApplet.*;
 
@@ -26,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test14();
+		test21();
 		update();
 	}
 	public void update() {
@@ -43,6 +45,10 @@ public class Test {
 	private void iterate(int max) {
 		iter = iter == max - 1 ? 0 : iter + 1;
 		iterNext = iter == max - 1 ? 0 : iter + 1;
+	}
+	
+	private void randomiseStroke() {
+		s.stroke(s.random(255), s.random(255), s.random(255));
 	}
 	
 	public void keyPressed(char keyDown) {
@@ -337,7 +343,7 @@ public class Test {
 			nodes.add(new ArrayList<>(nodes.get(nodes.size()-1)));
 			CirclePacking.voronoiPacking(nodes.get(nodes.size()-1));
 			s.strokeWeight(1);//2 * (max - i));
-			s.stroke(s.random(255), s.random(255), s.random(255));
+			randomiseStroke();
 			for(Circle n : nodes.get(nodes.size()-1)) {
 				n.draw(s);
 			}
@@ -493,15 +499,14 @@ public class Test {
 		s.stroke(0);
 		c1.draw(s);c2.draw(s);c3.draw(s);
 		s.randomSeed(0L);
-		s.stroke(s.random(255), s.random(255), s.random(255));
+		randomiseStroke();
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3)).iterator().forEachRemaining(c -> c.draw(s));
-		s.stroke(s.random(255), s.random(255), s.random(255));
+		randomiseStroke();
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3n)).iterator().forEachRemaining(c -> c.draw(s));
-		s.stroke(s.random(255), s.random(255), s.random(255));
+		randomiseStroke();
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2n, c3)).iterator().forEachRemaining(c -> c.draw(s));
-		s.stroke(s.random(255), s.random(255), s.random(255));
+		randomiseStroke();
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2n, c3n)).iterator().forEachRemaining(c -> c.draw(s));
-		s.stroke(s.random(255), s.random(255), s.random(255));
 		// The other four possible combinations are just inversions of what has already been called
 	}
 	public void test20() {
@@ -517,5 +522,42 @@ public class Test {
 				(to.getY() - from.getY()) / (to.getX() - from.getX()) < 0
 				), 10, 10);
 		s.noFill();
+	}
+	public void test21() {
+		s.stroke(0);
+		s.strokeWeight(1);
+		Bezier b = new Bezier(100, 100,
+				100, height - 100,
+				width - 100, 100,
+				mouseX, mouseY);//width - 100, height - 100);
+		b.draw(s);
+		b.drawLines(s);
+		s.strokeWeight(3);
+		b.drawPoints(s);
+		LinkedHashMap<Float, Float> lhm = b.speed(20);
+		float past = Float.MIN_VALUE;
+		for(Float f : lhm.keySet()) {
+			s.stroke(0);
+			s.point((width / 2) - 50 + (f * 100), height - 100 - ((lhm.get(f) / 1000) * 100));
+			s.stroke(255, 0, 0);
+			if(past != Float.MIN_VALUE) {
+				s.point((width / 2) - 50 + (((f + past) / 2) * 100), height - 100 - ((((lhm.get(f) - lhm.get(past)) / (f - past)) / 1000) * 100));
+			}
+			past = f;
+		}
+		s.stroke(255, 0, 0);
+		s.strokeWeight(1);
+		Smoothing.spacedOutBezier(b, max(1, mouseCount)).forEach(a -> {a.draw(s); /*System.out.println(a);*/});
+		HashMap<Integer, Float> c = new HashMap<>();
+		s.fill(0);
+		StringBuilder str = new StringBuilder();
+		int[] nums = new int[] {5, 10, 20, 50, 100, 500, 1000};
+		Arrays.stream(nums).forEach(i -> c.put(i, b.distance(i)));
+		Arrays.stream(nums).forEach(i -> str.append(String.format("(%d)   d: %.2f   %.2f%%\n",
+				i, c.get(i), 1 - c.get(i) / c.get(nums[nums.length - 1]))));
+		s.text(str.toString(), 10, 10);
+		s.noFill();
+		//Smoothing.bezierToArcs(b, 20).forEach(System.out::println);
+		//System.out.println();
 	}
 }

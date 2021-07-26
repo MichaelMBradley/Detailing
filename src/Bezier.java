@@ -1,10 +1,14 @@
+import lombok.Getter;
 import processing.core.PApplet;
 import processing.core.PVector;
+
+import java.util.LinkedHashMap;
 
 import static processing.core.PApplet.*;
 
 public class Bezier implements Curve {
-	private final PVector p1, c1, c2, p2;
+	private final PVector p1, p2;
+	@Getter private final PVector c1, c2;
 	
 	public Bezier() {
 		p1 = new PVector();
@@ -39,7 +43,6 @@ public class Bezier implements Curve {
 		c2 = Traversal.newRelative(p2, rT, to.getStartAngle());
 		// System.out.printf("%s\nFrom: %s\tTo: %s\n", Helpers.floatArrayToString(info), from, to));
 	}
-	
 	
 	@Override public boolean isEmpty() {
 		return new PVector().equals(p1) && p1.equals(c1) && c1.equals(c2) && c2.equals(p2);
@@ -87,6 +90,9 @@ public class Bezier implements Curve {
 		}
 		return bez;
 	}
+	public Bezier cut(float min, float max) {
+		return cut(max)[0].cut(min / max)[1];
+	}
 	public Bezier[] cut(float amt) {
 		amt = max(0, min(1, amt));
 		PVector a1 = PVector.lerp(p1, c1, amt);
@@ -97,8 +103,29 @@ public class Bezier implements Curve {
 		PVector c1 = PVector.lerp(b1, b2, amt);
 		return new Bezier[] { new Bezier(p1, a1, b1, c1), new Bezier(c1, b2, a3, p2) };
 	}
-	public Bezier cut(float min, float max) {
-		return cut(max)[0].cut(min / max)[1];
+	
+	public float distance() {
+		return distance(20);
+	}
+	public float distance(int accuracy) {
+		return speed(accuracy).get(1f);
+	}
+	public LinkedHashMap<Float, Float> speed(int accuracy) {
+		LinkedHashMap<Float, Float> lhm = new LinkedHashMap<>();
+		PVector prev, next = p1;
+		float dist = 0;
+		for(int i = 0; i <= accuracy; i++) {
+			prev = next;
+			next = pointAt((float) i / accuracy);
+			dist += prev.dist(next);
+			lhm.put((float) i / accuracy, dist);
+		}
+		return lhm;
+	}
+	public PVector pointAt(float amt) {
+		amt = 1 - amt;
+		return PVector.add(PVector.add(PVector.mult(p1, pow(amt, 3)), PVector.mult(c1, 3 * pow(amt, 2) * (1 - amt))),
+				PVector.add(PVector.mult(c2, 3 * amt * pow(1 - amt, 2)), PVector.mult(p2, pow((1 - amt), 3))));
 	}
 	
 	@Override public void draw(PApplet sketch) {
@@ -109,6 +136,11 @@ public class Bezier implements Curve {
 		sketch.point(p2.x, p2.y);
 		sketch.point(c1.x, c1.y);
 		sketch.point(c2.x, c2.y);
+	}
+	public void drawLines(PApplet sketch) {
+		sketch.line(p1.x, p1.y, c1.x, c1.y);
+		sketch.line(c1.x, c1.y, c2.x, c2.y);
+		sketch.line(c2.x, c2.y, p2.x, p2.y);
 	}
 	@Override public String toString() {
 		return String.format("[%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f]",
