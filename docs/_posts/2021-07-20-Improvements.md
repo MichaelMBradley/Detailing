@@ -23,4 +23,4 @@ Below are some full polycurves.
 {: style="text-align:center"}
 ![A single curve around the polyline, mostly without errors.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/main/docs/_assets/07-20/GoodCropped3.png)
 
-While quashing the ast few bugs, I'll also be focused on more artistic ideals, trying to find ways to alter the look and feel of the polycurve.
+While quashing the last few bugs, I'll also be focused on more artistic ideals, trying to find ways to alter the look and feel of the polycurve.
