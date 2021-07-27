@@ -117,6 +117,10 @@ public class Adjacent {
 		}
 	}
 	
+	public static Circle getConnecting(Circle from, Circle to) {
+		return getAdjacent(from, to, 1.01f * (from.distanceToCircle(to) / 2), true)[0];
+	}
+	
 	public static Circle getExterior(Circle from, Circle to, boolean clockwise) {
 		return getExterior(from, to)[clockwise ? 1 : 0];
 	}

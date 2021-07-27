@@ -28,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test21();
+		test22();
 		update();
 	}
 	public void update() {
@@ -103,7 +103,8 @@ public class Test {
 		s.text(9 + "\n" + n9.x + " " + n9.y, n9.x, n9.y);
 		s.noFill();
 		*/
-		ArrayList<Circle> ns = new ArrayList<>(Arrays.asList(n1, n2, n7, n8, n7, n9, n7, n2, n5, n6, n5, n2, n3, n4, n3, n2, n1));
+		ArrayList<Node> ns = new ArrayList<>();
+		new ArrayList<>(Arrays.asList(n1, n2, n7, n8, n7, n9, n7, n2, n5, n6, n5, n2, n3, n4, n3, n2, n1)).forEach(c -> ns.add(new Node(c)));
 		s.strokeWeight(1);
 		s.stroke(0, 255, 0);
 		/*n1.draw(s);n2.draw(s);n3.draw(s);n4.draw(s);n5.draw(s);n6.draw(s);n7.draw(s);n8.draw(s);n9.draw(s);*/
@@ -559,5 +560,14 @@ public class Test {
 		s.noFill();
 		//Smoothing.bezierToArcs(b, 20).forEach(System.out::println);
 		//System.out.println();
+	}
+	public void test22() {
+		Arc a1 = new Arc(new Circle(200, height / 2f, 50), new Circle(100, height / 2f, 50), new Circle(300, height / 2f, 50), true, true);
+		Arc a2 = new Arc(new Circle(width - 200, height / 2f, 50), new Circle(width - 300, height / 2f, 50), new Circle(width - 100, height / 2f, 50), false, true);
+		a1.draw(s);
+		a2.draw(s);
+		Smoothing.connectArcs(a1, a2).forEach(a -> a.draw(s));
+		/*Bezier b = new Bezier(a1, a2);
+		b.draw(s);*/
 	}
 }

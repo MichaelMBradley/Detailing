@@ -1,3 +1,10 @@
+/*
+ * TODO: Seperate trees further
+ * TODO: Replace Bezier with multiple circles
+ * TODO: Remove large connective circles
+ * TODO: Replace valid circle packing band with probability zone
+ */
+
 import megamu.mesh.Delaunay;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -7,13 +14,6 @@ import processing.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
-/* TODO: Refactor to better conform to OOP principles
- * TODO: Seperate trees further
- * TODO: Replace Bezier with multiple circles
- * TODO: Remove large connective circles
- * TODO: Replace valid circle packing band with probability zone
- */
 
 public class Detailing extends PApplet {
 	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
@@ -27,8 +27,8 @@ public class Detailing extends PApplet {
 	private PShape shape;
 	private PVector offset;
 	
-	private final boolean doTest = true;
-	private final String commands = "cmnsx";//"amnx";
+	private final boolean doTest = false;
+	private final String commands = "amnx";//"cmnsx";//
 	
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
@@ -173,9 +173,11 @@ public class Detailing extends PApplet {
 		translate(offset.x, offset.y);
 		if(draw.get("zoom")) {
 			translate(w / (zoom * 2) - mouseX, h / (zoom * 2) - mouseY);
-			fill(0);
-			text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
-			noFill();
+			if(draw.get("numCircles")) {
+				fill(0);
+				text(String.format("Zoom: %.2f", zoom), 30 - offset.x, 50 - offset.y);
+				noFill();
+			}
 		}
 		if(draw.get("grid")) {
 			String msg = "";
@@ -244,6 +246,7 @@ public class Detailing extends PApplet {
 		// kruskal(aCircles);
 		// altTreeCreate(aCircles, vertices);
 		TreeCreation.treeNearest(aCircles, vertices);
+		TreeCreation.seperateBranches(aCircles);
 		System.out.printf("\tKruskal: %.3f\n", (float) (millis() - start) / 1000);
 		return circumcircles;
 	}
@@ -267,6 +270,7 @@ public class Detailing extends PApplet {
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
+			Smoothing.doubleCheck(traverseArcs);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
 			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
@@ -362,14 +366,12 @@ public class Detailing extends PApplet {
 		String[] names = new String[] {
 				"size",
 				"depth",
-				"hard",
 				"attempts",
 		};
 		float[][] params = new float[][] {
 				{1, 4, 15, 0.5f},
 				{1, 4, 15, 0.5f},
-				{0, 1, 1, 1},
-				{10, 3000, 5000, 10}
+				{50, 1000, 5000, 50}
 		};
 		for(int i = 0; i < names.length; i++) {
 			sliders.put(names[i],

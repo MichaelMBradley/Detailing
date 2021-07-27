@@ -11,6 +11,7 @@ import static processing.core.PConstants.TWO_PI;
 
 public class Smoothing {
 	public static ArrayList<Circle> spacedOutBezier(Bezier b, int num) {
+		// At least 4 recommended
 		ArrayList<Circle> circles = new ArrayList<>();
 		ArrayList<Float> dists = new ArrayList<>();
 		float r = b.distance() / (num * 2f);
@@ -22,14 +23,10 @@ public class Smoothing {
 		float past = -Float.MAX_VALUE;
 		for(Float next : lhm.keySet()) {
 			if(past != -Float.MAX_VALUE) {
-				for(int curr = 0; curr < dists.size(); curr++) {
-					if (lhm.get(past) < dists.get(curr) && dists.get(curr) < lhm.get(next)) {
+				for(Float dist : dists) {
+					if(lhm.get(past) < dist && dist < lhm.get(next)) {
 						circles.add(new Circle(PVector.lerp(b.pointAt(past), b.pointAt(next),
-								(dists.get(curr) - lhm.get(past)) / (lhm.get(next) - lhm.get(past))), r));
-						/*curr++;
-						if(curr == dists.size()) {
-							break;
-						}*/
+								(dist - lhm.get(past)) / (lhm.get(next) - lhm.get(past))), r));
 					}
 				}
 			}
@@ -37,15 +34,38 @@ public class Smoothing {
 		}
 		return circles;
 	}
-	
-	public static ArrayList<Arc> connectArcs(Arc from, Arc to, int num) {
+	public static ArrayList<Arc> connectArcs(Arc from, Arc to) {
 		ArrayList<Arc> arcs = new ArrayList<>();
-		if(num < 2) {
-			return arcs;
-		}
+		int num = (from.isClockwise() == to.isClockwise()) ? 3 : 2;
 		ArrayList<Circle> circles = spacedOutBezier(new Bezier(from, to), num);
-		
+		circles.set(0, Adjacent.getAdjacent(from, circles.get(1), circles.get(0).getR() * 1.1f, true)[from.isClockwise() ? 1 : 0]);
+		circles.set(circles.size() - 1, Adjacent.getAdjacent(circles.get(circles.size() - 2), to, circles.get(circles.size() - 2).getR() * 1.5f, true)[to.isClockwise() ? 1 : 0]);
+		from.setEndAngle(circles.get(0), false);
+		to.setStartAngle(circles.get(circles.size() - 1), false);
+		circles.add(0, from);
+		circles.add(to);
+		for(int i = 1; i < circles.size() - 1; i++) {
+			arcs.add(new Arc(circles.get(i), circles.get(i - 1), circles.get(i + 1), (i % 2 == 0) == from.isClockwise(), (i % 2 == 0) == from.isClockwise()));
+		}
 		return arcs;
+	}
+	
+	public static void doubleCheck(ArrayList<Curve> curves) {
+		Arc prev, next;
+		PVector end, beg;
+		for(int i = 0; i < curves.size(); i++) {
+			if(curves.get(i) instanceof Arc && curves.get((i + 2) % curves.size()) instanceof Arc) {
+				prev = (Arc) curves.get(i);
+				next = (Arc) curves.get((i + 2) % curves.size());
+				if(prev.overlaps(next)) {
+					/*end = prev.getEndPVector();
+					beg = next.getStartPVector();*/
+					curves.set(i, new Bezier(prev, next));//Adjacent.getAdjacent(new Circle(end), new Circle(beg), end.dist(beg), true)[0]);
+					curves.remove(i + 1);
+					curves.remove(i + 1);
+				}
+			}
+		}
 	}
 	
 	public static ArrayList<Curve> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
@@ -76,10 +96,10 @@ public class Smoothing {
 		}
 		return getBezier(arcs);
 	}
-	public static ArrayList<Arc> surroundingArcsTree(ArrayList<? extends Circle> nodes, boolean clockwise) {
+	public static ArrayList<Arc> surroundingArcsTree(ArrayList<Node> nodes, boolean clockwise) {
 		ArrayList<Arc> arcs = new ArrayList<>();
 		ArrayList<Circle> baseCircles = new ArrayList<>();
-		Circle closeCircle;
+		Circle closeCircle, p, q;
 		Arc prev, next;
 		float closeDist, test;
 		boolean tri, overlap = true;
@@ -89,7 +109,7 @@ public class Smoothing {
 		}
 		for(int i = 0; i < nodes.size(); i++) {
 			baseCircles.add(nodes.get(i));
-			baseCircles.add(Adjacent.getExterior(nodes.get(i), nodes.get(i == nodes.size() - 1 ? 0 : i + 1))[clockwise ? 1 : 0]);
+			baseCircles.add(Adjacent.getExterior(nodes.get(i), nodes.get((i + 1) % nodes.size()))[clockwise ? 1 : 0]);
 		}
 		baseCircles.remove(baseCircles.size() - 1);
 		while(overlap) {
@@ -126,13 +146,18 @@ public class Smoothing {
 	}
 	private static ArrayList<Curve> getBezier(ArrayList<Curve> arcs) {
 		int prev, next;
+		ArrayList<Arc> bezNew;
 		for(int i = 0; i < arcs.size(); i++) {
 			if(isNull(arcs.get(i))) {
 				prev = i == 0 ? arcs.size() - 1 : i - 1;
 				next = i == arcs.size() - 1 ? 0 : i + 1;
 				((Arc) arcs.get(prev)).setEndAngle((Arc) arcs.get(next), false);
 				((Arc) arcs.get(next)).setStartAngle((Arc) arcs.get(prev), false);
-				arcs.set(i, new Bezier(arcs.get(prev), arcs.get(next)));
+				//arcs.set(i, new Bezier(arcs.get(prev), arcs.get(next)));
+				bezNew = connectArcs((Arc) arcs.get(prev), (Arc) arcs.get(next));
+				arcs.remove(i);
+				arcs.addAll(i, bezNew);
+				i += bezNew.size() - 1;
 				//arcs.set(i, new Clothoid(-8 * HALF_PI, 8 * HALF_PI, arcs.get(prev).getEndPVector(), arcs.get(next).getStartPVector()));
 				//arcs.set(i, ShapeFunctions.connectArcs(arcs.get(prev), arcs.get(next)));
 				//println(arcs.get(i) + "\t" + arcs.get(prev) + "\t" + arcs.get(next));

@@ -81,6 +81,24 @@ public class TreeCreation {
 		}
 	}
 	
+	public static void seperateBranches(HashSet<Node> nodes) {
+		ArrayList<Node> lstNodes = new ArrayList<>(nodes);
+		Node a, b;
+		float mult = 0.8f;
+		for(int i = 0; i < nodes.size() - 1; i++) {
+			for(int j = i + 1; j < nodes.size(); j++) {
+				a = lstNodes.get(i);
+				b = lstNodes.get(j);
+				if(a.distanceToCircle(b) < (a.getR() + b.getR()) / 8) {
+					a.move(PVector.sub(a.getPV(), b.getPV()).setMag(a.getR() * (1 - mult)));
+					b.move(PVector.sub(b.getPV(), a.getPV()).setMag(b.getR() * (1 - mult)));
+					a.setR(a.getR() * mult);
+					b.setR(b.getR() * mult);
+				}
+			}
+		}
+	}
+	
 	public static void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
 		/*
 		Creates trees based on the closest node touching the polyline to each node available.

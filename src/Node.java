@@ -20,6 +20,9 @@ public class Node extends Circle {
 		super(PVec, rad);
 		init();
 	}
+	public Node(Circle c) {
+		this(c.getPV(), c.getR());
+	}
 	public Node(PVector PVec) {
 		super(PVec);
 		init();
