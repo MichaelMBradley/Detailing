@@ -84,12 +84,13 @@ public class TreeCreation {
 	public static void seperateBranches(HashSet<Node> nodes) {
 		ArrayList<Node> lstNodes = new ArrayList<>(nodes);
 		Node a, b;
-		float mult = 0.8f;
-		for(int i = 0; i < nodes.size() - 1; i++) {
-			for(int j = i + 1; j < nodes.size(); j++) {
+		float mult = 0.5f;
+		for (int i = 0; i < nodes.size() - 1; i++) {
+			for (int j = i + 1; j < nodes.size(); j++) {
 				a = lstNodes.get(i);
 				b = lstNodes.get(j);
-				if(a.distanceToCircle(b) < (a.getR() + b.getR()) / 8) {
+				if (!a.getKruskal().contains(b) && a.distanceToCircle(b) < (a.getR() + b.getR()) / 8) {
+					//System.out.printf("%s\t%s\n", a, b);
 					a.move(PVector.sub(a.getPV(), b.getPV()).setMag(a.getR() * (1 - mult)));
 					b.move(PVector.sub(b.getPV(), a.getPV()).setMag(b.getR() * (1 - mult)));
 					a.setR(a.getR() * mult);

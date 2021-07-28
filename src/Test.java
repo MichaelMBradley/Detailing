@@ -562,12 +562,19 @@ public class Test {
 		//System.out.println();
 	}
 	public void test22() {
-		Arc a1 = new Arc(new Circle(200, height / 2f, 50), new Circle(100, height / 2f, 50), new Circle(300, height / 2f, 50), true, true);
-		Arc a2 = new Arc(new Circle(width - 200, height / 2f, 50), new Circle(width - 300, height / 2f, 50), new Circle(width - 100, height / 2f, 50), false, true);
+		Circle c1 = new Circle(200, height / 2f, 50);
+		Circle c2 = new Circle(width - 200, height / 2f, 50);
+		Arc a1 = new Arc(c1, c1.adjacent(PI, 0), c1.adjacent(QUARTER_PI, 0), true, true);
+		Arc a2 = new Arc(c2, c2.adjacent(-3 * QUARTER_PI, 0), c2.adjacent(0, 0), false, false);
 		a1.draw(s);
 		a2.draw(s);
-		Smoothing.connectArcs(a1, a2).forEach(a -> a.draw(s));
-		/*Bezier b = new Bezier(a1, a2);
-		b.draw(s);*/
+		Smoothing.connectArcs(a1, a2).forEach(a -> {
+			//a.draw(s);
+			a.drawCircle(s);
+			//System.out.println(a);
+		});
+		Bezier b = new Bezier(a1, a2);
+		b.draw(s);
+		//Smoothing.spacedOutBezier(b, 4).forEach(c -> c.draw(s));
 	}
 }

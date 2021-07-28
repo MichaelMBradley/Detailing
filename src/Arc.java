@@ -57,6 +57,9 @@ public class Arc extends Circle implements Curve {
 		clockwise = isClockwise;
 		connecting = connect;
 		anglesCalculated = false;
+		if(Float.isNaN(endAngleBase) || Float.isNaN(startAngleBase)) {
+			System.out.println("wtf bro");
+		}
 	}
 	
 	public void setStartAngle(Circle c, boolean offset) {
@@ -147,6 +150,9 @@ public class Arc extends Circle implements Curve {
 		getDrawingAngles();
 		if(getRange() > TWO_PI - 0.5f) {
 			return;
+		}
+		if(drawStart +TWO_PI < drawEnd) {
+			System.out.println(this);
 		}
 		sketch.arc(getX(), getY(), getR() * 2, getR() * 2, drawStart, drawEnd);
 		/*int colour = sketch.color(sketch.random(0, 255), sketch.random(0, 255), sketch.random(0, 255));

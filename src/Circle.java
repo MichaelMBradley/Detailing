@@ -96,6 +96,12 @@ public class Circle {
 	public void draw(PApplet sketch) {
 		sketch.circle(x, y, r * 2);  // p5 accepts diameter, not radius
 	}
+	public boolean hasNaN() {
+		return Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(r);
+	}
+	public boolean isNaN() {
+		return Float.isNaN(x) && Float.isNaN(y) && Float.isNaN(r);
+	}
 	
 	@Override public String toString() {
 		return String.format("(x: %.2f, y: %.2f, r: %.2f)", x, y, r);

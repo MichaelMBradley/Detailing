@@ -1,5 +1,6 @@
 import megamu.mesh.MPolygon;
 import megamu.mesh.Voronoi;
+import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -7,8 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Stack;
 
-import static processing.core.PApplet.max;
-import static processing.core.PApplet.min;
+import static processing.core.PApplet.*;
 import static processing.core.PConstants.TWO_PI;
 
 public class CirclePacking {
@@ -25,25 +25,35 @@ public class CirclePacking {
 				dists[i] = dists[i] + dists[i - 1];
 			}
 		}
-		float length, closestCircle;
+		float length, closestCircle, baseDist, nextDist;
 		PVector base, next;
 		int consecutiveFailed = 0;
 		Node test;
+		Circle testBase;
 		while(consecutiveFailed < numAttempts / circleSize) {
 			length = Helpers.random(dists[dists.length - 1]);
 			base = vertices.get(0);
+			baseDist = 0;
 			next = vertices.get(1);
+			nextDist = dists[0];
 			closestCircle = maxRadius;
 			for(int j = 0; j < dists.length; j++) {
 				if(dists[j] < length) {
+					baseDist = nextDist;
+					nextDist = dists[(j + 1) % dists.length];
 					base = vertices.get((j + 1) % vertices.size());
 					next = vertices.get((j + 2) % vertices.size());
 				} else {
 					break;
 				}
 			}
-			test = new Node(new Circle(PVector.lerp(base, next, Helpers.random(1f)), Helpers.random(cutoff))
-					.PVectorOnCircumference(Helpers.random(TWO_PI)));
+			testBase = new Circle(PVector.lerp(base, next, (length - baseDist) / (nextDist - baseDist)), 0);
+			if(testBase.distanceToCenter(base) < cutoff || testBase.distanceToCenter(next) < cutoff) {
+				testBase.setR(Helpers.random(cutoff * 1.1f));
+			} else {
+				testBase.setR(Helpers.random(cutoff));
+			}
+			test = new Node(testBase.PVectorOnCircumference(Helpers.random(TWO_PI)));
 			for(Node n : nodes) {
 				closestCircle = min(closestCircle, n.distanceToCircle(test));
 			}
@@ -56,6 +66,27 @@ public class CirclePacking {
 			}
 		}
 		return nodes;
+	}
+	public static void lineFillCutoff(ArrayList<PVector> vertices, float circleSize, float circleDepth, PApplet sketch) {
+		PVector max = ShapeFunctions.extremes(vertices)[1];
+		PVector prev, next, lerp;
+		float dist, mult, totalDist = 0;
+		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
+		float minRadius = maxRadius / 2;
+		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * circleDepth / 3);
+		sketch.fill(255, 200, 200);
+		sketch.noStroke();
+		for(int i = 0; i < vertices.size(); i++) {
+			prev = vertices.get(i);
+			next = vertices.get((i + 1) % vertices.size());
+			dist = prev.dist(next);
+			for(float j = 0; j < 1; j += (1f / dist)) {
+				totalDist ++;
+				lerp = PVector.lerp(prev, next, j);
+				mult = (min(lerp.dist(prev), lerp.dist(next)) < cutoff) ? 1.1f : 1f;
+				sketch.circle(lerp.x, lerp.y, (cutoff + maxRadius) * 2 * mult);// + cutoff * sin(totalDist / 10));
+			}
+		}
 	}
 	
 	public static HashSet<Node> randomFillAware(ArrayList<PVector> vertices, float circleSize, float circleDepth) {

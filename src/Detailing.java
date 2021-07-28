@@ -25,7 +25,7 @@ public class Detailing extends PApplet {
 	private float zoom = 2f;
 	private Test test;
 	private PShape shape;
-	private PVector offset;
+	private PVector offset, save;
 	
 	private final boolean doTest = false;
 	private final String commands = "amnx";//"cmnsx";//
@@ -76,6 +76,9 @@ public class Detailing extends PApplet {
 		if(doTest) {
 			test.run();
 		} else {
+			if(draw.get("boundary")) {
+				CirclePacking.lineFillCutoff(vertices, sliderVal("size"), sliderVal("depth"), this);
+			}
 			if(draw.get("numCircles")) {
 				fill(0);
 				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
@@ -128,6 +131,7 @@ public class Detailing extends PApplet {
 					iter = 0;
 				}
 			}
+			System.out.println(traverseArcs);
 			//noLoop();
 		}
 	}
@@ -166,6 +170,9 @@ public class Detailing extends PApplet {
 		if(draw.get("pause")) {
 			mouseX = pmouseX;
 			mouseY = pmouseY;
+			stroke(0);
+			strokeWeight(1);
+			point(save.x, save.y);
 		}
 		// Manages drawing the debug grid and the zoom/pan
 		int mx, my, og_mx = mouseX, og_my = mouseY;
@@ -243,8 +250,6 @@ public class Detailing extends PApplet {
 		circumcircles = ShapeFunctions.delaunayMeshToCircle(d, aCircles);
 		System.out.printf("\tTriangulation: %.3f\n", (float) (millis() - start) / 1000);
 		start = millis();
-		// kruskal(aCircles);
-		// altTreeCreate(aCircles, vertices);
 		TreeCreation.treeNearest(aCircles, vertices);
 		TreeCreation.seperateBranches(aCircles);
 		System.out.printf("\tKruskal: %.3f\n", (float) (millis() - start) / 1000);
@@ -270,11 +275,10 @@ public class Detailing extends PApplet {
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
-			Smoothing.doubleCheck(traverseArcs);
+			//Smoothing.doubleCheck(traverseArcs);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
 			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
-			//CirclePacking.comparePackings(this, vertices);
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
@@ -300,6 +304,9 @@ public class Detailing extends PApplet {
 			cmd = conv.get(key);
 			draw.replace(cmd, !draw.get(cmd));
 			println(cmd + ": " + draw.get(cmd));
+			if(conv.get(key).equals("pause")) {
+				save = new PVector(mouseX, mouseY);
+			}
 			loop();
 		} else {
 			mouseClicked();
@@ -339,6 +346,7 @@ public class Detailing extends PApplet {
 		// key, name, value
 		Object[][] cmd = new Object[][]{
 				{'a', "traversalArcs"},
+				{'b', "boundary"},
 				{'c', "circles"},
 				{'d', "delaunay"},
 				{'g', "grid"},
