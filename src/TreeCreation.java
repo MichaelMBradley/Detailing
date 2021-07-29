@@ -47,7 +47,7 @@ public class TreeCreation {
 	
 	public static void randomTreeCreate(HashSet<Node> nodes, ArrayList<PVector> vertices) {
 		/*
-		Creates trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
+		Create trees by starting at the polyline and randomly adding close unclaimed nodes to itself.
 		*/
 		HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);
 		HashSet<Node> valid;
@@ -102,7 +102,7 @@ public class TreeCreation {
 	
 	public static void treeNearest(HashSet<Node> nodes, ArrayList<PVector> vertices) {
 		/*
-		Creates trees based on the closest node touching the polyline to each node available.
+		Create trees based on the closest node touching the polyline to each node available.
 		Uses a random weighting to create variability in the size of the trees.
 		*/
 		HashSet<Node> touching = getNodesTouchingPolyline(nodes, vertices);

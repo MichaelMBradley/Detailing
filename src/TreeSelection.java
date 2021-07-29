@@ -20,7 +20,7 @@ public class TreeSelection {
 			MSTs.add(n.getKruskal());
 		}
 		options = MSTClosestNode(MSTs, vertices);
-		// Finding closest edge to node
+		// Finding the closest edge to the node
 		for(int i = 0; i < vertices.size(); i++) {
 			current = options.get(i);
 			while(!current.isEmpty()) {
@@ -54,7 +54,7 @@ public class TreeSelection {
 		for(int m = 0; m < vertices.size(); m++) {
 			options.add(new HashMap<>());
 		}
-		// Finding closest node to edge
+		// Finding the closest node to the edge
 		for(HashSet<Node> MST : MSTs) {
 			q = 0;
 			close = Float.MAX_VALUE;

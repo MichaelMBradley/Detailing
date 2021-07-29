@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Stack;
 
 import static processing.core.PApplet.*;
-import static processing.core.PConstants.TWO_PI;
 
 public class CirclePacking {
 	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float circleSize, float circleDepth, int numAttempts) {

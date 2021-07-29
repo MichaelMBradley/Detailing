@@ -9,7 +9,7 @@ public class Adjacent {
 	public static void condense(HashSet<Node> nodes) {
 		/*
 		Combine many graphs into one by moving the first graph
-		to be touching it's closest neighbour. Keeps doing this
+		to be touching its closest neighbour. Keeps doing this
 		until there is only one graph left.
 		*/
 		ArrayList<HashSet<Node>> graphs = createTouchingGraphs(nodes);
@@ -20,7 +20,7 @@ public class Adjacent {
 			closeBase = new Node();
 			closeNode = new Node();
 			closeDistance = Float.MAX_VALUE;  // Arbitrary large number
-			// Find closest node outside the first graph to the first graph
+			// Find the closest node outside the first graph to the first graph
 			for(Node n : graphs.get(0)) {  // For every node in the first graph
 				for(int i = 1; i < graphs.size(); i++) {
 					for(Node o : graphs.get(i)) {  // For every node not in the first graph
@@ -127,12 +127,14 @@ public class Adjacent {
 	public static Circle[] getExterior(Circle n1, Circle n2) {
 		float angle = PVector.sub(n2.getPV(), n1.getPV()).heading() + 0.01f;
 		float dist = n1.distanceToCenter(n2) / 2f;
-		return getAdjacent(n1, n2,
-				triCircleAdjacent(n1, n2,
-						new Circle(n1.getX() + dist * cos(angle),
-								n1.getY() + dist * sin(angle),
-								(n1.getR() + n2.getR()) / 3)//8)
-				)[0].getR(), true);
+		Circle f = new Circle(n1.getX() + dist * cos(angle),
+				n1.getY() + dist * sin(angle),
+				(n1.getR() + n2.getR()) / 3);//8
+		float r = triCircleAdjacent(n1, n2, f)[0].getR();
+		if(Float.isNaN(r)) {
+			r = (n1.getR() + n2.getR()) / 2f;
+		}
+		return getAdjacent(n1, n2, r, true);
 	}
 	public static Circle getExteriorSafe(Circle from, Circle to, boolean clockwise) {
 		return getExteriorSafe(from, to)[clockwise ? 1 : 0];
@@ -188,12 +190,14 @@ public class Adjacent {
 		//	0.01 -> straight line (breaks at 0)
 		//	1.00 -> normal triCircleAdjacent()
 		float dist = lockStart.distanceToCenter(lockEnd);
-		return triCircleAdjacent(lockStart,
-				new Circle(PVector.lerp(
-								PVector.lerp(lockStart.getPV(), lockEnd.getPV(), (lockStart.getR() / dist)),
-								PVector.lerp(lockEnd.getPV(), lockStart.getPV(), (lockEnd.getR() / dist)),
-								0.5f).lerp(mid.getPV(), lerpFactor),
-						mid.getR()),
-				lockEnd);
+		Circle newMid = new Circle(PVector.lerp(
+				PVector.lerp(lockStart.getPV(), lockEnd.getPV(), (lockStart.getR() / dist)),
+				PVector.lerp(lockEnd.getPV(), lockStart.getPV(), (lockEnd.getR() / dist)),
+				0.5f).lerp(mid.getPV(), lerpFactor),
+				mid.getR());
+		if(newMid.contains(lockStart) || newMid.contains(lockEnd)) {
+			return triCircleAdjacent(lockStart, mid, lockEnd);
+		}
+		return triCircleAdjacent(lockStart, newMid, lockEnd);
 	}
 }

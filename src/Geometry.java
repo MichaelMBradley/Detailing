@@ -5,8 +5,6 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import static processing.core.PApplet.*;
-import static processing.core.PConstants.PI;
-import static processing.core.PConstants.TWO_PI;
 
 public class Geometry {
 	public static Arc arcLine(PVector p1, PVector p2) {

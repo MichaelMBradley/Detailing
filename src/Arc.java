@@ -57,9 +57,6 @@ public class Arc extends Circle implements Curve {
 		clockwise = isClockwise;
 		connecting = connect;
 		anglesCalculated = false;
-		if(Float.isNaN(endAngleBase) || Float.isNaN(startAngleBase)) {
-			System.out.println("wtf bro");
-		}
 	}
 	
 	public void setStartAngle(Circle c, boolean offset) {

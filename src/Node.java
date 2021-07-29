@@ -58,7 +58,7 @@ public class Node extends Circle {
 	public void graphing(Node n) {
 		/*
 		Tells every node it's touching to recursively run this code,
-		but only if it does not already have this node in it's graph
+		but only if it does not already have this node in its graph
 		(prevents and infinite recursive loop).
 		*/
 		if(!graph.contains(n)) {
@@ -140,7 +140,7 @@ public class Node extends Circle {
 	private ArrayList<Node> sortRelativeHeadings(ArrayList<Node> children, Node call, boolean clockwise) {
 		/*
 		Returns a mapping of children->heading, offset such that the parent
-		is the largest/smallest value (depending in clockwise) so that the
+		is the largest/smallest value (depending on clockwise) so that the
 		nodes may be traversed in order.
 		*/
 		HashMap<Float, Node> headings = new HashMap<>();

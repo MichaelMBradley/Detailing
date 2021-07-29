@@ -80,10 +80,9 @@ public class Smoothing {
 		}
 	}
 	
-	public static ArrayList<Curve> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
-		ArrayList<Curve> arcTree, arcs = new ArrayList<>();
+	public static ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
+		ArrayList<Arc> arcTree, arcs = new ArrayList<>();
 		Arc arc, newArc;
-		boolean out;
 		Node base = nodes.get(0);
 		ArrayList<ArrayList<Node>> trees = new ArrayList<>(Collections.singletonList(new ArrayList<>(Collections.singletonList(base))));
 		for(Node n : nodes.subList(1, nodes.size())) {
@@ -95,8 +94,7 @@ public class Smoothing {
 		}
 		for(ArrayList<Node> tree : trees) {
 			arcs.add(null);
-			out = exterior.contains(tree.get(0));
-			arcs.addAll(surroundingArcsTree(tree, out));
+			arcs.addAll(surroundingArcsTree(tree, exterior.contains(tree.get(0))));
 		}
 		for(int i = 0; i < arcs.size(); i++) {
 			if(isNull(arcs.get(i))) {
@@ -106,7 +104,7 @@ public class Smoothing {
 				}
 			}
 		}
-		return getBezier(arcs, false);
+		return connectArcTrees(arcs);
 	}
 	public static ArrayList<Arc> surroundingArcsTree(ArrayList<Node> nodes, boolean clockwise) {
 		ArrayList<Arc> arcs = new ArrayList<>();
@@ -122,9 +120,6 @@ public class Smoothing {
 		for(int i = 0; i < nodes.size(); i++) {
 			baseCircles.add(nodes.get(i));
 			baseCircles.add(Adjacent.getExterior(nodes.get(i), nodes.get((i + 1) % nodes.size()))[clockwise ? 1 : 0]);
-			if(baseCircles.get(baseCircles.size() - 1).isNaN() || baseCircles.get(baseCircles.size() - 2).isNaN()) {
-				System.out.println("mens))");
-			}
 		}
 		baseCircles.remove(baseCircles.size() - 1);
 		while(overlap) {
@@ -159,7 +154,24 @@ public class Smoothing {
 		}
 		return arcs;
 	}
-	private static ArrayList<Curve> getBezier(ArrayList<Curve> arcs, boolean onlyBezier) {
+	private static ArrayList<Arc> connectArcTrees(ArrayList<Arc> arcs) {
+		int prev, next;
+		ArrayList<Arc> bezNew;
+		for(int i = 0; i < arcs.size(); i++) {
+			if(isNull(arcs.get(i))) {
+				prev = i == 0 ? arcs.size() - 1 : i - 1;
+				next = i == arcs.size() - 1 ? 0 : i + 1;
+				arcs.get(prev).setEndAngle(arcs.get(next), false);
+				arcs.get(next).setStartAngle(arcs.get(prev), false);
+				bezNew = connectArcs(arcs.get(prev), arcs.get(next));
+				arcs.remove(i);
+				arcs.addAll(i, bezNew);
+				i += bezNew.size() - 1;
+			}
+		}
+		return arcs;
+	}
+	private static ArrayList<Curve> connectTrees(ArrayList<Curve> arcs, boolean onlyBezier) {
 		int prev, next;
 		ArrayList<Arc> bezNew;
 		for(int i = 0; i < arcs.size(); i++) {
@@ -181,6 +193,16 @@ public class Smoothing {
 		return arcs;
 	}
 	
+	public static ArrayList<Arc> interiorArcs(ArrayList<Arc> arcs) {
+		ArrayList<Arc> interior = new ArrayList<>();
+		Arc newArc;
+		for(Arc arc : arcs) {
+			newArc = new Arc(arc);
+			newArc.setR(newArc.getR() + (newArc.isConnecting() ? -0.5f : 0.5f));
+			interior.add(newArc);
+		}
+		return interior;
+	}
 	public static ArrayList<Curve> interiorCurves(ArrayList<Curve> curves) {
 		ArrayList<Curve> interior = new ArrayList<>();
 		Arc newArc;

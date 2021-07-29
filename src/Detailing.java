@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Detailing extends PApplet {
-	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
+	private ArrayList<Arc> traverseArcs, traverseArcsInterior;
 	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 	private ArrayList<PVector> vertices;
 	private ArrayList<Node> traverse;
@@ -117,9 +117,9 @@ public class Detailing extends PApplet {
 					colorMode(RGB, 255, 255, 255);
 				}
 				stroke(0);
-				for(Curve c : traverseArcs) {
-					if(draw.get("arcCircles") && c instanceof Arc) {
-						((Arc) c).drawCircle(this);
+				for(Arc c : traverseArcs) {
+					if(draw.get("arcCircles")) {
+						c.drawCircle(this);
 					} else {
 						c.draw(this);
 					}
@@ -131,7 +131,6 @@ public class Detailing extends PApplet {
 					iter = 0;
 				}
 			}
-			System.out.println(traverseArcs);
 			//noLoop();
 		}
 	}
@@ -201,18 +200,14 @@ public class Detailing extends PApplet {
 						}
 					}
 				} else if(draw.get("traversalArcs")) {
-					Arc arc;
 					float h;
-					for(Curve a : traverseArcs) {
-						if(a instanceof Arc) {
-							arc = (Arc) a;
-							h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
-							if(abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
-								mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
-								mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
-								msg = a.toString();
-								break;
-							}
+					for(Arc arc : traverseArcs) {
+						h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
+						if(abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
+							mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
+							mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
+							msg = arc.toString();
+							break;
 						}
 					}
 				}
@@ -276,7 +271,7 @@ public class Detailing extends PApplet {
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			//Smoothing.doubleCheck(traverseArcs);
-			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
+			traverseArcsInterior = Smoothing.interiorArcs(traverseArcs);
 			maxIter = traverseArcsInterior.size();
 			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
 		} else {

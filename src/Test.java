@@ -251,7 +251,7 @@ public class Test {
 	}
 	public void test7() {
 		/*
-		Mixing safe connections with good looking ones.
+		Mixing safe connections with good-looking ones.
 		*/
 		Circle n1 = new Circle(width / 2, height / 2, 50);
 		Circle n2 = new Circle(mouseX, mouseY, 25);

@@ -7,7 +7,7 @@ import static processing.core.PApplet.*;
 
 public class Circle {
 	@Getter @Setter private float x, y, r;
-	@Getter private PVector PV;
+	@Getter private final PVector PV;
 	
 	public Circle(float xPos, float yPos, float rad) {
 		x = xPos;
@@ -68,6 +68,9 @@ public class Circle {
 		return distanceToRadius(c.PV) - c.r;
 	}
 	
+	public boolean contains(Circle c) {
+		return distanceToCenter(c) + c.getR() <= r;
+	}
 	public boolean overlaps(Circle c) {
 		return distanceToCircle(c) < 0;
 	}
