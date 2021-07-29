@@ -37,7 +37,7 @@ Going clockwise around the polyline, here is the order in which my first algorit
 {: style="text-align:center"}
 ![Each node in a circle packing is visited.](https://raw.githubusercontent.com/MichaelMBradley/Detailing/main/docs/_assets/05-13/CompleteTraverse.gif)
 
-My algorithm still has bugs. As mentioned earlier, the tree selection algorithm is not great. As well, I attempt to traverse every exterior tree in a clockwise manner and every interior tree in a counter-clockwise manner but it seems like my current implementation is bugged.
+My algorithm still has bugs. As mentioned earlier, the tree selection algorithm is not great. As well, I attempt to traverse every exterior tree in a clockwise manner and every interior tree in a counter-clockwise manner, but it seems like my current implementation is bugged.
 
 Along the way I also fixed a bug preventing circles from generating at a small distance away from the exterior of the polyline. The circles can now be packed properly.
 
