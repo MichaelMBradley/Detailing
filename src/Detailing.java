@@ -289,6 +289,7 @@ public class Detailing extends PApplet {
 			test.keyPressed(key);
 		}
 		String cmd;
+		key = Character.toLowerCase(key);
 		if(key == 'h') {
 			StringBuilder out = new StringBuilder("Draw:\n");
 			for(char c : conv.keySet()) {
