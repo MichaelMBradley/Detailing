@@ -254,8 +254,8 @@ public class Detailing extends PApplet {
 		// Completes all relevant calculations
 		iter = 0;
 		if(!doTest) {
-			int start;
-			start = millis();
+			int total = millis();
+			int start = millis();
 			//nodes = CirclePacking.randomFillAware(vertices, sliderVal("size"), sliderVal("depth"));
 			nodes = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts"));
 			CirclePacking.reduce(nodes, 0.9f);
@@ -274,6 +274,7 @@ public class Detailing extends PApplet {
 			traverseArcsInterior = Smoothing.interiorArcs(traverseArcs);
 			maxIter = traverseArcsInterior.size();
 			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
+			System.out.printf("Total: %.3f\n", (float) (millis() - total) / 1000);
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
