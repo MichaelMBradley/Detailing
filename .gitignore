@@ -10,3 +10,5 @@ application.macosx
 *.class
 Detailing.iml
 .idea/
+report/
+out/
