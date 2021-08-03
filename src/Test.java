@@ -28,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test22();
+		test2();
 		update();
 	}
 	public void update() {
@@ -89,7 +89,7 @@ public class Test {
 		Circle n6 = new Circle(300, 480, 30);
 		Circle n7 = new Circle(400, 300, 50);
 		Circle n8 = new Circle(470, 230, 50);
-		Circle n9 = new Circle(470, 370, 50);//mouseX, mouseY, mouseX / 10f);//
+		Circle n9 = new Circle(mouseX, mouseY, 50);//470, 370, 50);//
 		/*
 		s.fill(0);
 		s.text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
@@ -119,11 +119,14 @@ public class Test {
 		/*
 		Attempts to create a safe (non-overlapping) intermediate circle.
 		*/
+		mouseX = 410;
+		mouseY = 500;
 		Circle n1 = new Circle(width / 2, height / 2, 50);
 		Circle n2 = new Circle(mouseX, mouseY, n1.getR());
 		Circle n3 = n2.adjacent(TWO_PI * mouseX / width, n2.getR());
+		//System.out.printf("(%.0f, %.0f)\n", mouseX, mouseY);
 		s.strokeWeight(1);s.stroke(127);
-		n1.draw(s);n2.draw(s);n3.draw(s);
+		//n1.draw(s);n2.draw(s);n3.draw(s);
 		/*for(Circle n : Smoothing.getExterior(n1, n2)) {
 			s.stroke(255, 0, 0);
 			n.draw(s);
@@ -136,7 +139,7 @@ public class Test {
 		Circle second = Adjacent.getExterior(n2, n1)[0];
 		Circle first2 = Adjacent.getExterior(n2, n3)[0];
 		Circle second2 = Adjacent.getExterior(n3, n2)[0];
-		first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
+		//first.draw(s);second.draw(s);first2.draw(s);second2.draw(s);
 		// a1 -> aFirst -> a2 -> aFirst2 -> a3 -> aSecond2 -> a2 -> aSecond -> a1
 		Arc a1 = new Arc(n1, second, first, false);
 		Arc aFirst = new Arc(first, n1, n2, true);
@@ -147,12 +150,19 @@ public class Test {
 		Arc a22 = new Arc(n2, second2, second, false);
 		Arc aSecond = new Arc(second, n2, n1, true);
 		s.strokeWeight(3);s.stroke(0);
-		a1.draw(s);a2.draw(s);a3.draw(s);a22.draw(s);aFirst.draw(s);aSecond.draw(s);aFirst2.draw(s);aSecond2.draw(s);
-		s.fill(0);
-		s.text("a22: "+a22, a22.getX(), a22.getY());
+		a1.draw(s);a3.draw(s);a22.draw(s);aSecond.draw(s);aSecond2.draw(s);
+		new Arc(Adjacent.getAdjacent(n1, n3, n1.distanceToCircle(n3) / 2, true)[0], n1, n3, true, false).draw(s);
+		/*s.stroke(255, 0, 0);
+		a2.draw(s);
+		s.stroke(0, 255, 0);
+		aFirst.draw(s);
+		s.stroke(0, 0, 255);
+		aFirst2.draw(s);*/
+		//s.fill(0);
+		//s.text("a22: "+a22, a22.getX(), a22.getY());
 		//s.text("a1: "+a1,a1.x,a1.y);s.text("a2: "+a2,a2.x,a2.y);s.text("a3: "+a3,a3.x,a3.y);
 		//s.text("aFirst: "+aFirst,aFirst.x,aFirst.y);s.text("aSecond: "+aSecond,aSecond.x,aSecond.y);s.text("aFirst2: "+aFirst2,aFirst2.x,aFirst2.y);s.text("aSecond2: "+aSecond2,aSecond2.x,aSecond2.y);
-		s.noFill();
+		//s.noFill();
 	}
 	public void test3() {
 		/*

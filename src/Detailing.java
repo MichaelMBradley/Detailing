@@ -1,10 +1,3 @@
-/*
- * TODO: Seperate trees further
- * TODO: Replace Bezier with multiple circles
- * TODO: Remove large connective circles
- * TODO: Replace valid circle packing band with probability zone
- */
-
 import megamu.mesh.Delaunay;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -52,6 +45,8 @@ public class Detailing extends PApplet {
 		// float[][] initVertices = {{12, 8}, {25, 8}, {16, 20}, {0, 10}, {8, 0}, {25, 2}};
 		// More complex vertices:
 		float[][] initVertices = {{0, 0}, {12, 0}, {12, 9}, {18, 9}, {12, 15}, {3, 12}};
+		// Invalid polyline test:
+		// float[][] initVertices = {{0, 0}, {12, 0}, {3, 12}, {12, 9}, {18, 9}, {12, 15}};
 		vertices = ShapeFunctions.toPVector(initVertices);
 		ShapeFunctions.scaleVertices((float) w / 30, vertices);
 		shape = ShapeFunctions.toShape(vertices, this);
