@@ -247,7 +247,7 @@ public class Detailing extends PApplet {
 		System.out.printf("\tTriangulation: %.3f\n", (float) (millis() - start) / 1000);
 		start = millis();
 		TreeCreation.treeNearest(aCircles, vertices);
-		//TreeCreation.seperateBranches(aCircles);
+		TreeCreation.separateBranches(aCircles);
 		System.out.printf("\tKruskal: %.3f\n", (float) (millis() - start) / 1000);
 		return circumcircles;
 	}

@@ -81,7 +81,7 @@ public class TreeCreation {
 		}
 	}
 	
-	public static void seperateBranches(HashSet<Node> nodes) {
+	public static void separateBranches(HashSet<Node> nodes) {
 		ArrayList<Node> lstNodes = new ArrayList<>(nodes);
 		Node a, b;
 		float mult = 0.5f;
