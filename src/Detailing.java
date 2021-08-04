@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Detailing extends PApplet {
-	private ArrayList<Arc> traverseArcs, traverseArcsInterior;
+	private ArrayList<Curve> traverseArcs, traverseArcsInterior;
 	private ArrayList<Circle> interiorCircumcircles, exteriorCircumcircles;
 	private ArrayList<PVector> vertices;
 	private ArrayList<Node> traverse;
@@ -71,6 +71,7 @@ public class Detailing extends PApplet {
 		if(doTest) {
 			test.run();
 		} else {
+			CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts")).forEach(c -> c.draw(this));
 			if(draw.get("boundary")) {
 				CirclePacking.lineFillCutoff(vertices, sliderVal("size"), sliderVal("depth"), this);
 			}
@@ -78,6 +79,8 @@ public class Detailing extends PApplet {
 				fill(0);
 				text(String.format("Circles: %d", nodes.size()), 30 - offset.x, 30 - offset.y);
 				noFill();
+			}
+			if(draw.get("sliders")) {
 				sliders.values().forEach(s -> s.draw(this));
 			}
 			if(draw.get("shape")) {
@@ -112,9 +115,9 @@ public class Detailing extends PApplet {
 					colorMode(RGB, 255, 255, 255);
 				}
 				stroke(0);
-				for(Arc c : traverseArcs) {
-					if(draw.get("arcCircles")) {
-						c.drawCircle(this);
+				for(Curve c : traverseArcs) {
+					if(draw.get("arcCircles") && c instanceof Arc) {
+						((Arc) c).drawCircle(this);
 					} else {
 						c.draw(this);
 					}
@@ -196,13 +199,17 @@ public class Detailing extends PApplet {
 					}
 				} else if(draw.get("traversalArcs")) {
 					float h;
-					for(Arc arc : traverseArcs) {
-						h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
-						if(abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
-							mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
-							mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
-							msg = arc.toString();
-							break;
+					Arc arc;
+					for(Curve c : traverseArcs) {
+						if(c instanceof Arc) {
+							arc = (Arc) c;
+							h = PVector.sub(new PVector(mouseX - offset.x, mouseY - offset.y), arc.getPV()).heading();
+							if (abs(arc.distanceToRadius(mx, my)) < 5 / 2f && arc.inRange(h)) {
+								mouseX = (int) (arc.getX() + cos(h) * arc.getR() + offset.x);
+								mouseY = (int) (arc.getY() + sin(h) * arc.getR() + offset.y);
+								msg = arc.toString();
+								break;
+							}
 						}
 					}
 				}
@@ -241,7 +248,7 @@ public class Detailing extends PApplet {
 		System.out.printf("\tTriangulation: %.3f\n", (float) (millis() - start) / 1000);
 		start = millis();
 		TreeCreation.treeNearest(aCircles, vertices);
-		TreeCreation.seperateBranches(aCircles);
+		//TreeCreation.seperateBranches(aCircles);
 		System.out.printf("\tKruskal: %.3f\n", (float) (millis() - start) / 1000);
 		return circumcircles;
 	}
@@ -251,7 +258,6 @@ public class Detailing extends PApplet {
 		if(!doTest) {
 			int total = millis();
 			int start = millis();
-			//nodes = CirclePacking.randomFillAware(vertices, sliderVal("size"), sliderVal("depth"));
 			nodes = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts"));
 			CirclePacking.reduce(nodes, 0.9f);
 			System.out.printf("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f\n",
@@ -265,8 +271,7 @@ public class Detailing extends PApplet {
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
-			//Smoothing.doubleCheck(traverseArcs);
-			traverseArcsInterior = Smoothing.interiorArcs(traverseArcs);
+			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
 			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
 			System.out.printf("Total: %.3f\n", (float) (millis() - total) / 1000);
@@ -317,7 +322,7 @@ public class Detailing extends PApplet {
 		}
 	}
 	@Override public void mouseDragged() {
-		if(draw.get("numCircles")) {
+		if(draw.get("sliders")) {
 			sliders.values().forEach(s -> s.update(mouseX - offset.x, mouseY - offset.y));
 		}
 	}
@@ -344,6 +349,7 @@ public class Detailing extends PApplet {
 				{'g', "grid"},
 				{'i', "iterate"},
 				{'k', "kruskal"},
+				{'l', "sliders"},
 				{'m', "gradient"},
 				{'n', "numCircles"},
 				{'o', "arcCircles"},

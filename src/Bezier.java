@@ -35,9 +35,11 @@ public class Bezier implements Curve {
 		p2 = p2in;
 	}
 	public Bezier(Curve from, Curve to) {
+		this(from, to, 0.75f);
+	}
+	public Bezier(Curve from, Curve to, float power) {
 		// Bezier connect
-		//float rF = pow(from.getSize(), 1.35f), rT = pow(to.getSize(), 1.35f);
-		float rF = pow(from.getSize(), 0.75f), rT = pow(to.getSize(), 0.75f);
+		float rF = pow(from.getSize(), power), rT = pow(to.getSize(), power);
 		p1 = from.getEndPVector();
 		c1 = Traversal.newRelative(p1, rF, from.getEndAngle());
 		p2 = to.getStartPVector();

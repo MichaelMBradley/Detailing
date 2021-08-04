@@ -130,7 +130,7 @@ public class TreeCreation {
 			}
 		}
 		for(Node g : touching) {
-			if(groups.get(g).size() == 1) {
+			if(groups.get(g).size() <= 2) {
 				dist = Float.MAX_VALUE;
 				for(Node t : touching) {
 					testDist = g.distanceToCircle(t);

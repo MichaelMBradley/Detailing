@@ -38,7 +38,8 @@ public class Smoothing {
 	public static ArrayList<Arc> connectArcs(Arc from, Arc to) {
 		ArrayList<Arc> arcs = new ArrayList<>();
 		Circle newCirc;
-		ArrayList<Circle> circles = spacedOutBezier(new Bezier(from, to), (from.isClockwise() == to.isClockwise()) ? 3 : 2);
+		ArrayList<Circle> circles = spacedOutBezier(new Bezier(from, to),
+				(from.isClockwise() == to.isClockwise()) ? 3 : 2);
 		if(circles.get(0).getR() > max(from.getR(), to.getR()) * 1.25f) {
 			circles = spacedOutBezier(new Bezier(from, to), (from.isClockwise() == to.isClockwise()) ? 5 : 4);
 		}
@@ -56,9 +57,30 @@ public class Smoothing {
 		circles.set(circles.size() - 1, newCirc);
 		circles.add(0, from);
 		circles.add(to);
+		boolean clockwise;
 		for(int i = 1; i < circles.size() - 1; i++) {
-			arcs.add(new Arc(circles.get(i), circles.get(i - 1), circles.get(i + 1), (i % 2 == 0) == from.isClockwise(), (i % 2 == 0) == from.isClockwise()));
+			clockwise = (i % 2 == 0) == from.isClockwise();
+			arcs.add(new Arc(circles.get(i), circles.get(i - 1), circles.get(i + 1), clockwise, clockwise));
 		}
+		return arcs;
+	}
+	public static ArrayList<Curve> connectArcsBezier(Arc from, Arc to) {
+		ArrayList<Curve> arcs = new ArrayList<>();
+		Circle newCirc;
+		ArrayList<Circle> circles = spacedOutBezier(new Bezier(from, to),
+				(from.isClockwise() == to.isClockwise()) ? 3 : 2);
+		if(circles.get(0).getR() > max(from.getR(), to.getR()) * 1.25f) {
+			circles = spacedOutBezier(new Bezier(from, to), (from.isClockwise() == to.isClockwise()) ? 5 : 4);
+		}
+		circles.add(0, from);
+		circles.add(to);
+		boolean clockwise;
+		for(int i = 1; i < circles.size() - 1; i++) {
+			clockwise = (i % 2 == 0) == from.isClockwise();
+			arcs.add(new Arc(circles.get(i), circles.get(i - 1), circles.get(i + 1), clockwise, clockwise));
+		}
+		arcs.set(0, new Bezier(from, arcs.get(1)));
+		arcs.set(arcs.size() - 1, new Bezier(arcs.get(arcs.size() - 2), to));
 		return arcs;
 	}
 	
@@ -80,8 +102,8 @@ public class Smoothing {
 		}
 	}
 	
-	public static ArrayList<Arc> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
-		ArrayList<Arc> arcTree, arcs = new ArrayList<>();
+	public static ArrayList<Curve> surroundingArcs(ArrayList<Node> nodes, HashSet<Node> exterior) {
+		ArrayList<Curve> arcTree, arcs = new ArrayList<>();
 		Arc arc, newArc;
 		Node base = nodes.get(0);
 		ArrayList<ArrayList<Node>> trees = new ArrayList<>(Collections.singletonList(new ArrayList<>(Collections.singletonList(base))));
@@ -104,7 +126,7 @@ public class Smoothing {
 				}
 			}
 		}
-		return connectArcTrees(arcs);
+		return connectTrees(arcs, false);
 	}
 	public static ArrayList<Arc> surroundingArcsTree(ArrayList<Node> nodes, boolean clockwise) {
 		ArrayList<Arc> arcs = new ArrayList<>();
@@ -173,7 +195,7 @@ public class Smoothing {
 	}
 	private static ArrayList<Curve> connectTrees(ArrayList<Curve> arcs, boolean onlyBezier) {
 		int prev, next;
-		ArrayList<Arc> bezNew;
+		ArrayList<Curve> bezNew;
 		for(int i = 0; i < arcs.size(); i++) {
 			if(isNull(arcs.get(i))) {
 				prev = i == 0 ? arcs.size() - 1 : i - 1;
@@ -183,7 +205,7 @@ public class Smoothing {
 				if(onlyBezier) {
 					arcs.set(i, new Bezier(arcs.get(prev), arcs.get(next)));
 				} else {
-					bezNew = connectArcs((Arc) arcs.get(prev), (Arc) arcs.get(next));
+					bezNew = connectArcsBezier((Arc) arcs.get(prev), (Arc) arcs.get(next));
 					arcs.remove(i);
 					arcs.addAll(i, bezNew);
 					i += bezNew.size() - 1;
