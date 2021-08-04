@@ -71,7 +71,6 @@ public class Detailing extends PApplet {
 		if(doTest) {
 			test.run();
 		} else {
-			CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts")).forEach(c -> c.draw(this));
 			if(draw.get("boundary")) {
 				CirclePacking.lineFillCutoff(vertices, sliderVal("size"), sliderVal("depth"), this);
 			}
