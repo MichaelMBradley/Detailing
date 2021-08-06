@@ -28,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test1();
+		test24();
 		update();
 	}
 	public void update() {
@@ -599,5 +599,39 @@ public class Test {
 		Bezier b = new Bezier(a1, a2);
 		b.draw(s);
 		//Smoothing.spacedOutBezier(b, 4).forEach(c -> c.draw(s));
+	}
+	public void test23() {
+		float r = 75f;
+		Circle c1 = new Circle(width / 2 - 100, height / 2, 75);
+		Circle c2 = new Circle(width / 2 + 150, height / 2, 125);
+		Circle i1 = new Circle(c1.getX(), c1.getY(), c1.getR() + r);
+		Circle i2 = new Circle(c2.getX(), c2.getY(), c2.getR() + r);
+		s.strokeWeight(3);
+		s.stroke(0);
+		c1.draw(s);
+		c2.draw(s);
+		s.stroke(255, 0, 0);
+		i1.draw(s);
+		i2.draw(s);
+		Arrays.stream(Adjacent.getAdjacent(c1, c2, r, true)).forEach(c -> {
+			s.strokeWeight(3);
+			s.stroke(0, 255, 0);
+			c.draw(s);
+			s.strokeWeight(10);
+			s.stroke(0, 0, 255);
+			s.point(c.getX(), c.getY());
+		});
+	}
+	public void test24() {
+		Circle c1 = new Circle(width / 2 - 125, height / 2, 50);
+		Circle c2 = new Circle(width / 2 + 75, height / 2, 75);
+		Circle c3 = new Circle((c1.getX() + c2.getX()) / 2f, 1 + (c1.getY() + c2.getY()) / 2f, (c1.getR() + c2.getR()) / 8f);
+		s.strokeWeight(3);
+		s.stroke(0);
+		c1.draw(s);
+		c2.draw(s);
+		c3.draw(s);
+		s.stroke(255, 0, 0);
+		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3)).forEach(c -> c.draw(s));
 	}
 }
