@@ -28,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test2();
+		test1();
 		update();
 	}
 	public void update() {
@@ -89,7 +89,7 @@ public class Test {
 		Circle n6 = new Circle(300, 480, 30);
 		Circle n7 = new Circle(400, 300, 50);
 		Circle n8 = new Circle(470, 230, 50);
-		Circle n9 = new Circle(mouseX, mouseY, 50);//470, 370, 50);//
+		Circle n9 = new Circle(470, 370, 50);//mouseX, mouseY, 50);//
 		/*
 		s.fill(0);
 		s.text(1 + "\n" + n1.x + " " + n1.y, n1.x, n1.y);
@@ -108,10 +108,23 @@ public class Test {
 		s.strokeWeight(1);
 		s.stroke(0, 255, 0);
 		/*n1.draw(s);n2.draw(s);n3.draw(s);n4.draw(s);n5.draw(s);n6.draw(s);n7.draw(s);n8.draw(s);n9.draw(s);*/
-		s.strokeWeight(1);
+		s.strokeWeight(3);
 		s.stroke(0);
 		ArrayList<Arc> arcs = Smoothing.surroundingArcsTree(ns, true);
-		for(int i = 0; i < arcs.size() * percentX; i++) {
+		for(int i = 0; i < arcs.size(); i++) {
+			if(i % 2 == 0) {
+				s.stroke(200, 255, 200);
+			} else {
+				s.stroke(255, 200, 200);
+			}
+			arcs.get(i).drawCircle(s);
+		}
+		for(int i = 0; i < arcs.size(); i++) {
+			if(i % 2 == 0) {
+				s.stroke(0, 63, 0);
+			} else {
+				s.stroke(63, 0, 0);
+			}
 			arcs.get(i).draw(s);
 		}
 	}

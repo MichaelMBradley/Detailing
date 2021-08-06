@@ -21,7 +21,7 @@ public class Detailing extends PApplet {
 	private PVector offset, save;
 	
 	private final boolean doTest = false;
-	private final String commands = "amnx";//"cmnsx";//
+	private final String commands = "a";
 	
 	private HashMap<Character, String> conv;
 	private HashMap<String, Boolean> draw;
@@ -52,16 +52,17 @@ public class Detailing extends PApplet {
 		shape = ShapeFunctions.toShape(vertices, this);
 		offset = Helpers.calcOffset(vertices, w, h, doTest);
 		initializeSliders();
-		calc();
 		if(doTest) {
 			println("Test mode");
+		} else {
+			StringBuilder init = new StringBuilder();
+			for (char c : commands.toCharArray()) {
+				init.append(conv.get(c)).append(", ");
+			}
+			System.out.printf("Circle:\n\tSize: %.1f\n\tDepth: %.1f\nInitial settings (press 'h' for full list):\n%s\n\n",
+					sliderVal("size"), sliderVal("depth"), init);
+			calc();
 		}
-		StringBuilder init = new StringBuilder();
-		for(char c : commands.toCharArray()) {
-			init.append(conv.get(c)).append(", ");
-		}
-		System.out.printf("\nCircle:\n\tSize: %.1f\n\tDepth: %.1f\nInitial settings (press 'h' for full list):\n%s\n",
-				sliderVal("size"), sliderVal("depth"), init);
 	}
 	
 	@Override public void draw() {
@@ -86,6 +87,13 @@ public class Detailing extends PApplet {
 				stroke(0);
 				strokeWeight(1);
 				shape(shape, 0, 0);
+			}
+			if(draw.get("purePacking")) {
+				HashSet<Node> fill = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("relMinSize"), sliderVal("depth"), (int) sliderVal("attempts"));
+				fill(0);
+				text(fill.size(), -150, -180);
+				noFill();
+				fill.forEach(c -> c.draw(this));
 			}
 			drawNodes(interior, interiorCircumcircles, draw.get("circles"));
 			drawNodes(exterior, exteriorCircumcircles, draw.get("circles"));
@@ -257,23 +265,27 @@ public class Detailing extends PApplet {
 		if(!doTest) {
 			int total = millis();
 			int start = millis();
-			nodes = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("depth"), (int) sliderVal("attempts"));
+			nodes = CirclePacking.lineFill(vertices, sliderVal("size"), sliderVal("relMinSize"), sliderVal("depth"), (int) sliderVal("attempts"));
 			CirclePacking.reduce(nodes, 0.9f);
 			System.out.printf("Packing (rejection): %.3f\tCircles: %d\tCirc/Sec: %.2f\n",
 					(millis() - start) / 1000f, nodes.size(), nodes.size() / ((millis() - start) / 1000f));
+			start = millis();
 			println("-Interior-");
 			interior = Traversal.containing(vertices, nodes, true);
 			interiorCircumcircles = analyze(interior);
 			println("-Exterior-");
 			exterior = Traversal.containing(vertices, nodes, false);
 			exteriorCircumcircles = analyze(exterior);
+			System.out.printf("Tree Generation: %.3f\n", (float) (millis() - start) / 1000);
 			start = millis();
 			traverse = TreeSelection.traverseTreesBase(nodes, vertices, true);
+			System.out.printf("Tree Traversal: %.3f\n", (float) (millis() - start) / 1000);
+			start = millis();
 			traverseArcs = Smoothing.surroundingArcs(traverse, exterior);
 			traverseArcsInterior = Smoothing.interiorCurves(traverseArcs);
 			maxIter = traverseArcsInterior.size();
-			System.out.printf("Traversal: %.3f\n", (float) (millis() - start) / 1000);
-			System.out.printf("Total: %.3f\n", (float) (millis() - total) / 1000);
+			System.out.printf("Arc Generation: %.3f\n", (float) (millis() - start) / 1000);
+			System.out.printf("Total: %.3f\n\n", (float) (millis() - total) / 1000);
 		} else {
 			nodes = new HashSet<>();
 			interiorCircumcircles = new ArrayList<>();
@@ -313,10 +325,7 @@ public class Detailing extends PApplet {
 	}
 	@Override public void mouseClicked() {
 		if(!doTest) {
-			if(draw.get("numCircles") &&
-					!(sliders.get("size").update(mouseX, mouseY) || sliders.get("depth").update(mouseX, mouseY))) {
-				calc();
-			}
+			calc();
 			loop();
 		}
 	}
@@ -345,6 +354,7 @@ public class Detailing extends PApplet {
 				{'b', "boundary"},
 				{'c', "circles"},
 				{'d', "delaunay"},
+				{'e', "purePacking"},
 				{'g', "grid"},
 				{'i', "iterate"},
 				{'k', "kruskal"},
@@ -370,12 +380,14 @@ public class Detailing extends PApplet {
 		sliders = new HashMap<>();
 		String[] names = new String[] {
 				"size",
+				"relMinSize",
 				"depth",
 				"attempts",
 		};
 		float[][] params = new float[][] {
-				{1, 4, 15, 0.5f},
-				{1, 4, 15, 0.5f},
+				{1, 8, 15, 0.5f},
+				{0.1f, 0.5f, 1, 0.1f},
+				{1, 6, 15, 0.5f},
 				{50, 1000, 5000, 50}
 		};
 		for(int i = 0; i < names.length; i++) {

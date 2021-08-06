@@ -11,12 +11,11 @@ import java.util.Stack;
 import static processing.core.PApplet.*;
 
 public class CirclePacking {
-	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float circleSize, float circleDepth, int numAttempts) {
+	public static HashSet<Node> lineFill(ArrayList<PVector> vertices, float maxRadius, float relMinRadius, float circleDepth, int numAttempts) {
 		PVector max = ShapeFunctions.extremes(vertices)[1];
 		HashSet<Node> nodes = new HashSet<>();
-		float maxRadius = max(max.x, max.y) / (60 * circleSize) * 4;
-		float minRadius = maxRadius / 2;
-		float cutoff = ((max.x + max.y + maxRadius * 8) / 60) * (2 * circleDepth / 3);
+		float minRadius = maxRadius * relMinRadius;
+		float cutoff = maxRadius * circleDepth;
 		float[] dists = new float[vertices.size()];
 		for(int i = 0; i < dists.length; i++) {
 			dists[i] = PVector.dist(vertices.get(i), vertices.get((i + 1) % vertices.size()));
@@ -29,7 +28,7 @@ public class CirclePacking {
 		int consecutiveFailed = 0;
 		Node test;
 		Circle testBase;
-		while(consecutiveFailed < numAttempts / circleSize) {
+		while(consecutiveFailed < numAttempts) {
 			length = Helpers.random(dists[dists.length - 1]);
 			base = vertices.get(0);
 			baseDist = 0;
@@ -265,7 +264,7 @@ public class CirclePacking {
 			nodes = randomFillAware(vertices, d.sliderVal("size"), d.sliderVal("depth"), num);
 			System.out.printf("%s\t\t%.2f\t%d", strNum, (d.millis() - t) / 1000f, nodes.size());
 			t = d.millis();
-			nodes = lineFill(vertices, d.sliderVal("size"), d.sliderVal("depth"), num);
+			nodes = lineFill(vertices, d.sliderVal("size"), d.sliderVal("relMinSize"), d.sliderVal("depth"), num);
 			System.out.printf("\t\t%.2f\t%d\n", (d.millis() - t) / 1000f, nodes.size());
 		}
 	}
