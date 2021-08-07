@@ -1,3 +1,10 @@
+/*
+ * This is the main file.
+ * There is a lot of old code that I've moved on from, but the important methods are referenced in this file.
+ * Most of this file consists of code that I used to better bugfix and visualise my code.
+ * As it wasn't directly relevant to the project, I didn't talk about it in my blog or report.
+ */
+
 import megamu.mesh.Delaunay;
 import processing.core.PApplet;
 import processing.core.PShape;

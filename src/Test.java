@@ -28,7 +28,7 @@ public class Test {
 	}
 	
 	public void run() {
-		test24();
+		test1();
 		update();
 	}
 	public void update() {
@@ -121,9 +121,9 @@ public class Test {
 		}
 		for(int i = 0; i < arcs.size(); i++) {
 			if(i % 2 == 0) {
-				s.stroke(0, 63, 0);
+				s.stroke(0, 127, 0);
 			} else {
-				s.stroke(63, 0, 0);
+				s.stroke(127, 0, 0);
 			}
 			arcs.get(i).draw(s);
 		}
@@ -630,6 +630,7 @@ public class Test {
 		s.stroke(0);
 		c1.draw(s);
 		c2.draw(s);
+		s.stroke(0, 255, 0);
 		c3.draw(s);
 		s.stroke(255, 0, 0);
 		Arrays.stream(Adjacent.triCircleAdjacent(c1, c2, c3)).forEach(c -> c.draw(s));
